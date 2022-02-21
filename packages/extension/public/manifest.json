@@ -23,8 +23,8 @@
     "48": "/static/img/icon48.png",
     "128": "/static/img/icon128.png"
   },
-  "web_accessible_resources": ["/static/css/styles.css", "/static/img/*"],
-  "content_security_policy": "script-src 'self' 'sha256-GgRxrVOKNdB4LrRsVPDSbzvfdV4UqglmviH9GoBJ5jk='; object-src 'self'",
+  "web_accessible_resources": ["/static/css/annotator.css", "/static/css/styles.css", "/static/img/*"],
+  "content_security_policy":  "script-src 'self'; object-src 'self'",
   "options_ui": {
     "page": "options.html"
   },
