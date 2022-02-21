@@ -1,38 +1,6 @@
 import classnames from 'classnames';
 import React from 'react';
-import { LabeledButton } from './buttons';
 import CreateTermFromAnnotation from './CreateTermFromAnnotation';
-import Icon from './Icon';
-
-/**
- * @param {object} props
- *  @param {number} [props.badgeCount]
- *  @param {string} [props.icon]
- *  @param {string} props.label
- *  @param {() => any} props.onClick
- *  @param {string|null} props.shortcut
- */
- function ToolbarButton({ badgeCount, icon, label, onClick, shortcut }) {
-  // useShortcut(shortcut, onClick);
-
-  const title = shortcut ? `${label} (${shortcut})` : label;
-
-  return (
-    <LabeledButton
-      classes="LabeledIconButton AdderToolbar__button"
-      icon={icon}
-      onClick={onClick}
-      title={title}
-    >
-      {typeof badgeCount === 'number' && (
-        <span className="hyp-u-bg-color--grey-7 AdderToolbar__badge">
-          {badgeCount}
-        </span>
-      )}
-      <span className="LabeledIconButton__label">{label}</span>
-    </LabeledButton>
-  );
-}
 
 /**
  * Union of possible toolbar commands.
