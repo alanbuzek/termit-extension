@@ -1,9 +1,12 @@
-import axios from 'axios';
-import { MessageType } from '../types';
+import "regenerator-runtime/runtime.js";
+import { MessageType } from "../types";
 // import { JSDOM } from 'jsdom';
+
+console.log("executing listener");
 
 // handles request from content scripts
 function addListeners() {
+  console.log("adding listeners");
   chrome.runtime.onMessage.addListener(handleMessages);
 }
 
@@ -19,57 +22,49 @@ const sumResult = {
     failures: 0,
     overselectedFailures: 0,
   },
-}
+};
 
 addListeners();
 
 function handleMessages(message, sender, sendResponse) {
-  switch (message.type) {
-    case MessageType.GetAnnotations: {
-      const { pageHtml } = message.payload;
+  console.log("got handle message: ", message, "sendResponse: ", sendResponse);
 
-      axios
-        .post('http://localhost:8080/annotate?enableKeywordExtraction=true', {
-          content: pageHtml,
-          vocabularyRepository:
-            'http://onto.fel.cvut.cz/ontologies/slovník/agendový/popis-dat/pojem/slovník',
-          vocabularyContexts: [],
-          language: 'cs',
-        })
-        .then((res) => {
-          console.log('got response')
-          
-          sendResponse({ data: res.data })
-          // console.log('before virtual dom: ')
-          // const virtualDom = new JSDOM(res.data.annotatedDocument);
-          // console.log('after')
-        })
-        .catch((err) => sendResponse({ error: err || true }));
+  fetch("http://localhost:8080/annotate?enableKeywordExtraction=true", {
+    method: "POST",
+    mode: "cors", // no-cors, *cors, same-origin
+    cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
+    credentials: "same-origin", // include, *same-origin, omit
+    headers: {
+      "Content-Type": "application/json",
+      // 'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    redirect: "follow", // manual, *follow, error
+    referrerPolicy: "no-referrer", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+    body: JSON.stringify({
+      content: message.payload.pageHtml,
+      vocabularyRepository:
+        "http://onto.fel.cvut.cz/ontologies/slovník/agendový/popis-dat/pojem/slovník",
+      vocabularyContexts: [],
+      language: "cs",
+    }), // body data type must match "Content-Type" header
+  })
+    .then((res) => {
+      console.log("got response, res: ", res);
 
-      return true;
-    }
-    case MessageType.SaveAnnotaionResult: {
-      const { result } = message.payload;
-
-      annotationResults[result.url] = result;
-
-      let success = 0;
-      sumResult.highlights.failures += result.highlights.failures; 
-      sumResult.highlights.successes += result.highlights.successes; 
-      sumResult.highlights.overselectedFailures += result.highlights.overselectedFailures; 
-      sumResult.selectors.failures += result.selectors.failures; 
-      sumResult.selectors.successes += result.selectors.successes; 
-      sumResult.selectors.overselectedFailures += result.selectors.overselectedFailures; 
-
-      console.log('current result: ', result);
-      console.log('sumResults: ', sumResult);
-      console.log('annotationResults: ', annotationResults);
-
-      return true;
-    }
-    default:
-      console.error('Unknown MessageType');
-  }
+      return res.json();
+      // console.log('before virtual dom: ')
+      // const virtualDom = new JSDOM(res.data.annotatedDocument);
+      // console.log('after')
+    })
+    .then((res) => {
+      console.log("res: ", res);
+      sendResponse({ data: res });
+    })
+    .catch(
+      (err) => sendResponse({ error: "here" })
+      // sendResponse({ error: err || true })
+    );
+  console.log("past post");
 
   return true;
 }

@@ -3,18 +3,18 @@
   "name": "Termit Extension",
   "description": "Termit annotations anywhere on the web",
   "version": "0.0.1",
-  "manifest_version": 2,
+  "manifest_version": 3,
   "background": {
-    "scripts": ["/static/js/background.js"]
+    "service_worker": "/static/js/background.js"
   },
-  "browser_action": {
+  "action": {
     "default_popup": "popup.html",
     "default_icon": "/static/img/icon16.png"
   },
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "css": [],
+      "css": ["/static/css/content.css"],
       "js": ["/static/js/content.js"]
     }
   ],
@@ -23,10 +23,26 @@
     "48": "/static/img/icon48.png",
     "128": "/static/img/icon128.png"
   },
-  "web_accessible_resources": ["/static/css/annotator.css", "/static/css/styles.css", "/static/img/*"],
-  "content_security_policy":  "script-src 'self'; object-src 'self'",
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "/static/css/bootstrap-termit.css",
+        "/static/css/annotator.css",
+        "/static/css/styles.css",
+        "/static/img/*"
+      ],
+      "matches": ["<all_urls>"],
+      "extension_ids": ["fcjdbebldbibeepgebafdghhdcneeaip"]
+    }
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  },
   "options_ui": {
     "page": "options.html"
   },
-  "permissions": ["tabs"]
+  "permissions": ["tabs", "storage"],
+  "host_permissions": [
+    "*://*/*"
+  ]
 }

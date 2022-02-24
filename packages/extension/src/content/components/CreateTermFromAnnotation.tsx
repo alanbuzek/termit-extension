@@ -1,16 +1,9 @@
 import * as React from "react";
 // import withI18n, { HasI18n } from "../hoc/withI18n";
 // import Term, { TermData } from "../../model/Term";
-import {
-  // Button,
-  ButtonToolbar,
-  Col,
-  Modal,
-  ModalBody,
-  ModalHeader,
-  Row,
-} from "reactstrap";
-import Button from './Button';
+import SelectionPurposeDialog from "../../common/SelectionPurposeDialog";
+import TermOccurrenceAnnotation from "../../common/TermOccurrenceAnnotation";
+import Button from "./Button";
 // import TermMetadataCreateForm from "../term/TermMetadataCreateForm";
 // import { injectIntl } from "react-intl";
 // import { createTerm } from "../../action/AsyncTermActions";
@@ -72,24 +65,50 @@ export class CreateTermFromAnnotation extends React.Component {
     const i18n = this.props.i18n;
     // const invalid = !isTermValid(this.state, this.state.labelExists);
     const invalid = false;
+
+    const mockTermOccurrenceAnnotationProps = {
+      target: "id4540-5",
+      term: null,
+      score: "1.0",
+      text: "Obec",
+      annotationClass: "suggested-term-occurrence",
+      annotationOrigin: "proposed-occurrence",
+      isOpen: true,
+      onRemove: () => 0,
+      onSelectTerm: () => 0,
+      onCreateTerm: () => 0,
+      onToggleDetailOpen: () => 0,
+      onClose: () => 0,
+    };
     return (
-          <div className="flex">
-              <Button
-                id="create-term-submit"
-                onClick={this.onSave}
-                disabled={invalid}
-                className="mr-2"
-              >
-                Add
-              </Button>
-              <Button
-                id="create-term-cancel"
-                onClick={this.onCancel}
-                color="secondary"
-              >
-                Close
-              </Button>
-          </div>
+      // <div className="flex">
+      //     <Button
+      //       id="create-term-submit"
+      //       onClick={this.onSave}
+      //       disabled={invalid}
+      //       className="mr-2"
+      //     >
+      //       Add
+      //     </Button>
+      //     <Button
+      //       id="create-term-cancel"
+      //       onClick={this.onCancel}
+      //       color="secondary"
+      //     >
+      //       Close
+      //     </Button>
+      // </div>
+
+
+      // <SelectionPurposeDialog
+      //   show
+      //   onCreateTerm={() => 0}
+      //   onMarkOccurrence={() => 0}
+      //   onMarkDefinition={() => 0}
+      //   onCancel={() => 0}
+      // />
+
+      <TermOccurrenceAnnotation {...mockTermOccurrenceAnnotationProps} />
     );
   }
 }

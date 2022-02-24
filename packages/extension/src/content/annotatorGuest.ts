@@ -155,11 +155,11 @@ export default class AnnotatorGuest {
     });
 
     this._selectionObserver = new SelectionObserver(range => {
-      // console.log('selection observer callback called')
+      console.log('selection observer callback called: ', range);
       if (range) {
+        this._onClearSelection();
         this._onSelection(range);
       } else {
-        this._onClearSelection();
       }
     });
 
@@ -731,14 +731,28 @@ export default class AnnotatorGuest {
 //   }
 
   /**
+   * AB: this should handle click on annotation?
+   * @param tags 
+   * @param toggle 
+   */
+  selectAnnotations(tags, toggle = false) {
+    if (toggle) {
+      this._sidebarRPC.call('toggleAnnotationSelection', tags);
+    } else {
+      this._sidebarRPC.call('showAnnotations', tags);
+    }
+    this._sidebarRPC.call('openSidebar');
+  }
+
+  /**
    * Set whether highlights are visible in the document or not.
    *
    * @param {boolean} visible
    */
-//   setHighlightsVisible(visible) {
-//     setHighlightsVisible(this.element, visible);
-//     this._highlightsVisible = visible;
-//   }
+  setHighlightsVisible(visible) {
+    setHighlightsVisible(this.element, visible);
+    this._highlightsVisible = visible;
+  }
 
   /**
    * Attempt to fit the document content alongside the sidebar.
