@@ -2,6 +2,7 @@ import * as React from "react";
 // import withI18n, { HasI18n } from "../hoc/withI18n";
 // import Term, { TermData } from "../../model/Term";
 import SelectionPurposeDialog from "../../common/SelectionPurposeDialog";
+import TermDefinitionAnnotation from "../../common/TermDefinitionAnnotation";
 import TermOccurrenceAnnotation from "../../common/TermOccurrenceAnnotation";
 import Button from "./Button";
 // import TermMetadataCreateForm from "../term/TermMetadataCreateForm";
@@ -80,6 +81,16 @@ export class CreateTermFromAnnotation extends React.Component {
       onToggleDetailOpen: () => 0,
       onClose: () => 0,
     };
+    const termDefinitionMockProps = {
+      target: "idphu3n",
+      term: null,
+      text: "Drnholec",
+      isOpen: true,
+      onRemove: () => 0,
+      onSelectTerm: () => 0,
+      onToggleDetailOpen: () => 0,
+      onClose: () => 0,
+    };
     return (
       // <div className="flex">
       //     <Button
@@ -99,6 +110,7 @@ export class CreateTermFromAnnotation extends React.Component {
       //     </Button>
       // </div>
 
+      // 1. selection purpose dialog
 
       // <SelectionPurposeDialog
       //   show
@@ -108,7 +120,13 @@ export class CreateTermFromAnnotation extends React.Component {
       //   onCancel={() => 0}
       // />
 
-      <TermOccurrenceAnnotation {...mockTermOccurrenceAnnotationProps} />
+      // 2. term occurrence annotation
+      // <TermOccurrenceAnnotation {...mockTermOccurrenceAnnotationProps} />
+
+      // 3.
+      <TermDefinitionAnnotation
+        {...termDefinitionMockProps}
+      />
     );
   }
 }

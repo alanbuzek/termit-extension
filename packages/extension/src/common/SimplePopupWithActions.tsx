@@ -1,6 +1,6 @@
 import * as React from "react";
 import { ButtonToolbar } from "reactstrap";
-import { Popover, PopoverBody, PopoverHeader } from '../SelectionPurposeDialog';
+import { Popover, PopoverBody, PopoverHeader } from './SelectionPurposeDialog';
 
 interface PopupWithActionsProps {
   title: string;

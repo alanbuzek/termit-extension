@@ -31,6 +31,7 @@ import {
   createTermValueRenderer,
 } from "./mics/treeselect/Renderers";
 import { HasI18n } from "./components/hoc/withI18n";
+import { useI18n } from './components/hook/useI18n';
 
 type Term = any;
 
@@ -212,8 +213,8 @@ const mockProps = {
   counter: 0,
 };
 
-const wrapWithProps = Component => ({ ...props }) => (
-  <Component {...props} {...mockProps} />
-);
+const wrapWithProps = Component => ({ ...props }) => {
+  return <Component {...props} {...mockProps} />
+};
 
 export default wrapWithProps(AnnotationTerms);
