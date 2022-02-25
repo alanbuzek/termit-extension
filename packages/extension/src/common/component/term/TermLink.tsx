@@ -1,8 +1,8 @@
 import * as React from "react";
 
-import Term, { TermInfo } from '../model/Term';
-import User from '../model/User';
-import VocabularyUtils from '../util/VocabularyUtils';
+import Term, { TermInfo } from '../../model/Term';
+import User from '../../model/User';
+import VocabularyUtils from '../../util/VocabularyUtils';
 
 interface TermLinkProps {
   term: Term | TermInfo;

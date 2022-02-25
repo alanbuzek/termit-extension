@@ -1,10 +1,12 @@
 import * as React from "react";
+import TermDefinitionAnnotation from "../../common/component/annotator/TermDefinitionAnnotation";
 // import withI18n, { HasI18n } from "../hoc/withI18n";
 // import Term, { TermData } from "../../model/Term";
-import SelectionPurposeDialog from "../../common/SelectionPurposeDialog";
-import TermDefinitionAnnotation from "../../common/TermDefinitionAnnotation";
-import TermOccurrenceAnnotation from "../../common/TermOccurrenceAnnotation";
+import SelectionPurposeDialog from "../../common/component/annotator/SelectionPurposeDialog";
+// import TermDefinitionAnnotation from "../../common/component/annotator/TermDefinitionAnnotation";
+import TermOccurrenceAnnotation from "../../common/component/annotator/TermOccurrenceAnnotation";
 import Button from "./Button";
+import { CreateTermFromAnnotation } from '../../common/component/annotator/CreateTermFromAnnotation';
 // import TermMetadataCreateForm from "../term/TermMetadataCreateForm";
 // import { injectIntl } from "react-intl";
 // import { createTerm } from "../../action/AsyncTermActions";
@@ -14,9 +16,25 @@ import Button from "./Button";
 // import TermItState from "../../model/TermItState";
 // import { isTermValid, LabelExists } from "../term/TermValidationUtils";
 
-const injectIntl = () => {};
+const mockCreateTermAnnotationProps = {
+  show: true,
+  onClose: () => 0,
+  onMinimize: () => 0,
+  onTermCreated: () => 0,
+  vocabularyIri: {
+    fragment: "slovnik-document-376-2014",
+    namespace: "http://onto.fel.cvut.cz/ontologies/slovnik/",
+  },
+  language: "cs",
+  createTerm: () => 0,
+  i18n: () => 0,
+  formatMessage: () => 0,
+  formatDate: () => 0,
+  formatTime: () => 0,
+  locale: "cs-CZ",
+};
 
-export class CreateTermFromAnnotation extends React.Component {
+export class AnnotationPopup extends React.Component {
   constructor(props) {
     super(props);
     this.state = Object.assign(
@@ -123,12 +141,13 @@ export class CreateTermFromAnnotation extends React.Component {
       // 2. term occurrence annotation
       // <TermOccurrenceAnnotation {...mockTermOccurrenceAnnotationProps} />
 
-      // 3.
-      <TermDefinitionAnnotation
-        {...termDefinitionMockProps}
-      />
+      // 3. term definition annotaiton
+      // <TermDefinitionAnnotation {...termDefinitionMockProps} />
+
+      // 4. create term annotation
+      <CreateTermFromAnnotation {...mockCreateTermAnnotationProps}/>
     );
   }
 }
 
-export default CreateTermFromAnnotation;
+export default AnnotationPopup;

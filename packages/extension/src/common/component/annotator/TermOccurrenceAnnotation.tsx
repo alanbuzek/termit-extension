@@ -4,12 +4,12 @@ import AnnotationTerms from "./AnnotationTerms";
 import { Button } from "reactstrap";
 import { FaCheck } from "react-icons/fa";
 import { TiTimes, TiTrash } from "react-icons/ti";
-import { AnnotationOrigin } from "./util/Annotation";
+import { AnnotationOrigin } from "../../util/Annotation";
 import TermOccurrenceAnnotationView from "./TermOccurrenceAnnotationView";
 import { GoPencil } from "react-icons/go";
-import { useI18n } from './components/hook/useI18n';
+import { useI18n } from '../hook/useI18n';
 import SimplePopupWithActions from './SimplePopupWithActions';
-import Term from './model/Term';
+import Term from '../../model/Term';
 // import IfUserAuthorized from "../authorization/IfUserAuthorized";
 // import { useI18n } from "../hook/useI18n";
 

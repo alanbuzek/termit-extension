@@ -4,8 +4,8 @@ import { ToggleMinusIcon, TogglePlusIcon } from "intelligent-tree-select";
 // import Utils from "../../../util/Utils";
 import TooltipItem from "./TooltipItem";
 // import { ValueMapper } from "../../../util/Types";
-import Utils from '../../util/Utils';
-import { ValueMapper } from '../../util/Types';
+import Utils from '../../../util/Utils';
+import { ValueMapper } from '../../../util/Types';
 
 interface ResultItemProps {
   option: any;

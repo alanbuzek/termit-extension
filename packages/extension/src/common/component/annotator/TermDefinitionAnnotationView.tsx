@@ -1,7 +1,7 @@
 import * as React from "react";
-import Term from "./model/Term";
-import TermLink from "./term/TermLink";
-import { useI18n } from "./components/hook/useI18n";
+import Term from "../../model/Term";
+import TermLink from "../../component/term/TermLink";
+import { useI18n } from "../hook/useI18n";
 
 interface TermDefinitionAnnotationViewProps {
   term?: Term | null;

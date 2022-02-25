@@ -1,6 +1,6 @@
 import * as React from "react";
-import { useI18n } from './components/hook/useI18n';
-import { AnnotationClass } from './util/Annotation';
+import { useI18n } from '../hook/useI18n';
+import { AnnotationClass } from '../../util/Annotation';
 // import Term from "../../model/Term";
 // import TermLink from "../term/TermLink";
 // import { AnnotationClass } from "./Annotation";

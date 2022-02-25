@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Tooltip } from "reactstrap";
-import { ValueMapper } from '../../util/Types';
+import { ValueMapper } from '../../../util/Types';
 
 interface TooltipItemProps {
   targetId: string;

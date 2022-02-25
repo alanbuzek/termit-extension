@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Button, FormGroup, FormText, Label } from "reactstrap";
 // import withI18n, { HasI18n } from "../hoc/withI18n";
-import Vocabulary from "./model/Vocabulary";
+import Vocabulary from "../../model/Vocabulary";
 // @ts-ignore
 import { IntelligentTreeSelect } from "intelligent-tree-select";
 import "intelligent-tree-select/lib/styles.css";
@@ -20,18 +20,18 @@ import { GoPlus } from "react-icons/go";
 //   createTermValueRenderer,
 // } from "../misc/treeselect/Renderers";
 // import IfUserAuthorized from "../authorization/IfUserAuthorized";
-import Utils from "./util/Utils";
+import Utils from "../../util/Utils";
 import {
   commonTermTreeSelectProps,
   processTermsForTreeSelect,
-} from "./term/TermTreeSelectHelper";
-import { TermData } from "./model/Term";
+} from "../term/TermTreeSelectHelper";
+import { TermData } from "../../model/Term";
 import {
   createTermsWithImportsOptionRenderer,
   createTermValueRenderer,
-} from "./mics/treeselect/Renderers";
-import { HasI18n } from "./components/hoc/withI18n";
-import { useI18n } from './components/hook/useI18n';
+} from "../misc/treeselect/Renderers";
+import { HasI18n } from "../hoc/withI18n";
+import { useI18n } from '../hook/useI18n';
 
 type Term = any;
 

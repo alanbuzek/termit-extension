@@ -4,7 +4,7 @@ import {
   ButtonToolbar,
 } from "reactstrap";
 import { TiTimes } from "react-icons/ti";
-import { useI18n } from './components/hook/useI18n';
+import { useI18n } from '../hook/useI18n';
 // import { useI18n } from "../hook/useI18n";
 
 // i18n mock

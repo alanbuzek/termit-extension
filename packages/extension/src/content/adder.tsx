@@ -408,8 +408,12 @@ export class Adder {
     const zIndex = this._findZindex(left, top);
 
     Object.assign(this._outerContainer.style, {
-      left: toPx(left - parentRect.left),
-      top: toPx(top - parentRect.top),
+      // modal props
+      left: '50%',
+      top: '50%',
+      transform: 'translate(-400px, -400px)',
+      // left: toPx(left - parentRect.left),
+      // top: toPx(top - parentRect.top),
       zIndex,
     });
     // console.log("style: ", this._outerContainer.style);

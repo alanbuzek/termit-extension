@@ -1,5 +1,5 @@
 import * as React from "react";
-import Term from "./model/Term";
+import Term from "../../model/Term";
 import { Button } from "reactstrap";
 import { TiTimes, TiTrash } from "react-icons/ti";
 import SimplePopupWithActions from "./SimplePopupWithActions";
@@ -7,7 +7,7 @@ import AnnotationTerms from "./AnnotationTerms";
 // import TermDefinitionAnnotationView from "./TermDefinitionAnnotationView";
 import { GoPencil } from "react-icons/go";
 // import IfUserAuthorized from "../authorization/IfUserAuthorized";
-import { useI18n } from "./components/hook/useI18n";
+import { useI18n } from "../hook/useI18n";
 import TermDefinitionAnnotationView from './TermDefinitionAnnotationView';
 
 interface TermDefinitionAnnotationProps {

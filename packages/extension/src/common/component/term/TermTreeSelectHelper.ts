@@ -1,8 +1,8 @@
-import Term, { TermData, TermInfo } from "../model/Term";
-import Utils from '../util/Utils';
-import IntlUtil from '../util/IntlUtil';
-import { getLocalized } from '../model/MultilingualString';
-import { HasI18n } from '../components/hoc/withI18n';
+import Term, { TermData, TermInfo } from "../../model/Term";
+import Utils from '../../util/Utils';
+import IntlUtil from '../../util/IntlUtil';
+import { getLocalized } from '../../model/MultilingualString';
+import { HasI18n } from '../hoc/withI18n';
 
 /**
  * Common properties for a tree selector containing terms

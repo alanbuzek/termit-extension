@@ -59,9 +59,10 @@ export default function AdderToolbar({
           'is-active': isVisible,
         }
       )}
+      style={{ width: 800, height: 800, overflowY: 'scroll' }}
       // style={{ visibility: isVisible ? 'visible' : 'hidden' }}
     >
-      <div className="hyp-u-layout-row AdderToolbar__actions p-4">
+      <div className="hyp-u-layout-row AdderToolbar__actions p-4" style={{ width: '100%' }}>
         <CreateTermFromAnnotation />
       </div>
     </div>

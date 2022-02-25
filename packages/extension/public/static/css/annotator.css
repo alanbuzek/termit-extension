@@ -1,3 +1,19 @@
+form hr.form-section-separator {
+  position: relative;
+  border: none;
+  height: 1px;
+  background: #dee2e6;
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+.attribute-label {
+  margin-bottom: 0.5rem !important;
+}
+button.btn{
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
 /* Annotation.css */
 
 .legend-list-item {

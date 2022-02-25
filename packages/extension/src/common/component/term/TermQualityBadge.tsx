@@ -1,15 +1,15 @@
 import * as React from "react";
 import { injectIntl } from "react-intl";
 // import withI18n, { HasI18n } from "../hoc/withI18n";
-import Term from "../model/Term";
+import Term from "../../model/Term";
 // import TermItState from "../model/TermItState";
 import { Badge } from "reactstrap";
-import Utils from "../util/Utils";
-import ValidationResult from "../model/ValidationResult";
+import Utils from "../../util/Utils";
+import ValidationResult from "../../model/ValidationResult";
 // import Routing from "../util/Routing";
-import { ConsolidatedResults } from "../model/ConsolidatedResults";
-import Validation from "../util/Validation";
-import { HasI18n } from '../components/hoc/withI18n';
+import { ConsolidatedResults } from "../../model/ConsolidatedResults";
+import Validation from "../../util/Validation";
+import { HasI18n } from '../hoc/withI18n';
 
 interface TermQualityBadgeProps extends HasI18n {
   term: Term | null;

@@ -1,11 +1,11 @@
-import Term from "../../model/Term";
+import Term from "../../../model/Term";
 import classNames from "classnames";
 import ResultItem from "./ResultItem";
 import ImportedTermInfo from "../../term/ImportedTermInfo";
 import UnusedTermInfo from "../../term/UnusedTermInfo";
 // import TermQualityBadge from "../../term/TermQualityBadge";
 import TermLink from "../../term/TermLink";
-import Vocabulary from "../../model/Vocabulary";
+import Vocabulary from "../../../model/Vocabulary";
 import { TermQualityBadge } from '../../term/TermQualityBadge';
 // import VocabularyLink from "../..vocabulary/VocabularyLink";
 // import VocabularyNameBadge from "../../vocabulary/VocabularyNameBadge";
