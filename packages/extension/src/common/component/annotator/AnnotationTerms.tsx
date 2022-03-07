@@ -80,7 +80,7 @@ export class AnnotationTerms extends React.Component<AnnotationTermsProps> {
   }
 
   public componentWillUnmount() {
-    this.props.selectVocabularyTerm(null);
+    // this.props.selectVocabularyTerm(null);
   }
 
   private handleChange = (term: TermData | null) => {

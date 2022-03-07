@@ -1,12 +1,23 @@
-import classnames from 'classnames';
-import React from 'react';
-import CreateTermFromAnnotation from './CreateTermFromAnnotation';
-
+import classnames from "classnames";
+import React from "react";
+import { CreateTermFromAnnotation } from "../../common/component/annotator/CreateTermFromAnnotation";
+import SelectionPurposeDialog from "../../common/component/annotator/SelectionPurposeDialog";
+import TermDefinitionAnnotation from "../../common/component/annotator/TermDefinitionAnnotation";
+import TermOccurrenceAnnotation from "../../common/component/annotator/TermOccurrenceAnnotation";
+import { useState } from "react";
+import { overlay } from "..";
 /**
  * Union of possible toolbar commands.
  *
  * @typedef {'annotate'|'highlight'|'show'|'hide'} Command
  */
+
+export enum PopupType {
+  CreateTermModal,
+  TermDefinition,
+  TermOccurrence,
+  PurposeSelection,
+}
 
 /**
  * @typedef AdderToolbarProps
@@ -33,14 +44,19 @@ export default function AdderToolbar({
   isVisible,
   onCommand,
   annotationCount = 0,
+  initialPopupType = PopupType.PurposeSelection,
+  showAt,
+  hide,
 }) {
+  const [currPopup, setCurrPopup] = useState(initialPopupType);
+
   // Since the selection toolbar is only shown when there is a selection
   // of static text, we can use a plain key without any modifier as
   // the shortcut. This avoids conflicts with browser/OS shortcuts.
-  const annotateShortcut = isVisible ? 'a' : null;
-  const highlightShortcut = isVisible ? 'h' : null;
-  const showShortcut = isVisible ? 's' : null;
-  const hideShortcut = isVisible ? 'Escape' : null;
+  const annotateShortcut = isVisible ? "a" : null;
+  const highlightShortcut = isVisible ? "h" : null;
+  const showShortcut = isVisible ? "s" : null;
+  const hideShortcut = isVisible ? "Escape" : null;
 
   // Add a shortcut to close the adder. Note, there is no button associated with this
   // shortcut because any outside click will also hide the adder.
@@ -48,22 +64,115 @@ export default function AdderToolbar({
 
   // nb. The adder is hidden using the `visibility` property rather than `display`
   // so that we can compute its size in order to position it before display.
+
+  const closePopup = () => {
+    setCurrPopup(PopupType.PurposeSelection);
+    hide();
+  };
+
+  const mockCreateTermAnnotationProps = {
+    show: true,
+    onClose() {
+      closePopup();
+      overlay.off();
+    },
+    onSave() {
+      closePopup();
+      overlay.off();
+    },
+    onMinimize: () => 0,
+    onTermCreated: () => 0,
+    vocabularyIri: {
+      fragment: "slovnik-document-376-2014",
+      namespace: "http://onto.fel.cvut.cz/ontologies/slovnik/",
+    },
+    language: "cs",
+    createTerm: () => 0,
+    i18n: () => 0,
+    formatMessage: () => 0,
+    formatDate: () => 0,
+    formatTime: () => 0,
+    locale: "cs-CZ",
+  };
+
+  const renderContentPopup = () => {
+    const mockTermOccurrenceAnnotationProps = {
+      target: "id4540-5",
+      term: null,
+      score: "1.0",
+      text: "Obec",
+      annotationClass: "suggested-term-occurrence",
+      annotationOrigin: "proposed-occurrence",
+      isOpen: true,
+      onRemove: closePopup,
+      onSelectTerm: () => 0,
+      onCreateTerm: () => {
+        showAt(0, 0, true);
+        setCurrPopup(PopupType.CreateTermModal);
+      },
+      onToggleDetailOpen: () => 0,
+      onClose: closePopup,
+    };
+    const termDefinitionMockProps = {
+      target: "idphu3n",
+      term: null,
+      text: "Drnholec",
+      isOpen: true,
+      onRemove: closePopup,
+      onSelectTerm: () => 0,
+      onToggleDetailOpen: () => 0,
+      onClose: closePopup,
+    };
+
+    switch (currPopup) {
+      case PopupType.CreateTermModal:
+        // 4. create term annotation
+        return <CreateTermFromAnnotation {...mockCreateTermAnnotationProps} />;
+      case PopupType.PurposeSelection:
+        // 4. create term annotation
+        return (
+          <SelectionPurposeDialog
+            show
+            onCreateTerm={() => 0}
+            onMarkOccurrence={() => setCurrPopup(PopupType.TermOccurrence)}
+            onMarkDefinition={() => setCurrPopup(PopupType.TermDefinition)}
+            onCancel={closePopup}
+          />
+        );
+      case PopupType.TermOccurrence:
+        return (
+          <TermOccurrenceAnnotation {...mockTermOccurrenceAnnotationProps} />
+        );
+      case PopupType.TermDefinition:
+        return <TermDefinitionAnnotation {...termDefinitionMockProps} />;
+      default:
+        return null;
+    }
+  };
+
   return (
     <div
       className={classnames(
-        'hyp-u-border hyp-u-bg-color--white',
-        'AdderToolbar',
+        "hyp-u-border hyp-u-bg-color--white",
+        "AdderToolbar",
         {
-          'AdderToolbar--down': arrowDirection === 'up',
-          'AdderToolbar--up': arrowDirection === 'down',
-          'is-active': isVisible,
+          "AdderToolbar--down": arrowDirection === "up",
+          "AdderToolbar--up": arrowDirection === "down",
+          "is-active": isVisible,
         }
       )}
-      style={{ width: 800, height: 800, overflowY: 'scroll' }}
+      style={
+        currPopup === PopupType.CreateTermModal
+          ? { width: 800, height: 800, overflowY: "scroll" }
+          : null
+      }
       // style={{ visibility: isVisible ? 'visible' : 'hidden' }}
     >
-      <div className="hyp-u-layout-row AdderToolbar__actions p-4" style={{ width: '100%' }}>
-        <CreateTermFromAnnotation />
+      <div
+        className="hyp-u-layout-row AdderToolbar__actions p-4"
+        style={{ width: "100%" }}
+      >
+        {renderContentPopup()}
       </div>
     </div>
   );

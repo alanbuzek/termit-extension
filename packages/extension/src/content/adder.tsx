@@ -3,6 +3,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import { IntlProvider } from "react-intl";
 import cs from "../cs.locale";
+import { overlay } from '.';
 
 /**
  * Returns true when the device is a touch device such
@@ -192,6 +193,7 @@ export class Adder {
       position: "absolute",
       top: 0,
       left: 0,
+      'z-index': 1000,
     });
 
     this._view = /** @type {Window} */ element.ownerDocument.defaultView;
@@ -229,6 +231,7 @@ export class Adder {
 
   /** Hide the adder */
   hide() {
+    // overlay.off();
     this._isVisible = false;
     this._render();
     // Reposition the outerContainer because it affects the responsiveness of host page
@@ -352,40 +355,43 @@ export class Adder {
    * @return {number} - greatest zIndex (default value of 1)
    */
   _findZindex(left, top) {
-    if (document.elementsFromPoint === undefined) {
-      // In case of not being able to use document.elementsFromPoint,
-      // default to the large arbitrary number (2^15)
-      return 32768;
-    }
+    // TODO: uncomment this and make it work
+    // if (document.elementsFromPoint === undefined) {
+    //   // In case of not being able to use document.elementsFromPoint,
+    //   // default to the large arbitrary number (2^15)
+    //   return 32768;
+    // }
 
-    const adderWidth = this._width();
-    const adderHeight = this._height();
+    // const adderWidth = this._width();
+    // const adderHeight = this._height();
 
-    // Find the Z index of all the elements in the screen for five positions
-    // around the adder (left-top, left-bottom, middle-center, right-top,
-    // right-bottom) and use the greatest.
+    // // Find the Z index of all the elements in the screen for five positions
+    // // around the adder (left-top, left-bottom, middle-center, right-top,
+    // // right-bottom) and use the greatest.
 
-    // Unique elements so getComputedStyle is called the minimum amount of times.
-    const elements = new Set([
-      ...document.elementsFromPoint(left, top),
-      ...document.elementsFromPoint(left, top + adderHeight),
-      ...document.elementsFromPoint(
-        left + adderWidth / 2,
-        top + adderHeight / 2
-      ),
-      ...document.elementsFromPoint(left + adderWidth, top),
-      ...document.elementsFromPoint(left + adderWidth, top + adderHeight),
-    ]);
+    // // Unique elements so getComputedStyle is called the minimum amount of times.
+    // const elements = new Set([
+    //   ...document.elementsFromPoint(left, top),
+    //   ...document.elementsFromPoint(left, top + adderHeight),
+    //   ...document.elementsFromPoint(
+    //     left + adderWidth / 2,
+    //     top + adderHeight / 2
+    //   ),
+    //   ...document.elementsFromPoint(left + adderWidth, top),
+    //   ...document.elementsFromPoint(left + adderWidth, top + adderHeight),
+    // ]);
 
-    const zIndexes = [...elements]
-      .map((element) => +getComputedStyle(element).zIndex)
-      .filter(Number.isInteger);
+    // const zIndexes = [...elements]
+    //   .map((element) => +getComputedStyle(element).zIndex)
+    //   .filter(Number.isInteger);
 
-    // Make sure the array contains at least one element,
-    // otherwise Math.max(...[]) results in +Infinity
-    zIndexes.push(0);
+    // // Make sure the array contains at least one element,
+    // // otherwise Math.max(...[]) results in +Infinity
+    // zIndexes.push(0);
 
-    return Math.max(...zIndexes) + 1;
+    // return Math.max(...zIndexes) + 1;
+
+    return 10000;
   }
 
   /**
@@ -395,7 +401,7 @@ export class Adder {
    * @param {number} left - Horizontal offset from left edge of viewport.
    * @param {number} top - Vertical offset from top edge of viewport.
    */
-  _showAt(left, top) {
+  _showAt(left, top, isModal = false) {
     // Translate the (left, top) viewport coordinates into positions relative to
     // the adder's nearest positioned ancestor (NPA).
     //
@@ -407,15 +413,27 @@ export class Adder {
 
     const zIndex = this._findZindex(left, top);
 
-    Object.assign(this._outerContainer.style, {
-      // modal props
-      left: '50%',
-      top: '50%',
-      transform: 'translate(-400px, -400px)',
-      // left: toPx(left - parentRect.left),
-      // top: toPx(top - parentRect.top),
-      zIndex,
-    });
+    if (isModal){
+      overlay.on();
+      Object.assign(this._outerContainer.style, {
+        // modal props
+        left: '50%',
+        top: '50%',
+        position: 'fixed',
+        transform: 'translate(-400px, -400px)',
+
+        zIndex,
+      });
+    } else {
+      Object.assign(this._outerContainer.style, {
+        left: toPx(left - parentRect.left),
+        top: toPx(top - parentRect.top),
+        position: 'absolute',
+        transform: 'none',
+        zIndex,
+      });
+    }
+  
     // console.log("style: ", this._outerContainer.style);
   }
 
@@ -451,6 +469,8 @@ export class Adder {
           arrowDirection={this._arrowDirection}
           onCommand={handleCommand}
           annotationCount={20}
+          showAt={this._showAt.bind(this)}
+          hide={this.hide.bind(this)}
         />
       </IntlProvider>,
       this._shadowRoot,

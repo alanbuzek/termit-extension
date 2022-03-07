@@ -175,8 +175,10 @@ const annotate = () => {
       },
     },
     (response) => {
-      const { data: { termOccurrencesSelectors: data }, error } = response;
-      console.log('response: ', data);
+      const {
+        data: { termOccurrencesSelectors: data },
+        error,
+      } = response;
 
       if (error || !data) {
         console.error("There was an error annotationg this page: ", error);
@@ -291,7 +293,26 @@ const annotate = () => {
   );
 };
 
+export const overlay = {
+  previousOverflowValue: "",
+  init() {
+    const overlay = document.createElement("div");
+    overlay.id = "termit-overlay";
+    document.body.appendChild(overlay);
+  },
+  on() {
+    this.previousOverflowValue = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    document.getElementById("termit-overlay").style.display = "block";
+  },
+  off() {
+    document.body.style.overflow = this.previousOverflowValue;
+    document.getElementById("termit-overlay").style.display = "none";
+  },
+};
+
 window.addEventListener("load", () => {
+  overlay.init();
   preloadURL(
     document,
     "style",
@@ -307,7 +328,9 @@ window.addEventListener("load", () => {
     "style",
     chrome.runtime.getURL("/static/css/bootstrap-termit.css")
   );
+  annotate();
+  // setTimeout(() => {
 
   new AnnotatorGuest(document.body);
-  annotate();
+  // }, 10000);
 });
