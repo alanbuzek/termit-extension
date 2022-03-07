@@ -77,7 +77,6 @@ export function createShadowRoot(container) {
     applyFocusVisible(shadowRoot);
   }
 
-  console.log("SR 2: ", shadowRoot.children);
   stopEventPropagation(shadowRoot);
   return shadowRoot;
 }

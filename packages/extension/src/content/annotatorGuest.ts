@@ -736,12 +736,12 @@ export default class AnnotatorGuest {
    * @param toggle 
    */
   selectAnnotations(tags, toggle = false) {
-    if (toggle) {
-      this._sidebarRPC.call('toggleAnnotationSelection', tags);
-    } else {
-      this._sidebarRPC.call('showAnnotations', tags);
-    }
-    this._sidebarRPC.call('openSidebar');
+    // if (toggle) {
+    //   this._sidebarRPC.call('toggleAnnotationSelection', tags);
+    // } else {
+    //   this._sidebarRPC.call('showAnnotations', tags);
+    // }
+    // this._sidebarRPC.call('openSidebar');
   }
 
   /**

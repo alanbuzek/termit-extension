@@ -3,6 +3,9 @@
 import { MessageType } from "../types";
 import AnnotatorGuest from "./annotatorGuest";
 import Mark from "../markjs";
+import { EventBus } from './utils/emitter';
+import { Sidebar } from './sidebar';
+import React from 'react';
 
 /**
  * Mark an element as having been added by the boot script.
@@ -332,5 +335,263 @@ window.addEventListener("load", () => {
   // setTimeout(() => {
 
   new AnnotatorGuest(document.body);
+  initSidebar();
   // }, 10000);
 });
+
+
+/**
+ * List of allowed configuration keys per application context. Keys omitted
+ * in a given context will be removed from the relative configs when calling
+ * getConfig.
+ *
+ * @param {AppContext} [appContext] - The name of the app.
+ */
+ function configurationKeys(appContext) {
+  const contexts = {
+    annotator: ['clientUrl', 'subFrameIdentifier'],
+    sidebar: [
+      'appType',
+      'annotations',
+      'branding',
+      'enableExperimentalNewNoteButton',
+      'externalContainerSelector',
+      'focus',
+      'group',
+      'onLayoutChange',
+      'openSidebar',
+      'query',
+      'requestConfigFromFrame',
+      'services',
+      'showHighlights',
+      'sidebarAppUrl',
+      'theme',
+      'usernameUrl',
+    ],
+    notebook: [
+      'branding',
+      'group',
+      'notebookAppUrl',
+      'requestConfigFromFrame',
+      'services',
+      'theme',
+      'usernameUrl',
+    ],
+  };
+
+  switch (appContext) {
+    case 'annotator':
+      return contexts.annotator;
+    case 'sidebar':
+      return contexts.sidebar;
+    case 'notebook':
+      return contexts.notebook;
+    case 'all':
+      // Complete list of configuration keys used for testing.
+      return [...contexts.annotator, ...contexts.sidebar, ...contexts.notebook];
+    default:
+      throw new Error(`Invalid application context used: "${appContext}"`);
+  }
+}
+
+/** @type {ValueGetter} */
+function getHostPageSetting(settings, name) {
+  return settings.hostPageSetting(name);
+}
+
+/**
+ * Definitions of configuration keys
+ * @type {ConfigDefinitionMap}
+ */
+ const configDefinitions = {
+  annotations: {
+    allowInBrowserExt: true,
+    defaultValue: null,
+    getValue: settings => settings.annotations,
+  },
+  appType: {
+    allowInBrowserExt: true,
+    defaultValue: null,
+    getValue: getHostPageSetting,
+  },
+  branding: {
+    defaultValue: null,
+    allowInBrowserExt: false,
+    getValue: getHostPageSetting,
+  },
+  // URL of the client's boot script. Used when injecting the client into
+  // child iframes.
+  clientUrl: {
+    allowInBrowserExt: true,
+    defaultValue: null,
+    getValue: settings => settings.clientUrl,
+  },
+  enableExperimentalNewNoteButton: {
+    allowInBrowserExt: false,
+    defaultValue: null,
+    getValue: getHostPageSetting,
+  },
+  group: {
+    allowInBrowserExt: true,
+    defaultValue: null,
+    getValue: settings => settings.group,
+  },
+  focus: {
+    allowInBrowserExt: false,
+    defaultValue: null,
+    getValue: getHostPageSetting,
+  },
+  theme: {
+    allowInBrowserExt: false,
+    defaultValue: null,
+    getValue: getHostPageSetting,
+  },
+  usernameUrl: {
+    allowInBrowserExt: false,
+    defaultValue: null,
+    getValue: getHostPageSetting,
+  },
+  onLayoutChange: {
+    allowInBrowserExt: false,
+    defaultValue: null,
+    getValue: getHostPageSetting,
+  },
+  openSidebar: {
+    allowInBrowserExt: true,
+    defaultValue: false,
+    coerce: () => false,
+    getValue: getHostPageSetting,
+  },
+  query: {
+    allowInBrowserExt: true,
+    defaultValue: null,
+    getValue: settings => settings.query,
+  },
+  requestConfigFromFrame: {
+    allowInBrowserExt: false,
+    defaultValue: null,
+    getValue: getHostPageSetting,
+  },
+  services: {
+    allowInBrowserExt: false,
+    defaultValue: null,
+    getValue: getHostPageSetting,
+  },
+  showHighlights: {
+    allowInBrowserExt: false,
+    defaultValue: 'always',
+    getValue: settings => settings.showHighlights,
+  },
+  notebookAppUrl: {
+    allowInBrowserExt: true,
+    defaultValue: null,
+    getValue: settings => settings.notebookAppUrl,
+  },
+  sidebarAppUrl: {
+    allowInBrowserExt: true,
+    defaultValue: null,
+    getValue: settings => settings.sidebarAppUrl,
+  },
+  // Sub-frame identifier given when a frame is being embedded into
+  // by a top level client
+  subFrameIdentifier: {
+    allowInBrowserExt: true,
+    defaultValue: null,
+    getValue: getHostPageSetting,
+  },
+  externalContainerSelector: {
+    allowInBrowserExt: false,
+    defaultValue: null,
+    getValue: getHostPageSetting,
+  },
+};
+
+/**
+ * Return the configuration for a given application context.
+ *
+ * @param {AppContext} [appContext] - The name of the app.
+ */
+ export function getConfig(appContext = 'annotator', window_ = window) {
+  // const settings = settingsFrom(window_);
+  const settings = {};
+  const config = {};
+  // Filter the config based on the application context as some config values
+  // may be inappropriate or erroneous for some applications.
+  let filteredKeys = configurationKeys(appContext);
+  filteredKeys.forEach(name => {
+    const configDef = configDefinitions[name];
+    const hasDefault = configDef.defaultValue !== undefined; // A default could be null
+
+    // Only allow certain values in the browser extension context
+    if (!configDef.allowInBrowserExt) {
+      // If the value is not allowed here, then set to the default if provided, otherwise ignore
+      // the key:value pair
+      if (hasDefault) {
+        config[name] = configDef.defaultValue;
+      }
+      return;
+    }
+  });
+
+  return config;
+}
+
+/**
+ * Entry point for the part of the Hypothesis client that runs in the page being
+ * annotated.
+ *
+ * Depending on the client configuration in the current frame, this can
+ * initialize different functionality. In "host" frames the sidebar controls and
+ * iframe containing the sidebar application are created. In "guest" frames the
+ * functionality to support anchoring and creating annotations is loaded. An
+ * instance of Hypothesis will have one host frame, one sidebar frame and one or
+ * more guest frames. The most common case is that the host frame, where the
+ * client is initially loaded, is also the only guest frame.
+ */
+ function initSidebar() {
+  // const annotatorConfig = getConfig('annotator');
+
+  // const hostFrame = annotatorConfig.subFrameIdentifier ? window.parent : window;
+
+  /** @type {Destroyable[]} */
+  const destroyables = [];
+
+  // if (hostFrame === window) {
+    // Ensure port "close" notifications from eg. guest frames are delivered properly.
+    // const sidebarConfig = getConfig('sidebar');
+
+    // const hypothesisAppsOrigin = new URL(sidebarConfig.sidebarAppUrl).origin;
+
+    const eventBus = new EventBus();
+    const sidebar = new Sidebar(document.body, eventBus, {});
+    setTimeout(() => {
+      // sidebar.open();
+      console.log('sidebar was just opened now')
+    }, 1000)
+
+  // }
+
+  // const vsFrameRole = vitalSourceFrameRole();
+  // if (vsFrameRole === 'container') {
+  //   const vitalSourceInjector = new VitalSourceInjector(annotatorConfig);
+  //   destroyables.push(vitalSourceInjector);
+  // } else {
+  //   // Set up automatic injection of the client into iframes in this frame.
+  //   const hypothesisInjector = new HypothesisInjector(
+  //     document.body,
+  //     annotatorConfig
+  //   );
+  //   // Create the guest that handles creating annotations and displaying highlights.
+  //   const guest = new Guest(document.body, annotatorConfig, hostFrame);
+  //   destroyables.push(hypothesisInjector, guest);
+  // }
+
+  // sidebarLinkElement.addEventListener('destroy', () => {
+  //   destroyables.forEach(instance => instance.destroy());
+
+  //   // Remove all the `<link>`, `<script>` and `<style>` elements added to the
+  //   // page by the boot script.
+  //   const clientAssets = document.querySelectorAll('[data-hypothesis-asset]');
+  //   clientAssets.forEach(el => el.remove());
+  // });
+}
