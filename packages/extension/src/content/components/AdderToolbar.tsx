@@ -4,6 +4,7 @@ import { CreateTermFromAnnotation } from "../../common/component/annotator/Creat
 import SelectionPurposeDialog from "../../common/component/annotator/SelectionPurposeDialog";
 import TermDefinitionAnnotation from "../../common/component/annotator/TermDefinitionAnnotation";
 import TermOccurrenceAnnotation from "../../common/component/annotator/TermOccurrenceAnnotation";
+import HighlightedTextAdder from "./HighlightedTextAdder";
 import { useState } from "react";
 import { overlay } from "..";
 /**
@@ -131,12 +132,16 @@ export default function AdderToolbar({
       case PopupType.PurposeSelection:
         // 4. create term annotation
         return (
-          <SelectionPurposeDialog
-            show
-            onCreateTerm={() => 0}
-            onMarkOccurrence={() => setCurrPopup(PopupType.TermOccurrence)}
-            onMarkDefinition={() => setCurrPopup(PopupType.TermDefinition)}
-            onCancel={closePopup}
+          // <SelectionPurposeDialog
+          //   show
+          //   onCreateTerm={() => 0}
+          //   onMarkOccurrence={() => setCurrPopup(PopupType.TermOccurrence)}
+          //   onMarkDefinition={() => setCurrPopup(PopupType.TermDefinition)}
+          //   onCancel={closePopup}
+          // />
+          <HighlightedTextAdder
+            onMarkOccurrence={() => {setCurrPopup(PopupType.TermOccurrence)}}
+            onMarkDefinition={() => {setCurrPopup(PopupType.TermDefinition)}}
           />
         );
       case PopupType.TermOccurrence:
@@ -169,7 +174,7 @@ export default function AdderToolbar({
       // style={{ visibility: isVisible ? 'visible' : 'hidden' }}
     >
       <div
-        className="hyp-u-layout-row AdderToolbar__actions p-4"
+        className="hyp-u-layout-row AdderToolbar__actions p-2"
         style={{ width: "100%" }}
       >
         {renderContentPopup()}

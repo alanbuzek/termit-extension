@@ -92,6 +92,7 @@ export class CreateTermFromAnnotation extends React.Component<
         toggle={this.onCancel}
         size="lg"
         style={{ width: "100%" }}
+        className="p-3"
       >
         <div
           className="modal-header"
