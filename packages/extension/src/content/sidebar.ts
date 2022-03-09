@@ -9,6 +9,7 @@ import { BucketBar } from "./bucket-bar";
 // import { createAppConfig } from './config/app';
 import { features } from "./features";
 import { sidebarTrigger } from "./sidebar-trigger";
+import SidebarBox from './SidebarBox';
 import { ToolbarController } from "./toolbar";
 
 /**
@@ -121,7 +122,7 @@ export class Sidebar {
     /**
      * The `<iframe>` element containing the sidebar application.
      */
-    this.iframe = createSidebarIframe(config);
+    // this.iframe = createSidebarIframe(config);
 
     this._config = config;
 
@@ -155,7 +156,7 @@ export class Sidebar {
       });
     // }
 
-    this.iframeContainer.appendChild(this.iframe);
+    // this.iframeContainer.appendChild(this.iframe);
 
     // Wrap up the 'iframeContainer' element into a shadow DOM so it is not affected by host CSS styles
     this.hypothesisSidebar = document.createElement("hypothesis-sidebar");
@@ -163,6 +164,17 @@ export class Sidebar {
     shadowRoot.appendChild(this.iframeContainer);
 
     element.appendChild(this.hypothesisSidebar);
+
+    const sidebarContainer = document.createElement("hypothesis-sidebar-container");
+    sidebarContainer.style.width = '100%';
+    sidebarContainer.style.height = '100%';
+    sidebarContainer.style.position = 'relative';
+    sidebarContainer.style['z-index'] = 3;
+
+
+    this.iframeContainer.appendChild(sidebarContainer);
+
+    new SidebarBox(sidebarContainer);
 
     // Register the sidebar as a handler for Hypothesis errors in this frame.
     // if (this.iframe.contentWindow) {
