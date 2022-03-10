@@ -17,12 +17,14 @@ import SidebarApp from "./components/SidebarApp";
  */
 export default class SidebarBox {
   _container: any;
+  _state: any;
   /**
    * @param {HTMLElement} container - Element into which the toolbar is rendered
    * @param {ToolbarOptions} options
    */
-  constructor(container) {
+  constructor(container, state) {
     this._container = container;
+    this._state = state;
     this.render();
   }
 
@@ -33,7 +35,7 @@ export default class SidebarBox {
 
   render() {
     ReactDOM.render(
-      <SidebarApp />,
+      <SidebarApp state={this._state} />,
       this._container
     );
   }

@@ -29,7 +29,7 @@ addListeners();
 function handleMessages(message, sender, sendResponse) {
   console.log("got handle message: ", message, "sendResponse: ", sendResponse);
 
-  fetch("http://localhost:8080/annotate?enableKeywordExtraction=true", {
+  fetch("http://localhost:8888/annotate?enableKeywordExtraction=true", {
     method: "POST",
     mode: "cors", // no-cors, *cors, same-origin
     cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached

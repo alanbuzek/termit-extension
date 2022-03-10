@@ -54,7 +54,8 @@
     "build": "node scripts/build.js",
     "test": "node scripts/test.js --env=jsdom",
     "watch": "npm-watch",
-    "build:css": "NODE_ENV=production tailwind build -i src/styles/index.css -o public/static/css/styles.css --minify"
+    "build:css": "NODE_ENV=production tailwind build -i src/styles/index.css -o public/static/css/styles.css --minify",
+    "watch:css": "npx tailwindcss -i src/styles/index.css -o public/static/css/styles.css --watch"
   },
   "watch": {
     "build": {

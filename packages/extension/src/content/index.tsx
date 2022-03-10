@@ -160,12 +160,9 @@ const config = {
   assetRoot,
 };
 
-/**
- * @param {SidebarAppConfig|AnnotatorConfig} config
- * @param {string} path
- */
-function assetURL(config, path) {
-  return config.assetRoot + "build/" + config.manifest[path];
+
+const contentState = {
+  annotations: null,
 }
 
 const annotate = () => {
@@ -188,6 +185,8 @@ const annotate = () => {
         return;
       }
 
+      console.log('got data: ', data);
+      contentState.annotations = data;
       const results = {
         highlights: {
           failures: 0,
@@ -292,6 +291,9 @@ const annotate = () => {
           });
         }
       });
+
+
+      initSidebar();
     }
   );
 };
@@ -335,7 +337,6 @@ window.addEventListener("load", () => {
   // setTimeout(() => {
 
   new AnnotatorGuest(document.body);
-  initSidebar();
   // }, 10000);
 });
 
@@ -535,62 +536,11 @@ export function getConfig(appContext = "annotator", window_ = window) {
   return config;
 }
 
-/**
- * Entry point for the part of the Hypothesis client that runs in the page being
- * annotated.
- *
- * Depending on the client configuration in the current frame, this can
- * initialize different functionality. In "host" frames the sidebar controls and
- * iframe containing the sidebar application are created. In "guest" frames the
- * functionality to support anchoring and creating annotations is loaded. An
- * instance of Hypothesis will have one host frame, one sidebar frame and one or
- * more guest frames. The most common case is that the host frame, where the
- * client is initially loaded, is also the only guest frame.
- */
 function initSidebar() {
-  // const annotatorConfig = getConfig('annotator');
-
-  // const hostFrame = annotatorConfig.subFrameIdentifier ? window.parent : window;
-
-  /** @type {Destroyable[]} */
-  const destroyables = [];
-
-  // if (hostFrame === window) {
-  // Ensure port "close" notifications from eg. guest frames are delivered properly.
-  // const sidebarConfig = getConfig('sidebar');
-
-  // const hypothesisAppsOrigin = new URL(sidebarConfig.sidebarAppUrl).origin;
-
   const eventBus = new EventBus();
-  const sidebar = new Sidebar(document.body, eventBus, {});
+  const sidebar = new Sidebar(document.body, eventBus, contentState);
   setTimeout(() => {
     // sidebar.open();
     console.log("sidebar was just opened now");
   }, 1000);
-
-  // }
-
-  // const vsFrameRole = vitalSourceFrameRole();
-  // if (vsFrameRole === 'container') {
-  //   const vitalSourceInjector = new VitalSourceInjector(annotatorConfig);
-  //   destroyables.push(vitalSourceInjector);
-  // } else {
-  //   // Set up automatic injection of the client into iframes in this frame.
-  //   const hypothesisInjector = new HypothesisInjector(
-  //     document.body,
-  //     annotatorConfig
-  //   );
-  //   // Create the guest that handles creating annotations and displaying highlights.
-  //   const guest = new Guest(document.body, annotatorConfig, hostFrame);
-  //   destroyables.push(hypothesisInjector, guest);
-  // }
-
-  // sidebarLinkElement.addEventListener('destroy', () => {
-  //   destroyables.forEach(instance => instance.destroy());
-
-  //   // Remove all the `<link>`, `<script>` and `<style>` elements added to the
-  //   // page by the boot script.
-  //   const clientAssets = document.querySelectorAll('[data-hypothesis-asset]');
-  //   clientAssets.forEach(el => el.remove());
-  // });
 }

@@ -93,6 +93,7 @@ export class Sidebar {
   constructor(
     element: HTMLElement,
     eventBus: any,
+    state: any,
     config: Record<string, any> = {}
   ) {
     this._emitter = eventBus.createEmitter();
@@ -174,7 +175,7 @@ export class Sidebar {
 
     this.iframeContainer.appendChild(sidebarContainer);
 
-    new SidebarBox(sidebarContainer);
+    new SidebarBox(sidebarContainer, state);
 
     // Register the sidebar as a handler for Hypothesis errors in this frame.
     // if (this.iframe.contentWindow) {
