@@ -1,7 +1,8 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import Buckets from './components/Buckets';
-import { computeBuckets } from './utils/buckets';
+import React from "react";
+import ReactDOM from "react-dom";
+import { loadStyles } from "./adder";
+import Buckets from "./components/Buckets";
+import { computeBuckets } from "./utils/buckets";
 
 /**
  * @typedef {import('../types/annotator').AnchorPosition} AnchorPosition
@@ -34,7 +35,7 @@ export class BucketBar {
       onSelectAnnotations,
     }
   ) {
-    this._bucketsContainer = document.createElement('div');
+    this._bucketsContainer = document.createElement("div");
     container.appendChild(this._bucketsContainer);
 
     this._onFocusAnnotations = onFocusAnnotations;
@@ -60,7 +61,7 @@ export class BucketBar {
         above={buckets.above}
         below={buckets.below}
         buckets={buckets.buckets}
-        onFocusAnnotations={tags => this._onFocusAnnotations(tags)}
+        onFocusAnnotations={(tags) => this._onFocusAnnotations(tags)}
         onScrollToClosestOffScreenAnchor={(tags, direction) =>
           this._onScrollToClosestOffScreenAnchor(tags, direction)
         }
@@ -68,7 +69,12 @@ export class BucketBar {
           this._onSelectAnnotations(tags, toogle)
         }
       />,
-      this._bucketsContainer
+      this._bucketsContainer,
+      () => {
+        loadStyles(this._bucketsContainer, "annotator");
+        loadStyles(this._bucketsContainer, "styles");
+        loadStyles(this._bucketsContainer, "bootstrap-termit");
+      }
     );
   }
 }

@@ -33,9 +33,7 @@ export function loadStyles(shadowRoot, fileName = "annotator") {
   const linkEl = document.createElement("link");
   linkEl.rel = "stylesheet";
   linkEl.href = url;
-  console.log("before linkEl: ", linkEl, "url: ", url);
   shadowRoot.appendChild(linkEl);
-  console.log("after shadow root: ", shadowRoot.children);
 }
 
 /**
@@ -184,7 +182,7 @@ export class Adder {
     element.appendChild(this._outerContainer);
     this._shadowRoot = createShadowRoot(this._outerContainer);
 
-    console.log("SR 3: ", this._shadowRoot.children);
+    // console.log("SR 3: ", this._shadowRoot.children);
 
     // Set initial style
     Object.assign(this._outerContainer.style, {
@@ -475,7 +473,7 @@ export class Adder {
       this._shadowRoot,
       () => {
         if (!calledRender) {
-          console.log("back call called!");
+          // console.log("back call called!");
           loadStyles(this._shadowRoot, "annotator");
           loadStyles(this._shadowRoot, "styles");
           loadStyles(this._shadowRoot, "bootstrap-termit");

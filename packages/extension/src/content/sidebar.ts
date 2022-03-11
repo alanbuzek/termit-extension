@@ -209,7 +209,7 @@ export class Sidebar {
     // If using our own container frame for the sidebar, add the toolbar to it.
     this.iframeContainer.prepend(toolbarContainer);
     this.toolbarWidth = this.toolbar.getWidth();
-    console.log('added toolbar container: ', this.iframeContainer, ', toolbar Contatiner')
+    // console.log('added toolbar container: ', this.iframeContainer, ', toolbar Contatiner')
     // } else {
     //   // If using a host-page provided container for the sidebar, the toolbar is
     //   // not shown.

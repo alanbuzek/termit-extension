@@ -1,5 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
+import { loadStyles } from './adder';
 import SidebarApp from "./components/SidebarApp";
 
 /**
@@ -34,9 +35,10 @@ export default class SidebarBox {
   }
 
   render() {
-    ReactDOM.render(
-      <SidebarApp state={this._state} />,
-      this._container
-    );
+    ReactDOM.render(<SidebarApp state={this._state} />, this._container, () => {
+      loadStyles(this._container, "annotator");
+      loadStyles(this._container, "styles");
+      loadStyles(this._container, "bootstrap-termit");
+    });
   }
 }

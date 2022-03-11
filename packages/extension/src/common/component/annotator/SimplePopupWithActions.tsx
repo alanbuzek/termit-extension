@@ -12,7 +12,7 @@ interface PopupWithActionsProps {
 }
 
 const handler = (e: any) => {
-  console.log('propagation stopped')
+  // console.log('propagation stopped')
   // e.stopPropagation();
 };
 

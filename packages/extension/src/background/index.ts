@@ -2,11 +2,9 @@ import "regenerator-runtime/runtime.js";
 import { MessageType } from "../types";
 // import { JSDOM } from 'jsdom';
 
-console.log("executing listener");
 
 // handles request from content scripts
 function addListeners() {
-  console.log("adding listeners");
   chrome.runtime.onMessage.addListener(handleMessages);
 }
 
@@ -49,22 +47,18 @@ function handleMessages(message, sender, sendResponse) {
     }), // body data type must match "Content-Type" header
   })
     .then((res) => {
-      console.log("got response, res: ", res);
-
       return res.json();
       // console.log('before virtual dom: ')
       // const virtualDom = new JSDOM(res.data.annotatedDocument);
       // console.log('after')
     })
     .then((res) => {
-      console.log("res: ", res);
       sendResponse({ data: res });
     })
     .catch(
       (err) => sendResponse({ error: "here" })
       // sendResponse({ error: err || true })
     );
-  console.log("past post");
 
   return true;
 }

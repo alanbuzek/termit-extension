@@ -147,7 +147,7 @@ export default class AnnotatorGuest {
     /** @type {Range[]} - Ranges of the current text selection. */
     this.selectedRanges = [];
 
-    console.log('annotatorGuest constructor called')
+    // console.log('annotatorGuest constructor called')
     this._adder = new Adder(this.element, {
       onAnnotate: () => console.log('this.createAnnotation()'),
       onHighlight: () => console.log('({ highlight: true })'),
@@ -155,7 +155,7 @@ export default class AnnotatorGuest {
     });
 
     this._selectionObserver = new SelectionObserver(range => {
-      console.log('selection observer callback called: ', range);
+      // console.log('selection observer callback called: ', range);
       if (range) {
         this._onClearSelection();
         this._onSelection(range);

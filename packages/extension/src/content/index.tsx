@@ -185,7 +185,7 @@ const annotate = () => {
         return;
       }
 
-      console.log('got data: ', data);
+      // console.log('got data: ', data);
       contentState.annotations = data;
       const results = {
         highlights: {
@@ -267,6 +267,7 @@ const annotate = () => {
               separateWordSearch: false,
               className: `termit-highlighted-word`,
               done(numberOfMatches) {
+                console.log('done once: ', numberOfMatches)
                 if (numberOfMatches === 1) {
                   results.highlights.successes += 1;
                 } else if (numberOfMatches === 0) {
@@ -292,7 +293,7 @@ const annotate = () => {
         }
       });
 
-
+      console.log('results: ', results)
       initSidebar();
     }
   );

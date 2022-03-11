@@ -1,5 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
+import { loadStyles } from './adder';
 
 import Toolbar from "./components/Toolbar";
 
@@ -125,7 +126,7 @@ export class ToolbarController {
   }
 
   render() {
-    console.log("rendering toolbar");
+    // console.log("rendering toolbar");
     ReactDOM.render(
       <Toolbar
         closeSidebar={this._closeSidebar}
@@ -138,7 +139,12 @@ export class ToolbarController {
         toggleSidebarRef={this._sidebarToggleButton}
         useMinimalControls={this.useMinimalControls}
       />,
-      this._container
+      this._container,
+      () => {
+        loadStyles(this._container, "annotator");
+        loadStyles(this._container, "styles");
+        loadStyles(this._container, "bootstrap-termit");
+      }
     );
   }
 }
