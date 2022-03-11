@@ -3,6 +3,7 @@ import { Spinner } from "reactstrap";
 import Button from "./Button";
 import Toggle from "react-toggle";
 import { useState } from "react";
+import VocabularySelect from '../../common/component/vocabulary/VocabularySelect';
 
 export const getUrlInfo = (url) => {
   const urlObject = new URL(url);
@@ -42,7 +43,8 @@ const PageSummary = ({ annotations, annotatePage, flatTermOccs }) => {
     return (
       <div className="p-3 mb-4 rounded-md bg-gray-100 border-gray-600 border">
         {/* {allowPannel} */}
-        <p>This page hasn't be annotated yet, you can do so now.</p>
+        <p className='font-semibold'>This page hasn't be annotated yet.</p>
+        <VocabularySelect />
         <Button
           onClick={() => {
             setAnnotationLoading(true);
