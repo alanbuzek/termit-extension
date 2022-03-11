@@ -2,6 +2,7 @@ import React from "react";
 import { Spinner } from "reactstrap";
 import Button from "./Button";
 import Toggle from "react-toggle";
+import { useState } from "react";
 
 export const getUrlInfo = (url) => {
   const urlObject = new URL(url);
@@ -14,6 +15,7 @@ const PageSummary = ({ annotations, annotatePage, flatTermOccs }) => {
   const loading = false;
   const disabled = false;
 
+  const [annotationLoading, setAnnotationLoading] = useState(false);
   const { checkedHostname } = getUrlInfo(window.location.href);
   const allowPannel = (
     <label className="flex justify-between rounded-lg p-3 items-center mb-4 bg-white">
@@ -39,9 +41,21 @@ const PageSummary = ({ annotations, annotatePage, flatTermOccs }) => {
   if (!annotations) {
     return (
       <div className="p-3 mb-4 rounded-md bg-gray-100 border-gray-600 border">
-        {allowPannel}
+        {/* {allowPannel} */}
         <p>This page hasn't be annotated yet, you can do so now.</p>
-        <Button onClick={annotatePage}>Annotate page</Button>
+        <Button
+          onClick={() => {
+            setAnnotationLoading(true);
+
+            // TODO: remove timeout
+            setTimeout(() => {
+              annotatePage();
+            }, 1500);
+          }}
+          loading={annotationLoading}
+        >
+          Annotate page
+        </Button>
       </div>
     );
   }

@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import { loadStyles } from './adder';
+import { loadStyles } from "./adder";
 import SidebarApp from "./components/SidebarApp";
 
 /**
@@ -19,13 +19,17 @@ import SidebarApp from "./components/SidebarApp";
 export default class SidebarBox {
   _container: any;
   _state: any;
+  _annotatePage: any;
+  _loadedStyles: boolean;
   /**
    * @param {HTMLElement} container - Element into which the toolbar is rendered
    * @param {ToolbarOptions} options
    */
-  constructor(container, state) {
+  constructor(container, state, annotatePage) {
     this._container = container;
     this._state = state;
+    this._annotatePage = annotatePage;
+    this._loadedStyles = false;
     this.render();
   }
 
@@ -35,10 +39,17 @@ export default class SidebarBox {
   }
 
   render() {
-    ReactDOM.render(<SidebarApp state={this._state} />, this._container, () => {
-      loadStyles(this._container, "annotator");
-      loadStyles(this._container, "styles");
-      loadStyles(this._container, "bootstrap-termit");
-    });
+    ReactDOM.render(
+      <SidebarApp annotatePage={this._annotatePage} state={this._state} />,
+      this._container,
+      () => {
+        if (!this._loadedStyles) {
+          loadStyles(this._container, "annotator");
+          loadStyles(this._container, "styles");
+          loadStyles(this._container, "bootstrap-termit");
+          this._loadedStyles = true;
+        }
+      }
+    );
   }
 }

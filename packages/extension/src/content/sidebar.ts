@@ -62,6 +62,7 @@ export class Sidebar {
   _guestRPC: never[];
   iframe: HTMLIFrameElement;
   _config: {};
+  _sidebar: any;
   bucketBar: null;
   externalFrame: any;
   iframeContainer: HTMLDivElement;
@@ -94,6 +95,7 @@ export class Sidebar {
     element: HTMLElement,
     eventBus: any,
     state: any,
+    annotatePage: any,
     config: Record<string, any> = {}
   ) {
     this._emitter = eventBus.createEmitter();
@@ -175,7 +177,7 @@ export class Sidebar {
 
     this.iframeContainer.appendChild(sidebarContainer);
 
-    new SidebarBox(sidebarContainer, state);
+    this._sidebar = new SidebarBox(sidebarContainer, state, annotatePage);
 
     // Register the sidebar as a handler for Hypothesis errors in this frame.
     // if (this.iframe.contentWindow) {
@@ -624,5 +626,9 @@ export class Sidebar {
     if (this.iframeContainer) {
       this.iframeContainer.classList.add("is-hidden");
     }
+  }
+
+  render(){
+    this._sidebar.render();
   }
 }

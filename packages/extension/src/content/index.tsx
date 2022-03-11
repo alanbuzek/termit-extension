@@ -160,143 +160,148 @@ const config = {
   assetRoot,
 };
 
-
 const contentState = {
   annotations: null,
-}
+  sidebar: null,
+};
 
 const annotate = () => {
-  chrome.runtime.sendMessage(
-    {
-      type: MessageType.GetAnnotations,
-      payload: {
-        // pageLang: document.documentElement.lang,
-        pageHtml: document.body.outerHTML,
+  return new Promise((resolve, reject) => {
+    chrome.runtime.sendMessage(
+      {
+        type: MessageType.GetAnnotations,
+        payload: {
+          // pageLang: document.documentElement.lang,
+          pageHtml: document.body.outerHTML,
+        },
       },
-    },
-    (response) => {
-      const {
-        data: { termOccurrencesSelectors: data },
-        error,
-      } = response;
+      (response) => {
+        const {
+          data: { termOccurrencesSelectors: data },
+          error,
+        } = response;
 
-      if (error || !data) {
-        console.error("There was an error annotationg this page: ", error);
-        return;
-      }
-
-      // console.log('got data: ', data);
-      contentState.annotations = data;
-      const results = {
-        highlights: {
-          failures: 0,
-          successes: 0,
-          overselectedFailures: 0,
-        },
-        selectors: {
-          successes: 0,
-          failures: 0,
-          overselectedFailures: 0,
-        },
-      };
-      data.forEach(({ cssSelectors, termOccurrences }) => {
-        const selectedElements = Array.from(
-          document.querySelectorAll(cssSelectors[0])
-        );
-        if (selectedElements.length === 1) {
-          results.selectors.successes += 1;
-        } else if (selectedElements.length === 0) {
-          console.log(
-            "[Selector] Failure: ",
-            cssSelectors,
-            ", ",
-            selectedElements
-          );
-          results.selectors.failures += 1;
-        } else {
-          results.selectors.overselectedFailures += 1;
-          console.log(
-            "[Selector] Overseledcted Failure: ",
-            cssSelectors,
-            ", ",
-            selectedElements
-          );
+        if (error || !data) {
+          console.error("There was an error annotationg this page: ", error);
+          return;
         }
-        if (selectedElements.length === 1) {
-          const markInstance = new Mark(selectedElements[0]);
-          termOccurrences.forEach((termOccurance) => {
-            markInstance.mark(termOccurance.originalTerm, {
-              accuracy: {
-                value: "exactly",
-                limiters: [
-                  ",",
-                  ".",
-                  ":",
-                  ";",
-                  "'",
-                  '"',
-                  "?",
-                  "!",
-                  ")",
-                  "(",
-                  "-",
-                ],
-              },
-              filter(node, term, offestInCurrentNode) {
-                let calculatedOffset = node.textContent.slice(
-                  0,
-                  offestInCurrentNode
-                );
-                let currNode = node;
-                while (currNode.previousSibling) {
-                  currNode = currNode.previousSibling;
-                  if (currNode.textContent) {
-                    calculatedOffset = currNode.textContent + calculatedOffset;
+
+        // console.log('got data: ', data);
+        contentState.annotations = data;
+        const results = {
+          highlights: {
+            failures: 0,
+            successes: 0,
+            overselectedFailures: 0,
+          },
+          selectors: {
+            successes: 0,
+            failures: 0,
+            overselectedFailures: 0,
+          },
+        };
+        data.forEach(({ cssSelectors, termOccurrences }) => {
+          const selectedElements = Array.from(
+            document.querySelectorAll(cssSelectors[0])
+          );
+          if (selectedElements.length === 1) {
+            results.selectors.successes += 1;
+          } else if (selectedElements.length === 0) {
+            console.log(
+              "[Selector] Failure: ",
+              cssSelectors,
+              ", ",
+              selectedElements
+            );
+            results.selectors.failures += 1;
+          } else {
+            results.selectors.overselectedFailures += 1;
+            console.log(
+              "[Selector] Overseledcted Failure: ",
+              cssSelectors,
+              ", ",
+              selectedElements
+            );
+          }
+          if (selectedElements.length === 1) {
+            const markInstance = new Mark(selectedElements[0]);
+            termOccurrences.forEach((termOccurance) => {
+              markInstance.mark(termOccurance.originalTerm, {
+                accuracy: {
+                  value: "exactly",
+                  limiters: [
+                    ",",
+                    ".",
+                    ":",
+                    ";",
+                    "'",
+                    '"',
+                    "?",
+                    "!",
+                    ")",
+                    "(",
+                    "-",
+                  ],
+                },
+                filter(node, term, offestInCurrentNode) {
+                  let calculatedOffset = node.textContent.slice(
+                    0,
+                    offestInCurrentNode
+                  );
+                  let currNode = node;
+                  while (currNode.previousSibling) {
+                    currNode = currNode.previousSibling;
+                    if (currNode.textContent) {
+                      calculatedOffset =
+                        currNode.textContent + calculatedOffset;
+                    }
                   }
-                }
 
-                const pureLeft = calculatedOffset.replace(/\s/g, "");
-                const pureRight = termOccurance.startOffset.replace(/\s/g, "");
+                  const pureLeft = calculatedOffset.replace(/\s/g, "");
+                  const pureRight = termOccurance.startOffset.replace(
+                    /\s/g,
+                    ""
+                  );
 
-                return pureLeft === pureRight;
-              },
-              element: "termit-h",
-              diacritcs: false,
-              exclude: ["termit-h"],
-              caseSensitive: true,
-              separateWordSearch: false,
-              className: `termit-highlighted-word`,
-              done(numberOfMatches) {
-                console.log('done once: ', numberOfMatches)
-                if (numberOfMatches === 1) {
-                  results.highlights.successes += 1;
-                } else if (numberOfMatches === 0) {
-                  console.log(
-                    "Failure: ",
-                    termOccurance,
-                    ", ",
-                    selectedElements[0]
-                  );
-                  results.highlights.failures += 1;
-                } else {
-                  results.highlights.overselectedFailures += 1;
-                  console.log(
-                    "Overseledcted Failure: ",
-                    termOccurance,
-                    ", ",
-                    selectedElements[0]
-                  );
-                }
-              },
+                  return pureLeft === pureRight;
+                },
+                element: "termit-h",
+                diacritcs: false,
+                exclude: ["termit-h"],
+                caseSensitive: true,
+                separateWordSearch: false,
+                className: `termit-highlighted-word`,
+                done(numberOfMatches) {
+                  console.log("done once: ", numberOfMatches);
+                  if (numberOfMatches === 1) {
+                    results.highlights.successes += 1;
+                  } else if (numberOfMatches === 0) {
+                    console.log(
+                      "Failure: ",
+                      termOccurance,
+                      ", ",
+                      selectedElements[0]
+                    );
+                    results.highlights.failures += 1;
+                  } else {
+                    results.highlights.overselectedFailures += 1;
+                    console.log(
+                      "Overseledcted Failure: ",
+                      termOccurance,
+                      ", ",
+                      selectedElements[0]
+                    );
+                  }
+                },
+              });
             });
-          });
-        }
-      });
+          }
+        });
 
-      console.log('results: ', results)
-      initSidebar();
-    }
-  );
+        resolve(data);
+      }
+    );
+  });
 };
 
 export const overlay = {
@@ -317,7 +322,7 @@ export const overlay = {
   },
 };
 
-window.addEventListener("load", () => {
+window.addEventListener("load", async () => {
   overlay.init();
   preloadURL(
     document,
@@ -334,10 +339,13 @@ window.addEventListener("load", () => {
     "style",
     chrome.runtime.getURL("/static/css/bootstrap-termit.css")
   );
-  annotate();
+
+  initSidebar();
   // setTimeout(() => {
 
   new AnnotatorGuest(document.body);
+  // const annotations = await annotate();
+  // contentState.annotations = annotations;
   // }, 10000);
 });
 
@@ -539,7 +547,11 @@ export function getConfig(appContext = "annotator", window_ = window) {
 
 function initSidebar() {
   const eventBus = new EventBus();
-  const sidebar = new Sidebar(document.body, eventBus, contentState);
+  const sidebar = new Sidebar(document.body, eventBus, contentState, async () => {
+    const annotations = await annotate();
+    contentState.annotations = annotations;
+    sidebar.render();
+  });
   setTimeout(() => {
     // sidebar.open();
     console.log("sidebar was just opened now");
