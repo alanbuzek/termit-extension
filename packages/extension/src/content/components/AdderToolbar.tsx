@@ -6,7 +6,10 @@ import TermDefinitionAnnotation from "../../common/component/annotator/TermDefin
 import TermOccurrenceAnnotation from "../../common/component/annotator/TermOccurrenceAnnotation";
 import HighlightedTextAdder from "./HighlightedTextAdder";
 import { useState } from "react";
-import { overlay } from "..";
+import { markTerm, overlay } from "..";
+import { getCssSelector } from "css-selector-generator";
+import { useEffect } from "react";
+
 /**
  * Union of possible toolbar commands.
  *
@@ -48,7 +51,9 @@ export default function AdderToolbar({
   initialPopupType = PopupType.PurposeSelection,
   showAt,
   hide,
+  selectionRange
 }) {
+  console.log('selectionRange: ', selectionRange);
   const [currPopup, setCurrPopup] = useState(initialPopupType);
 
   // Since the selection toolbar is only shown when there is a selection
@@ -71,6 +76,20 @@ export default function AdderToolbar({
     hide();
   };
 
+  const [newTerm, setNewTerm] = useState(null);
+  useEffect(() => {
+    if (!window.getSelection()?.toString() || newTerm) {
+      return;
+    }
+
+    let newTermTemplate = {
+      cssSelectors: [],
+      termOccurrences: [],
+    };
+
+   
+  });
+
   const mockCreateTermAnnotationProps = {
     show: true,
     onClose() {
@@ -78,6 +97,29 @@ export default function AdderToolbar({
       overlay.off();
     },
     onSave() {
+      console.log("on save called with term, ", newTerm);
+      // markTerm()(newTerm);
+      const parentElement = selectionRange.startContainer.parentNode;
+      console.log(parentElement)
+      if (parentElement) {
+        const selectedString = selectionRange.commonAncestorContainer.wholeText.slice(selectionRange.startOffset, selectionRange.endOffset);
+        const generatedCssSelector = getCssSelector(parentElement);
+        const startOffsetIdx = parentElement.textContent.indexOf(selectedString);
+        const newTerm = { cssSelectors: [], termOccurrences: [] };
+        const termOccurrence = {
+          about: "_:bbc3-0",
+          content: selectedString,
+          originalTerm: selectedString,
+          property: "ddo:je-výskytem-termu",
+          resource: "",
+          score: 1,
+          startOffset: parentElement.textContent.slice(0, startOffsetIdx),
+          typeof: "ddo:výskyt-termu",
+        };
+        newTerm.cssSelectors.push(generatedCssSelector);
+        newTerm.termOccurrences.push(termOccurrence);
+        markTerm(newTerm);
+      }
       closePopup();
       overlay.off();
     },
@@ -140,8 +182,12 @@ export default function AdderToolbar({
           //   onCancel={closePopup}
           // />
           <HighlightedTextAdder
-            onMarkOccurrence={() => {setCurrPopup(PopupType.TermOccurrence)}}
-            onMarkDefinition={() => {setCurrPopup(PopupType.TermDefinition)}}
+            onMarkOccurrence={() => {
+              setCurrPopup(PopupType.TermOccurrence);
+            }}
+            onMarkDefinition={() => {
+              setCurrPopup(PopupType.TermDefinition);
+            }}
           />
         );
       case PopupType.TermOccurrence:

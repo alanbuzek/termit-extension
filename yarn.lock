@@ -4188,10 +4188,10 @@ css-select@^4.1.3:
     domutils "^2.6.0"
     nth-check "^2.0.0"
 
-css-selector-generator@^3.4.4:
-  version "3.4.4"
-  resolved "https://registry.yarnpkg.com/css-selector-generator/-/css-selector-generator-3.4.4.tgz#daba9fdd0d61de5efeda8cdafb57ae6f8defb44f"
-  integrity sha512-opjk54O5JZaKf8UrxUciqBdyIggH3D/TSZYI/AAJd0KNb6hBhjJtCI034rWDEHn0IIBsZEuAIuVR7N4j9n75lg==
+css-selector-generator@^3.6.0:
+  version "3.6.0"
+  resolved "https://registry.yarnpkg.com/css-selector-generator/-/css-selector-generator-3.6.0.tgz#06293fb3d9303cc4b55f2d8e40aa6b85bf1c405b"
+  integrity sha512-t1wTGaASlIyCd5nYA0sptNgn97bkAWlZlVSvQKXbR9xhWANDvTu9blgAFyZ8db8xGyTzUIDYjngjAmwmMNM+KQ==
   dependencies:
     cartesian "^1.0.1"
     iselement "^1.1.4"

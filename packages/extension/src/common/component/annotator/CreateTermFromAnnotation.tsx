@@ -70,11 +70,13 @@ export class CreateTermFromAnnotation extends React.Component<
   };
 
   public onSave = () => {
-    const newTerm = new Term(this.state);
-    this.props.createTerm(newTerm, this.props.vocabularyIri).then(() => {
-      this.props.onTermCreated(newTerm);
-      this.onCancel();
-    });
+    // const newTerm = new Term(this.state);
+    console.log('on save inside called')
+    this.props.onSave();
+    // this.props.createTerm(newTerm, this.props.vocabularyIri).then(() => {
+    //   this.props.onTermCreated(newTerm);
+    //   this.onCancel();
+    // });
   };
 
   public onCancel = () => {

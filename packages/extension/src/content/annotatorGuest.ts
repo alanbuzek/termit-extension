@@ -697,8 +697,9 @@ export default class AnnotatorGuest {
     // this._hostRPC.call('textSelected');
 
     // this._adder.annotationsForSelection = annotationsForSelection();
+    const selectionRange = window.getSelection()?.getRangeAt(0);
     this._isAdderVisible = true;
-    this._adder.show(focusRect, isBackwards);
+    this._adder.show(focusRect, isBackwards, selectionRange);
   }
 
   _onClearSelection() {

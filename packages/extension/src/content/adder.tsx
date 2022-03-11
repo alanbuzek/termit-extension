@@ -254,7 +254,7 @@ export class Adder {
    *        rigth-to-left, such that the focus point is mosty likely at the
    *        top-left edge of targetRect.
    */
-  show(selectionRect, isRTLselection) {
+  show(selectionRect, isRTLselection, selectionRange) {
     const { left, top, arrowDirection } = this._calculateTarget(
       selectionRect,
       isRTLselection
@@ -264,7 +264,7 @@ export class Adder {
     this._isVisible = true;
     this._arrowDirection = arrowDirection === ARROW_POINTING_UP ? "up" : "down";
 
-    this._render();
+    this._render(selectionRange);
   }
 
   /**
@@ -434,7 +434,7 @@ export class Adder {
     // console.log("style: ", this._outerContainer.style);
   }
 
-  _render() {
+  _render(selectionRange) {
     // console.log("rendering adder");
     const handleCommand = (command) => {
       // switch (command) {
@@ -468,6 +468,7 @@ export class Adder {
           annotationCount={20}
           showAt={this._showAt.bind(this)}
           hide={this.hide.bind(this)}
+          selectionRange={selectionRange}
         />
       </IntlProvider>,
       this._shadowRoot,
