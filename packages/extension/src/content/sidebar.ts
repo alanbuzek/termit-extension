@@ -2,6 +2,7 @@ import Hammer from "hammerjs";
 
 import { sendErrorsTo } from "../shared/frame-error-capture";
 import { ListenerCollection } from "../shared/listener-collection";
+import { MessageType } from "../types";
 import { createShadowRoot } from "./adder";
 
 import { annotationCounts } from "./annotation-counts";
@@ -9,7 +10,7 @@ import { BucketBar } from "./bucket-bar";
 // import { createAppConfig } from './config/app';
 import { features } from "./features";
 import { sidebarTrigger } from "./sidebar-trigger";
-import SidebarBox from './SidebarBox';
+import SidebarBox from "./SidebarBox";
 import { ToolbarController } from "./toolbar";
 
 /**
@@ -145,18 +146,18 @@ export class Sidebar {
     // if (config.theme === "clean") {
     //   this.iframeContainer.classList.add("annotator-frame--theme-clean");
     // } else {
-      this.bucketBar = new BucketBar(this.iframeContainer, {
-        onFocusAnnotations: (tags) =>
-          this._guestRPC.forEach((rpc) => rpc.call("focusAnnotations", tags)),
-        onScrollToClosestOffScreenAnchor: (tags, direction) =>
-          this._guestRPC.forEach((rpc) =>
-            rpc.call("scrollToClosestOffScreenAnchor", tags, direction)
-          ),
-        onSelectAnnotations: (tags, toggle) =>
-          this._guestRPC.forEach((rpc) =>
-            rpc.call("selectAnnotations", tags, toggle)
-          ),
-      });
+    this.bucketBar = new BucketBar(this.iframeContainer, {
+      onFocusAnnotations: (tags) =>
+        this._guestRPC.forEach((rpc) => rpc.call("focusAnnotations", tags)),
+      onScrollToClosestOffScreenAnchor: (tags, direction) =>
+        this._guestRPC.forEach((rpc) =>
+          rpc.call("scrollToClosestOffScreenAnchor", tags, direction)
+        ),
+      onSelectAnnotations: (tags, toggle) =>
+        this._guestRPC.forEach((rpc) =>
+          rpc.call("selectAnnotations", tags, toggle)
+        ),
+    });
     // }
 
     // this.iframeContainer.appendChild(this.iframe);
@@ -168,12 +169,13 @@ export class Sidebar {
 
     element.appendChild(this.hypothesisSidebar);
 
-    const sidebarContainer = document.createElement("hypothesis-sidebar-container");
-    sidebarContainer.style.width = '100%';
-    sidebarContainer.style.height = '100%';
-    sidebarContainer.style.position = 'relative';
-    sidebarContainer.style['z-index'] = 3;
-
+    const sidebarContainer = document.createElement(
+      "hypothesis-sidebar-container"
+    );
+    sidebarContainer.style.width = "100%";
+    sidebarContainer.style.height = "100%";
+    sidebarContainer.style.position = "relative";
+    sidebarContainer.style["z-index"] = 3;
 
     this.iframeContainer.appendChild(sidebarContainer);
 
@@ -199,6 +201,21 @@ export class Sidebar {
       },
       setSidebarOpen: (open) => (open ? this.open() : this.close()),
       setHighlightsVisible: (show) => this.setHighlightsVisible(show),
+    });
+
+    console.log("registering listener");
+    chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+      console.log("got message");
+      switch (message.type) {
+        case MessageType.OpenToolbar: {
+          if (this.toolbar.sidebarOpen) {
+            this.close();
+          } else {
+            this.open();
+          }
+        }
+      }
+      return true;
     });
 
     if (config.theme === "clean") {
@@ -628,7 +645,7 @@ export class Sidebar {
     }
   }
 
-  render(){
+  render() {
     this._sidebar.render();
   }
 }

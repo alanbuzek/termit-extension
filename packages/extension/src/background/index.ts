@@ -2,7 +2,6 @@ import "regenerator-runtime/runtime.js";
 import { MessageType } from "../types";
 // import { JSDOM } from 'jsdom';
 
-
 // handles request from content scripts
 function addListeners() {
   chrome.runtime.onMessage.addListener(handleMessages);
@@ -25,40 +24,66 @@ const sumResult = {
 addListeners();
 
 function handleMessages(message, sender, sendResponse) {
-  console.log("got handle message: ", message, "sendResponse: ", sendResponse);
+  switch (message.type) {
+    case MessageType.GetAnnotations: {
+      console.log(
+        "got handle message: ",
+        message,
+        "sendResponse: ",
+        sendResponse
+      );
 
-  fetch("http://localhost:8888/annotate?enableKeywordExtraction=true", {
-    method: "POST",
-    mode: "cors", // no-cors, *cors, same-origin
-    cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
-    credentials: "same-origin", // include, *same-origin, omit
-    headers: {
-      "Content-Type": "application/json",
-      // 'Content-Type': 'application/x-www-form-urlencoded',
-    },
-    redirect: "follow", // manual, *follow, error
-    referrerPolicy: "no-referrer", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
-    body: JSON.stringify({
-      content: message.payload.pageHtml,
-      vocabularyRepository:
-        "http://onto.fel.cvut.cz/ontologies/slovník/agendový/popis-dat/pojem/slovník",
-      vocabularyContexts: [],
-      language: "cs",
-    }), // body data type must match "Content-Type" header
-  })
-    .then((res) => {
-      return res.json();
-      // console.log('before virtual dom: ')
-      // const virtualDom = new JSDOM(res.data.annotatedDocument);
-      // console.log('after')
-    })
-    .then((res) => {
-      sendResponse({ data: res });
-    })
-    .catch(
-      (err) => sendResponse({ error: "here" })
-      // sendResponse({ error: err || true })
-    );
+      fetch("http://localhost:8888/annotate?enableKeywordExtraction=true", {
+        method: "POST",
+        mode: "cors", // no-cors, *cors, same-origin
+        cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
+        credentials: "same-origin", // include, *same-origin, omit
+        headers: {
+          "Content-Type": "application/json",
+          // 'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        redirect: "follow", // manual, *follow, error
+        referrerPolicy: "no-referrer", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+        body: JSON.stringify({
+          content: message.payload.pageHtml,
+          vocabularyRepository:
+            "http://onto.fel.cvut.cz/ontologies/slovník/agendový/popis-dat/pojem/slovník",
+          vocabularyContexts: [],
+          language: "cs",
+        }), // body data type must match "Content-Type" header
+      })
+        .then((res) => {
+          return res.json();
+          // console.log('before virtual dom: ')
+          // const virtualDom = new JSDOM(res.data.annotatedDocument);
+          // console.log('after')
+        })
+        .then((res) => {
+          sendResponse({ data: res });
+        })
+        .catch(
+          (err) => sendResponse({ error: "here" })
+          // sendResponse({ error: err || true })
+        );
+    }
+  }
 
   return true;
 }
+
+chrome.action.onClicked.addListener((tab) => {
+  console.log('action clicked: ', tab);
+  if (!tab || !tab.id) {
+    return;
+  }
+  chrome.tabs.sendMessage(
+    tab.id,
+    { type: MessageType.OpenToolbar },
+    function (response) {
+      console.log("GOT Response");
+    }
+  );
+});
+
+console.log("action handler registered");
+// chrome.action.onClicked.addListener((tab) => console.log("tab clicked!!!"));

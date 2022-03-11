@@ -1,6 +1,7 @@
 export enum MessageType {
   GetAnnotations,
-  SaveAnnotaionResult
+  SaveAnnotaionResult,
+  OpenToolbar
 }
 
 export default {
