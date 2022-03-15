@@ -6,6 +6,7 @@ import Mark from "../markjs";
 import { EventBus } from "./utils/emitter";
 import React from "react";
 import { Sidebar } from "./sidebar";
+import Vocabulary from '../common/model/Vocabulary';
 
 /**
  * Mark an element as having been added by the boot script.
@@ -165,6 +166,14 @@ const contentState = {
   sidebar: null,
 };
 
+const classesMap = {
+  unknownTermOcc: 'suggested-term-occurrence selected-occurrence',
+  knownTermOcc: 'suggested-term-occurrence selected-occurrence',
+  termDefinition: 'term-definition',
+  newTermProposal: 'proposed-occurrence suggested-term-occurrence',
+  existingTermProposal: 'proposed-occurrence assigned-term-occurrence',
+};
+
 export const markTerm = ({ cssSelectors, termOccurrences }, results) => {
   const selectedElements = Array.from(
     document.querySelectorAll(cssSelectors[0])
@@ -243,7 +252,7 @@ export const markTerm = ({ cssSelectors, termOccurrences }, results) => {
   }
 };
 
-const annotate = () => {
+const annotate = (vocabulary: Vocabulary) => {
   return new Promise((resolve, reject) => {
     chrome.runtime.sendMessage(
       {
@@ -251,6 +260,7 @@ const annotate = () => {
         payload: {
           // pageLang: document.documentElement.lang,
           pageHtml: document.body.outerHTML,
+          vocabulary: vocabulary.iri
         },
       },
       (response) => {
@@ -533,8 +543,8 @@ function initSidebar() {
     document.body,
     eventBus,
     contentState,
-    async () => {
-      const annotations = await annotate();
+    async (vocabulary: Vocabulary) => {
+      const annotations = await annotate(vocabulary);
       contentState.annotations = annotations;
       sidebar.render();
     }

@@ -3,7 +3,10 @@ import { Spinner } from "reactstrap";
 import Button from "./Button";
 import Toggle from "react-toggle";
 import { useState } from "react";
-import VocabularySelect from '../../common/component/vocabulary/VocabularySelect';
+import VocabularySelect from "../../common/component/vocabulary/VocabularySelect";
+import { useEffect } from "react";
+import { loadVocabularies } from "../../api";
+import Vocabulary from "../../common/model/Vocabulary";
 
 export const getUrlInfo = (url) => {
   const urlObject = new URL(url);
@@ -15,6 +18,13 @@ export const getUrlInfo = (url) => {
 const PageSummary = ({ annotations, annotatePage, flatTermOccs }) => {
   const loading = false;
   const disabled = false;
+
+  const [vocabularies, setVocabularies] = useState<Vocabulary[]>([]);
+  useEffect(() => {
+    loadVocabularies().then((vocab) => setVocabularies(vocab));
+  }, []);
+  const [selectedVocabulary, setSelectedVocabulary] = useState();
+  const onVocabularyChange = (vIri: string) => setSelectedVocabulary(vocabularies[vIri]);
 
   const [annotationLoading, setAnnotationLoading] = useState(false);
   const { checkedHostname } = getUrlInfo(window.location.href);
@@ -43,15 +53,21 @@ const PageSummary = ({ annotations, annotatePage, flatTermOccs }) => {
     return (
       <div className="p-3 mb-4 rounded-md bg-gray-100 border-gray-600 border">
         {/* {allowPannel} */}
-        <p className='font-semibold'>This page hasn't be annotated yet.</p>
-        <VocabularySelect />
+        <p className="font-semibold">This page hasn't be annotated yet.</p>
+        <VocabularySelect
+          id={"vocabularySelect1"}
+          vocabularies={vocabularies}
+          selectVocabulary={selectedVocabulary}
+          onVocabularyChange={onVocabularyChange}
+        />
         <Button
           onClick={() => {
             setAnnotationLoading(true);
 
             // TODO: remove timeout
             setTimeout(() => {
-              annotatePage();
+              // TODO: remove this fallback, adjust it to a different, proper default (To be specified)
+              annotatePage(selectedVocabulary || vocabularies[0]);
             }, 1500);
           }}
           loading={annotationLoading}

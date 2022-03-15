@@ -1,4 +1,5 @@
 import Hammer from "hammerjs";
+import Vocabulary from '../common/model/Vocabulary';
 
 import { sendErrorsTo } from "../shared/frame-error-capture";
 import { ListenerCollection } from "../shared/listener-collection";
@@ -96,7 +97,7 @@ export class Sidebar {
     element: HTMLElement,
     eventBus: any,
     state: any,
-    annotatePage: any,
+    annotatePage: (vocabulary: Vocabulary) => void,
     config: Record<string, any> = {}
   ) {
     this._emitter = eventBus.createEmitter();

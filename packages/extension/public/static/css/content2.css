@@ -40,6 +40,13 @@ termit-h.termit-highlighted-word {
     border: 0.15em dotted #ef451b;
 }
 
+termit-h.suggested-term-occurrence {
+    background-color: rgba(239,207,184,.8) !important;
+}
+
+termit-h.suggested-term-occurrence.proposed-occurrence {
+    border: 0.15em dotted #ef451b;
+}
 
 termit-h.termit-highlighted-word--not-due{
     background-color: #f6fcd0 !important;
@@ -47,6 +54,14 @@ termit-h.termit-highlighted-word--not-due{
 
 termit-h.termit-highlighted-word:hover {
     background-color: rgb(219, 219, 219) !important;
+}
+
+termit-h.assigned-term-occurrence {
+    background: rgba(188,239,184,.8);
+}
+
+termit-h.assigned-term-occurrence.proposed-occurrence {
+    border: 0.15em dotted green;
 }
 
 .termit-info-window {

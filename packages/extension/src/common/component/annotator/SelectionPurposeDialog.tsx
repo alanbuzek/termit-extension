@@ -1,10 +1,7 @@
 import * as React from "react";
-import {
-  Button,
-  ButtonToolbar,
-} from "reactstrap";
+import { Button, ButtonToolbar } from "reactstrap";
 import { TiTimes } from "react-icons/ti";
-import { useI18n } from '../hook/useI18n';
+import { useI18n } from "../hook/useI18n";
 // import { useI18n } from "../hook/useI18n";
 
 // i18n mock
@@ -27,18 +24,17 @@ function handler(e: any) {
 }
 
 // mock popover components
-export const Popover = ({ children, className = '' }) => {
-  return <div className={`popover ${className}`}>{children}</div>
-}
+export const Popover = ({ children, className = "" }) => {
+  return <div className={`popover ${className}`}>{children}</div>;
+};
 
-export const PopoverHeader = ({ children,  className = '' }) => {
-  return <div className={`popover-header ${className}`}>{children}</div>
-}
+export const PopoverHeader = ({ children, className = "" }) => {
+  return <div className={`popover-header ${className}`}>{children}</div>;
+};
 
-export const PopoverBody = ({ children, className = '' }) => {
-  return <div className={`popover-body ${className}`}>{children}</div>
-}
-
+export const PopoverBody = ({ children, className = "" }) => {
+  return <div className={`popover-body ${className}`}>{children}</div>;
+};
 
 export const SelectionPurposeDialog: React.FC<SelectionPurposeDialogProps> = (
   props
@@ -48,8 +44,7 @@ export const SelectionPurposeDialog: React.FC<SelectionPurposeDialogProps> = (
   //   return null;
   // }
   return (
-    <Popover
-    >
+    <Popover>
       <div onClick={handler}>
         <PopoverHeader className="d-flex align-items-center">
           <div className="flex-grow-1">

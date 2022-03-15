@@ -1,4 +1,8 @@
 import React from "react";
+import { useState } from "react";
+import { useEffect } from "react";
+import api from "../../api";
+import Vocabulary from "../../common/model/Vocabulary";
 import PageSummary from "./PageSummery";
 
 const SidebarApp = ({ state, annotatePage }) => {
@@ -8,7 +12,10 @@ const SidebarApp = ({ state, annotatePage }) => {
       termOccurrences.map((termOcc) => ({ ...termOcc, cssSelectors }))
   );
   return (
-    <div className="h-full w-full p-3 overflow-x-auto" style={{ background: "#dddddd" }}>
+    <div
+      className="h-full w-full p-3 overflow-x-auto"
+      style={{ background: "#dddddd" }}
+    >
       <PageSummary
         annotations={state.annotations}
         flatTermOccs={flatTermOccs}
@@ -17,7 +24,9 @@ const SidebarApp = ({ state, annotatePage }) => {
       {flatTermOccs.map((termOcc) => {
         return (
           <div className="shadow-md rounded-md p-3 border border-gray-400 mb-3 cursor-pointer bg-white hover:bg-gray-300">
-            <div className="mb-0 text-lg font-semibold">{termOcc.originalTerm}</div>
+            <div className="mb-0 text-lg font-semibold">
+              {termOcc.originalTerm}
+            </div>
           </div>
         );
       })}

@@ -25,6 +25,7 @@
     "hammerjs": "^2.0.8",
     "intelligent-tree-select": "^0.8.3",
     "jsdom": "^18.1.0",
+    "jsonld": "^5.2.0",
     "lodash": "^4.17.21",
     "mark.js": "^8.11.1",
     "postcss-flexbugs-fixes": "^4.2.1",
