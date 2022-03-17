@@ -7,9 +7,11 @@ import TermOccurrenceAnnotation from "../../common/component/annotator/TermOccur
 import HighlightedTextAdder from "./HighlightedTextAdder";
 import { useState } from "react";
 import { overlay } from "..";
-import { getCssSelector } from "css-selector-generator";
 import { useEffect } from "react";
-import { markTerm } from "../marker";
+import { createAnnotation, markTerm } from "../marker";
+import JsonLdUtils from "../../common/util/JsonLdUtils";
+import { getPropertyForAnnotationType } from "../../common/component/annotator/AnnotationDomHelper";
+import { AnnotationType } from "../../common/util/Annotation";
 
 /**
  * Union of possible toolbar commands.
@@ -96,34 +98,12 @@ export default function AdderToolbar({
     },
     onSave() {
       // markTerm()(newTerm);
-      let parentElement = selectionRange.startContainer;
-      if (parentElement) {
-        const isTextNode = parentElement.nodeType === Node.TEXT_NODE;
-        const selectedString = selectionRange.toString();
-        let startOffsetIdx;
-        if (isTextNode) {
-          const nodeText = parentElement.wholeText;
-          parentElement = parentElement.parentNode;
-          startOffsetIdx = parentElement.textContent.indexOf(nodeText) + selectionRange.startOffset;
-        } else {
-          startOffsetIdx = selectionRange.startOffset;
-        }
-        const generatedCssSelector = getCssSelector(parentElement);
-        const newTerm = { cssSelectors: [], termOccurrences: [] };
-        const termOccurrence = {
-          about: "_:bbc3-0",
-          content: selectedString,
-          originalTerm: selectedString,
-          property: "ddo:je-výskytem-termu",
-          resource: "",
-          score: 1,
-          startOffset: parentElement.textContent.slice(0, startOffsetIdx),
-          typeof: "ddo:výskyt-termu",
-        };
-        newTerm.cssSelectors.push(generatedCssSelector);
-        newTerm.termOccurrences.push(termOccurrence);
-        console.log("new term: ", newTerm);
-        markTerm(newTerm);
+      const newAnnotation = createAnnotation(
+        selectionRange,
+        AnnotationType.OCCURRENCE
+      );
+      if (newAnnotation) {
+        markTerm(newAnnotation);
       }
       closePopup();
       overlay.off();

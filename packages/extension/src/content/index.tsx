@@ -14,15 +14,6 @@ const contentState = {
   sidebar: null,
 };
 
-// TODO: use this later
-const classesMap = {
-  unknownTermOcc: "suggested-term-occurrence selected-occurrence",
-  knownTermOcc: "suggested-term-occurrence selected-occurrence",
-  termDefinition: "term-definition",
-  newTermProposal: "proposed-occurrence suggested-term-occurrence",
-  existingTermProposal: "proposed-occurrence assigned-term-occurrence",
-};
-
 const annotate = (vocabulary: Vocabulary) => {
   return new Promise((resolve) => {
     chrome.runtime.sendMessage(
