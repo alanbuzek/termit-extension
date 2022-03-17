@@ -2,7 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import { loadStyles } from './adder';
 
-import Toolbar from "./components/Toolbar";
+import Toolbar from "../components/Toolbar";
 
 /**
  * @typedef ToolbarOptions

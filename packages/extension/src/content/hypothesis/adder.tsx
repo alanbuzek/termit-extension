@@ -1,9 +1,9 @@
-import AdderToolbar from "./components/AdderToolbar";
+import AdderToolbar from "../components/AdderToolbar";
 import React from "react";
 import ReactDOM from "react-dom";
 import { IntlProvider } from "react-intl";
-import cs from "../cs.locale";
-import { overlay } from '.';
+import cs from "../../cs.locale";
+import { overlay } from '..';
 
 /**
  * Returns true when the device is a touch device such

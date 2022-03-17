@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import { loadStyles } from "./adder";
-import Buckets from "./components/Buckets";
+import Buckets from "../components/Buckets";
 import { computeBuckets } from "./utils/buckets";
 
 /**

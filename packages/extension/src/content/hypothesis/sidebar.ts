@@ -1,9 +1,9 @@
 import Hammer from "hammerjs";
-import Vocabulary from '../common/model/Vocabulary';
+import Vocabulary from '../../common/model/Vocabulary';
 
-import { sendErrorsTo } from "../shared/frame-error-capture";
-import { ListenerCollection } from "../shared/listener-collection";
-import { MessageType } from "../types";
+import { sendErrorsTo } from "../../shared/frame-error-capture";
+import { ListenerCollection } from "../../shared/listener-collection";
+import { MessageType } from "../../types";
 import { createShadowRoot } from "./adder";
 
 import { annotationCounts } from "./annotation-counts";
@@ -11,7 +11,7 @@ import { BucketBar } from "./bucket-bar";
 // import { createAppConfig } from './config/app';
 import { features } from "./features";
 import { sidebarTrigger } from "./sidebar-trigger";
-import SidebarBox from "./SidebarBox";
+import SidebarBox from "../components/SidebarBox";
 import { ToolbarController } from "./toolbar";
 
 /**

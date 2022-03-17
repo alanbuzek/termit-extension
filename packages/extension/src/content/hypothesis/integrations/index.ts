@@ -13,6 +13,7 @@ import { HTMLIntegration } from './html';
  * @return {Integration}
  */
 export function createIntegration(annotator) {
+  // TODO: add PDF and possibly other integrations later
   // if (isPDF()) {
   //   return new PDFIntegration(annotator);
   // }

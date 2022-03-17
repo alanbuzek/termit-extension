@@ -6,9 +6,10 @@ import TermDefinitionAnnotation from "../../common/component/annotator/TermDefin
 import TermOccurrenceAnnotation from "../../common/component/annotator/TermOccurrenceAnnotation";
 import HighlightedTextAdder from "./HighlightedTextAdder";
 import { useState } from "react";
-import { markTerm, overlay } from "..";
+import { overlay } from "..";
 import { getCssSelector } from "css-selector-generator";
 import { useEffect } from "react";
+import { markTerm } from "../marker";
 
 /**
  * Union of possible toolbar commands.
@@ -51,9 +52,8 @@ export default function AdderToolbar({
   initialPopupType = PopupType.PurposeSelection,
   showAt,
   hide,
-  selectionRange
+  selectionRange,
 }) {
-  console.log('selectionRange: ', selectionRange);
   const [currPopup, setCurrPopup] = useState(initialPopupType);
 
   // Since the selection toolbar is only shown when there is a selection
@@ -86,8 +86,6 @@ export default function AdderToolbar({
       cssSelectors: [],
       termOccurrences: [],
     };
-
-   
   });
 
   const mockCreateTermAnnotationProps = {
@@ -97,14 +95,20 @@ export default function AdderToolbar({
       overlay.off();
     },
     onSave() {
-      console.log("on save called with term, ", newTerm);
       // markTerm()(newTerm);
-      const parentElement = selectionRange.startContainer.parentNode;
-      console.log(parentElement)
+      let parentElement = selectionRange.startContainer;
       if (parentElement) {
-        const selectedString = selectionRange.commonAncestorContainer.wholeText.slice(selectionRange.startOffset, selectionRange.endOffset);
+        const isTextNode = parentElement.nodeType === Node.TEXT_NODE;
+        const selectedString = selectionRange.toString();
+        let startOffsetIdx;
+        if (isTextNode) {
+          const nodeText = parentElement.wholeText;
+          parentElement = parentElement.parentNode;
+          startOffsetIdx = parentElement.textContent.indexOf(nodeText) + selectionRange.startOffset;
+        } else {
+          startOffsetIdx = selectionRange.startOffset;
+        }
         const generatedCssSelector = getCssSelector(parentElement);
-        const startOffsetIdx = parentElement.textContent.indexOf(selectedString);
         const newTerm = { cssSelectors: [], termOccurrences: [] };
         const termOccurrence = {
           about: "_:bbc3-0",
@@ -118,6 +122,7 @@ export default function AdderToolbar({
         };
         newTerm.cssSelectors.push(generatedCssSelector);
         newTerm.termOccurrences.push(termOccurrence);
+        console.log("new term: ", newTerm);
         markTerm(newTerm);
       }
       closePopup();

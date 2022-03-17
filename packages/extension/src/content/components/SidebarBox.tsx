@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import { loadStyles } from "./adder";
-import SidebarApp from "./components/SidebarApp";
+import { loadStyles } from "../hypothesis/adder";
+import SidebarApp from "./SidebarApp";
 
 /**
  * @typedef ToolbarOptions

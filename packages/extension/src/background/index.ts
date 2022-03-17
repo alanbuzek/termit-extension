@@ -11,15 +11,16 @@ function addListeners() {
 addListeners();
 
 function handleMessages(message, sender, sendResponse) {
+  console.log(
+    "[Background] got handle message: ",
+    message,
+    "sendResponse: ",
+    sendResponse
+  );
+  
   switch (message.type) {
     case MessageType.GetAnnotations: {
-      console.log(
-        "got handle message: ",
-        message,
-        "sendResponse: ",
-        sendResponse
-      );
-      
+   
       api.annotatePage(message.payload.vocabulary, message.payload.pageHtml)
         .then((res) => {
           sendResponse({ data: res });
@@ -35,7 +36,6 @@ function handleMessages(message, sender, sendResponse) {
 }
 
 chrome.action.onClicked.addListener((tab) => {
-  console.log('action clicked: ', tab);
   if (!tab || !tab.id) {
     return;
   }
@@ -43,9 +43,7 @@ chrome.action.onClicked.addListener((tab) => {
     tab.id,
     { type: MessageType.OpenToolbar },
     function (response) {
-      console.log("GOT Response");
     }
   );
 });
 
-console.log("action handler registered");

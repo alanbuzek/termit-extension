@@ -25,8 +25,6 @@ const VocabularySelect: React.FC<VocabularySelectProps> = ({
   selectedVocabulary
 }) => {
   const items = Object.keys(vocabularies).map((vIri) => {
-    console.log("vIri: ", vIri);
-
     return (
       <DropdownItem
         className="m-vocabulary-select-item"
