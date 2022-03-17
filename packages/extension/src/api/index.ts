@@ -28,10 +28,20 @@ const api = {
     return callFetch(path, { ...fetchConfig, ...config, method: "GET" });
   },
   post(path, body, config = {}) {
-    return callFetch(path, { ...fetchConfig, ...config, body, method: "POST" });
+    return callFetch(path, {
+      ...fetchConfig,
+      ...config,
+      body: JSON.stringify(body),
+      method: "POST",
+    });
   },
   put(path, body, config = {}) {
-    return callFetch(path, { ...fetchConfig, ...config, body, method: "GET" });
+    return callFetch(path, {
+      ...fetchConfig,
+      ...config,
+      body: JSON.stringify(body),
+      method: "GET",
+    });
   },
   del(path, config = {}) {
     return callFetch(path, { ...fetchConfig, ...config, method: "DELETE" });
@@ -55,7 +65,7 @@ export function loadVocabularies() {
 }
 
 export function annotatePage(vocabulary, pageHtml) {
-  return api.post("/annotate?enableKeywordExtraction=true", {
+  return api.post("annotate?enableKeywordExtraction=true", {
     content: pageHtml,
     vocabularyRepository: vocabulary,
     vocabularyContexts: [],
@@ -65,5 +75,5 @@ export function annotatePage(vocabulary, pageHtml) {
 
 export default {
   loadVocabularies,
-  annotatePage
+  annotatePage,
 };

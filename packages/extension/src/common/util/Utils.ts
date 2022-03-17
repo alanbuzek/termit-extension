@@ -1,14 +1,13 @@
 /**
  * General utility functions.
  */
-import Asset, { HasLabel, HasTypes } from "../model/Asset";
+import { HasLabel } from "../model/Asset";
 // import AppNotification, {
 //   AssetUpdateNotification,
 // } from "../model/AppNotification";
 // import NotificationType from "../model/NotificationType";
 // import { BasicRouteProps } from "./Types";
 import _ from "lodash";
-import VocabularyUtils from './VocabularyUtils';
 
 const Utils = {
   /**

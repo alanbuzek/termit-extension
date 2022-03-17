@@ -7,7 +7,8 @@ const ENV = {
     acc[strippedKey] = process.env[key]!;
     return acc;
   }, {}),
-  ...(window as any).__config__,
+  // NOTE: Commented out because window doesn't exist in service worker
+  // ...(window as any).__config__,
 };
 
 /**
@@ -85,12 +86,6 @@ const constants = {
   MESSAGE_DISPLAY_COUNT: 5,
   // For how long should a message be displayed
   MESSAGE_DISPLAY_TIMEOUT: 5000,
-
-  // News
-  NEWS_MD_URL: {
-    cs: window.location.origin + window.location.pathname + "NEWS.cs.md",
-    en: window.location.origin + window.location.pathname + "NEWS.en.md",
-  },
 
   // Wallpaper: ~60% color saturation + some blur (~4px radius) + JPEG compression to <150KB.
   // LAYOUT_WALLPAPER: null,

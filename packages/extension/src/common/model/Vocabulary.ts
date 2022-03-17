@@ -1,4 +1,3 @@
-import OntologicalVocabulary from "../util/VocabularyUtils";
 import VocabularyUtils from "../util/VocabularyUtils";
 import Asset, { ASSET_CONTEXT, AssetData } from "./Asset";
 import Document, {
@@ -60,8 +59,8 @@ export default class Vocabulary extends Asset implements VocabularyData {
     Object.assign(this, data);
     this.label = data.label;
     this.types = Utils.sanitizeArray(data.types);
-    if (this.types.indexOf(OntologicalVocabulary.VOCABULARY) === -1) {
-      this.types.push(OntologicalVocabulary.VOCABULARY);
+    if (this.types.indexOf(VocabularyUtils.VOCABULARY) === -1) {
+      this.types.push(VocabularyUtils.VOCABULARY);
     }
     if (data.document) {
       this.document = new Document(data.document);
