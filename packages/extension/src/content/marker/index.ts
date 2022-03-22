@@ -1,4 +1,5 @@
 import { getCssSelector } from "css-selector-generator";
+import { globalActions } from "..";
 import { getPropertyForAnnotationType } from "../../common/component/annotator/AnnotationDomHelper";
 import { AnnotationType } from "../../common/util/Annotation";
 import JsonLdUtils from "../../common/util/JsonLdUtils";
@@ -11,6 +12,10 @@ const classesMap = {
   termDefinition: "term-definition",
   newTermProposal: "proposed-occurrence suggested-term-occurrence",
   existingTermProposal: "proposed-occurrence assigned-term-occurrence",
+};
+
+const handleElementClick = (element) => () => {
+  globalActions.showPopup(element);
 };
 
 export const markTerm = ({ cssSelectors, termOccurrences }, results) => {
@@ -57,7 +62,6 @@ export const markTerm = ({ cssSelectors, termOccurrences }, results) => {
           const pureLeft = calculatedOffset.replace(/\s/g, "");
           const pureRight = termOccurance.startOffset.replace(/\s/g, "");
 
-          console.log("pureLeft: ", pureLeft, ", pureRight: ", pureRight);
           return pureLeft === pureRight;
         },
         element: "termit-h",
@@ -66,8 +70,11 @@ export const markTerm = ({ cssSelectors, termOccurrences }, results) => {
         caseSensitive: true,
         separateWordSearch: false,
         className: `termit-highlighted-word`,
+        each(element) {
+          console.log('registering listener')
+          element.addEventListener("click", handleElementClick(element));
+        },
         done(numberOfMatches) {
-          console.log("done once: ", numberOfMatches);
           if (!results) {
             return;
           }
@@ -134,6 +141,6 @@ export const createAnnotation = (
     };
     newTerm.cssSelectors.push(generatedCssSelector);
     newTerm.termOccurrences.push(termOccurrence);
-    return newTerm
+    return newTerm;
   }
 };
