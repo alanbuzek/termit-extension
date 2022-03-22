@@ -1,17 +1,17 @@
-import ListenerCollection from './utils/listenerCollection';
+import ListenerCollection from "./utils/listenerCollection";
 // import { PortFinder, PortRPC } from '../shared/messaging';
 
-import { Adder } from './adder';
+import { Adder } from "./adder";
 // import { BucketBarClient } from './bucket-bar-client';
 // import {
 //   getHighlightsContainingNode,
 //   removeAllHighlights,
 // } from './highlighter';
-import { createIntegration } from './integrations';
-import * as rangeUtil from './utils/rangeUtils';
-import SelectionObserver from './utils/selectionObserver';
+import { createIntegration } from "./integrations";
+import * as rangeUtil from "./utils/rangeUtils";
+import SelectionObserver from "./utils/selectionObserver";
 // import { findClosestOffscreenAnchor } from './util/buckets';
-import { normalizeURI } from './utils/url';
+import { normalizeURI } from "./utils/url";
 
 /**
  * @typedef {import('../types/annotator').AnnotationData} AnnotationData
@@ -149,12 +149,12 @@ export default class AnnotatorGuest {
 
     // console.log('annotatorGuest constructor called')
     this._adder = new Adder(this.element, {
-      onAnnotate: () => console.log('this.createAnnotation()'),
-      onHighlight: () => console.log('({ highlight: true })'),
-      onShowAnnotations: tags => console.log('this.selectAnnotations(tags)'),
+      onAnnotate: () => console.log("this.createAnnotation()"),
+      onHighlight: () => console.log("({ highlight: true })"),
+      onShowAnnotations: (tags) => console.log("this.selectAnnotations(tags)"),
     });
 
-    this._selectionObserver = new SelectionObserver(range => {
+    this._selectionObserver = new SelectionObserver((range) => {
       // console.log('selection observer callback called: ', range);
       if (range) {
         this._onClearSelection();
@@ -178,7 +178,7 @@ export default class AnnotatorGuest {
      * Tags of annotations that are currently anchored or being anchored in
      * the guest.
      */
-    this._annotations = /** @type {Set<string>} */ (new Set());
+    this._annotations = /** @type {Set<string>} */ new Set();
 
     // Set the frame identifier if it's available.
     // The "top" guest instance will have this as null since it's in a top frame not a sub frame
@@ -232,9 +232,9 @@ export default class AnnotatorGuest {
      */
     this._focusedAnnotations = new Set();
   }
-    // selectAnnotations(tags: any) {
-    //     throw new Error('Method not implemented.');
-    // }
+  // selectAnnotations(tags: any) {
+  //     throw new Error('Method not implemented.');
+  // }
 
   // Add DOM event listeners for clicks, taps etc. on the document and
   // highlights.
@@ -287,7 +287,7 @@ export default class AnnotatorGuest {
     //   }
     // });
 
-    this._listeners.add(window, 'resize', () => this._repositionAdder());
+    this._listeners.add(window, "resize", () => this._repositionAdder());
   }
 
   /**
@@ -319,120 +319,120 @@ export default class AnnotatorGuest {
     }
   }
 
-//   async _connectHost() {
-//     this._hostRPC.on('clearSelection', () => {
-//       this._informHostOnNextSelectionClear = false;
-//       removeTextSelection();
-//     });
+  //   async _connectHost() {
+  //     this._hostRPC.on('clearSelection', () => {
+  //       this._informHostOnNextSelectionClear = false;
+  //       removeTextSelection();
+  //     });
 
-//     this._hostRPC.on('createAnnotation', () => this.createAnnotation());
+  //     this._hostRPC.on('createAnnotation', () => this.createAnnotation());
 
-//     this._hostRPC.on(
-//       'focusAnnotations',
-//       /** @param {string[]} tags */
-//       tags => this._focusAnnotations(tags)
-//     );
+  //     this._hostRPC.on(
+  //       'focusAnnotations',
+  //       /** @param {string[]} tags */
+  //       tags => this._focusAnnotations(tags)
+  //     );
 
-//     this._hostRPC.on(
-//       'scrollToClosestOffScreenAnchor',
-//       /**
-//        * @param {string[]} tags
-//        * @param {'down'|'up'} direction
-//        */
-//       (tags, direction) => this._scrollToClosestOffScreenAnchor(tags, direction)
-//     );
+  //     this._hostRPC.on(
+  //       'scrollToClosestOffScreenAnchor',
+  //       /**
+  //        * @param {string[]} tags
+  //        * @param {'down'|'up'} direction
+  //        */
+  //       (tags, direction) => this._scrollToClosestOffScreenAnchor(tags, direction)
+  //     );
 
-//     this._hostRPC.on(
-//       'selectAnnotations',
-//       /**
-//        * @param {string[]} tags
-//        * @param {boolean} toggle
-//        */
-//       (tags, toggle) => this.selectAnnotations(tags, toggle)
-//     );
+  //     this._hostRPC.on(
+  //       'selectAnnotations',
+  //       /**
+  //        * @param {string[]} tags
+  //        * @param {boolean} toggle
+  //        */
+  //       (tags, toggle) => this.selectAnnotations(tags, toggle)
+  //     );
 
-//     this._hostRPC.on(
-//       'sidebarLayoutChanged',
-//       /** @param {SidebarLayout} sidebarLayout */
-//       sidebarLayout => {
-//         if (this._frameIdentifier === null) {
-//           this.fitSideBySide(sidebarLayout);
-//         }
-//       }
-//     );
+  //     this._hostRPC.on(
+  //       'sidebarLayoutChanged',
+  //       /** @param {SidebarLayout} sidebarLayout */
+  //       sidebarLayout => {
+  //         if (this._frameIdentifier === null) {
+  //           this.fitSideBySide(sidebarLayout);
+  //         }
+  //       }
+  //     );
 
-//     // Discover and connect to the host frame. All RPC events must be
-//     // registered before creating the channel.
-//     const hostPort = await this._portFinder.discover('host');
-//     this._hostRPC.connect(hostPort);
-//   }
+  //     // Discover and connect to the host frame. All RPC events must be
+  //     // registered before creating the channel.
+  //     const hostPort = await this._portFinder.discover('host');
+  //     this._hostRPC.connect(hostPort);
+  //   }
 
-//   async _connectSidebar() {
-//     // Handlers for events sent when user hovers or clicks on an annotation card
-//     // in the sidebar.
-//     this._sidebarRPC.on(
-//       'focusAnnotations',
-//       /** @param {string[]} tags */
-//       tags => this._focusAnnotations(tags)
-//     );
+  //   async _connectSidebar() {
+  //     // Handlers for events sent when user hovers or clicks on an annotation card
+  //     // in the sidebar.
+  //     this._sidebarRPC.on(
+  //       'focusAnnotations',
+  //       /** @param {string[]} tags */
+  //       tags => this._focusAnnotations(tags)
+  //     );
 
-//     this._sidebarRPC.on(
-//       'scrollToAnnotation',
-//       /** @param {string} tag */
-//       tag => {
-//         const anchor = this.anchors.find(a => a.annotation.$tag === tag);
-//         if (!anchor?.highlights) {
-//           return;
-//         }
-//         const range = resolveAnchor(anchor);
-//         if (!range) {
-//           return;
-//         }
+  //     this._sidebarRPC.on(
+  //       'scrollToAnnotation',
+  //       /** @param {string} tag */
+  //       tag => {
+  //         const anchor = this.anchors.find(a => a.annotation.$tag === tag);
+  //         if (!anchor?.highlights) {
+  //           return;
+  //         }
+  //         const range = resolveAnchor(anchor);
+  //         if (!range) {
+  //           return;
+  //         }
 
-//         // Emit a custom event that the host page can respond to. This is useful,
-//         // for example, if the highlighted content is contained in a collapsible
-//         // section of the page that needs to be un-collapsed.
-//         const event = new CustomEvent('scrolltorange', {
-//           bubbles: true,
-//           cancelable: true,
-//           detail: range,
-//         });
-//         const defaultNotPrevented = this.element.dispatchEvent(event);
+  //         // Emit a custom event that the host page can respond to. This is useful,
+  //         // for example, if the highlighted content is contained in a collapsible
+  //         // section of the page that needs to be un-collapsed.
+  //         const event = new CustomEvent('scrolltorange', {
+  //           bubbles: true,
+  //           cancelable: true,
+  //           detail: range,
+  //         });
+  //         const defaultNotPrevented = this.element.dispatchEvent(event);
 
-//         if (defaultNotPrevented) {
-//           this._integration.scrollToAnchor(anchor);
-//         }
-//       }
-//     );
+  //         if (defaultNotPrevented) {
+  //           this._integration.scrollToAnchor(anchor);
+  //         }
+  //       }
+  //     );
 
-//     // Handler for controls on the sidebar
-//     this._sidebarRPC.on('setHighlightsVisible', showHighlights => {
-//       this.setHighlightsVisible(showHighlights);
-//     });
+  //     // Handler for controls on the sidebar
+  //     this._sidebarRPC.on('setHighlightsVisible', showHighlights => {
+  //       this.setHighlightsVisible(showHighlights);
+  //     });
 
-//     this._sidebarRPC.on(
-//       'deleteAnnotation',
-//       /** @param {string} tag */
-//       tag => this.detach(tag)
-//     );
+  //     this._sidebarRPC.on(
+  //       'deleteAnnotation',
+  //       /** @param {string} tag */
+  //       tag => this.detach(tag)
+  //     );
 
-//     this._sidebarRPC.on(
-//       'loadAnnotations',
-//       /** @param {AnnotationData[]} annotations */
-//       annotations => annotations.forEach(annotation => this.anchor(annotation))
-//     );
+  //     this._sidebarRPC.on(
+  //       'loadAnnotations',
+  //       /** @param {AnnotationData[]} annotations */
+  //       annotations => annotations.forEach(annotation => this.anchor(annotation))
+  //     );
 
-//     // Connect to sidebar and send document info/URIs to it.
-//     //
-//     // RPC calls are deferred until a connection is made, so these steps can
-//     // complete in either order.
-//     this._portFinder.discover('sidebar').then(port => {
-//       this._sidebarRPC.connect(port);
-//     });
-//     this.getDocumentInfo().then(metadata =>
-//       this._sidebarRPC.call('documentInfoChanged', metadata)
-//     );
-//   }
+  //     // Connect to sidebar and send document info/URIs to it.
+  //     //
+  //     // RPC calls are deferred until a connection is made, so these steps can
+  //     // complete in either order.
+  //     this._portFinder.discover('sidebar').then(port => {
+  //       this._sidebarRPC.connect(port);
+  //     });
+  //     this.getDocumentInfo().then(metadata =>
+  //       this._sidebarRPC.call('documentInfoChanged', metadata)
+  //     );
+  //   }
 
   destroy() {
     // this._portFinder.destroy();
@@ -462,101 +462,101 @@ export default class AnnotatorGuest {
    * @param {AnnotationData} annotation
    * @return {Promise<Anchor[]>}
    */
-//   async anchor(annotation) {
-//     /**
-//      * Resolve an annotation's selectors to a concrete range.
-//      *
-//      * @param {Target} target
-//      * @return {Promise<Anchor>}
-//      */
-//     const locate = async target => {
-//       // Only annotations with an associated quote can currently be anchored.
-//       // This is because the quote is used to verify anchoring with other selector
-//       // types.
-//       if (
-//         !target.selector ||
-//         !target.selector.some(s => s.type === 'TextQuoteSelector')
-//       ) {
-//         return { annotation, target };
-//       }
+  //   async anchor(annotation) {
+  //     /**
+  //      * Resolve an annotation's selectors to a concrete range.
+  //      *
+  //      * @param {Target} target
+  //      * @return {Promise<Anchor>}
+  //      */
+  //     const locate = async target => {
+  //       // Only annotations with an associated quote can currently be anchored.
+  //       // This is because the quote is used to verify anchoring with other selector
+  //       // types.
+  //       if (
+  //         !target.selector ||
+  //         !target.selector.some(s => s.type === 'TextQuoteSelector')
+  //       ) {
+  //         return { annotation, target };
+  //       }
 
-//       /** @type {Anchor} */
-//       let anchor;
-//       try {
-//         const range = await this._integration.anchor(
-//           this.element,
-//           target.selector
-//         );
-//         // Convert the `Range` to a `TextRange` which can be converted back to
-//         // a `Range` later. The `TextRange` representation allows for highlights
-//         // to be inserted during anchoring other annotations without "breaking"
-//         // this anchor.
-//         const textRange = TextRange.fromRange(range);
-//         anchor = { annotation, target, range: textRange };
-//       } catch (err) {
-//         anchor = { annotation, target };
-//       }
-//       return anchor;
-//     };
+  //       /** @type {Anchor} */
+  //       let anchor;
+  //       try {
+  //         const range = await this._integration.anchor(
+  //           this.element,
+  //           target.selector
+  //         );
+  //         // Convert the `Range` to a `TextRange` which can be converted back to
+  //         // a `Range` later. The `TextRange` representation allows for highlights
+  //         // to be inserted during anchoring other annotations without "breaking"
+  //         // this anchor.
+  //         const textRange = TextRange.fromRange(range);
+  //         anchor = { annotation, target, range: textRange };
+  //       } catch (err) {
+  //         anchor = { annotation, target };
+  //       }
+  //       return anchor;
+  //     };
 
-//     /**
-//      * Highlight the text range that `anchor` refers to.
-//      *
-//      * @param {Anchor} anchor
-//      */
-//     const highlight = anchor => {
-//       const range = resolveAnchor(anchor);
-//       if (!range) {
-//         return;
-//       }
+  //     /**
+  //      * Highlight the text range that `anchor` refers to.
+  //      *
+  //      * @param {Anchor} anchor
+  //      */
+  //     const highlight = anchor => {
+  //       const range = resolveAnchor(anchor);
+  //       if (!range) {
+  //         return;
+  //       }
 
-//       const highlights = /** @type {AnnotationHighlight[]} */ (
-//         highlightRange(range)
-//       );
-//       highlights.forEach(h => {
-//         h._annotation = anchor.annotation;
-//       });
-//       anchor.highlights = highlights;
+  //       const highlights = /** @type {AnnotationHighlight[]} */ (
+  //         highlightRange(range)
+  //       );
+  //       highlights.forEach(h => {
+  //         h._annotation = anchor.annotation;
+  //       });
+  //       anchor.highlights = highlights;
 
-//       if (this._focusedAnnotations.has(anchor.annotation.$tag)) {
-//         setHighlightsFocused(highlights, true);
-//       }
-//     };
+  //       if (this._focusedAnnotations.has(anchor.annotation.$tag)) {
+  //         setHighlightsFocused(highlights, true);
+  //       }
+  //     };
 
-//     // Remove existing anchors for this annotation.
-//     this.detach(annotation.$tag, false /* notify */);
+  //     // Remove existing anchors for this annotation.
+  //     this.detach(annotation.$tag, false /* notify */);
 
-//     this._annotations.add(annotation.$tag);
+  //     this._annotations.add(annotation.$tag);
 
-//     // Resolve selectors to ranges and insert highlights.
-//     if (!annotation.target) {
-//       annotation.target = [];
-//     }
-//     const anchors = await Promise.all(annotation.target.map(locate));
+  //     // Resolve selectors to ranges and insert highlights.
+  //     if (!annotation.target) {
+  //       annotation.target = [];
+  //     }
+  //     const anchors = await Promise.all(annotation.target.map(locate));
 
-//     // If the annotation was removed while anchoring, don't save the anchors.
-//     if (!this._annotations.has(annotation.$tag)) {
-//       return [];
-//     }
+  //     // If the annotation was removed while anchoring, don't save the anchors.
+  //     if (!this._annotations.has(annotation.$tag)) {
+  //       return [];
+  //     }
 
-//     for (let anchor of anchors) {
-//       highlight(anchor);
-//     }
+  //     for (let anchor of anchors) {
+  //       highlight(anchor);
+  //     }
 
-//     // Set flag indicating whether anchoring succeeded. For each target,
-//     // anchoring is successful either if there are no selectors (ie. this is a
-//     // Page Note) or we successfully resolved the selectors to a range.
-//     annotation.$orphan =
-//       anchors.length > 0 &&
-//       anchors.every(anchor => anchor.target.selector && !anchor.range);
+  //     // Set flag indicating whether anchoring succeeded. For each target,
+  //     // anchoring is successful either if there are no selectors (ie. this is a
+  //     // Page Note) or we successfully resolved the selectors to a range.
+  //     annotation.$orphan =
+  //       anchors.length > 0 &&
+  //       anchors.every(anchor => anchor.target.selector && !anchor.range);
 
-//     this._updateAnchors(this.anchors.concat(anchors), true /* notify */);
+  //     this._updateAnchors(this.anchors.concat(anchors), true /* notify */);
 
-//     // Let other frames (eg. the sidebar) know about the new annotation.
-//     this._sidebarRPC.call('syncAnchoringStatus', annotation);
+  //     // Let other frames (eg. the sidebar) know about the new annotation.
+  //     this._sidebarRPC.call('syncAnchoringStatus', annotation);
 
-//     return anchors;
-//   }
+  //     return anchors;
+  //   }
 
   /**
    * Remove the anchors and associated highlights for an annotation from the document.
@@ -565,31 +565,31 @@ export default class AnnotatorGuest {
    * @param {boolean} [notify] - For internal use. Whether to inform the host
    *   frame about the removal of an anchor.
    */
-//   detach(tag, notify = true) {
-//     this._annotations.delete(tag);
+  //   detach(tag, notify = true) {
+  //     this._annotations.delete(tag);
 
-//     /** @type {Anchor[]} */
-//     const anchors = [];
-//     for (let anchor of this.anchors) {
-//       if (anchor.annotation.$tag !== tag) {
-//         anchors.push(anchor);
-//       } else if (anchor.highlights) {
-//         removeHighlights(anchor.highlights);
-//       }
-//     }
-//     this._updateAnchors(anchors, notify);
-//   }
+  //     /** @type {Anchor[]} */
+  //     const anchors = [];
+  //     for (let anchor of this.anchors) {
+  //       if (anchor.annotation.$tag !== tag) {
+  //         anchors.push(anchor);
+  //       } else if (anchor.highlights) {
+  //         removeHighlights(anchor.highlights);
+  //       }
+  //     }
+  //     this._updateAnchors(anchors, notify);
+  //   }
 
   /**
    * @param {Anchor[]} anchors
    * @param {boolean} notify
    */
-//   _updateAnchors(anchors, notify) {
-//     this.anchors = anchors;
-//     if (notify) {
-//     //   this._bucketBarClient.update(this.anchors);
-//     }
-//   }
+  //   _updateAnchors(anchors, notify) {
+  //     this.anchors = anchors;
+  //     if (notify) {
+  //     //   this._bucketBarClient.update(this.anchors);
+  //     }
+  //   }
 
   /**
    * Create a new annotation that is associated with the selected region of
@@ -601,41 +601,41 @@ export default class AnnotatorGuest {
    *     prompting for a comment.
    * @return {Promise<AnnotationData>} - The new annotation
    */
-//   async createAnnotation({ highlight = false } = {}) {
-//     const ranges = this.selectedRanges;
-//     this.selectedRanges = [];
+  //   async createAnnotation({ highlight = false } = {}) {
+  //     const ranges = this.selectedRanges;
+  //     this.selectedRanges = [];
 
-//     const info = await this.getDocumentInfo();
-//     const root = this.element;
-//     const rangeSelectors = await Promise.all(
-//       ranges.map(range => this._integration.describe(root, range))
-//     );
-//     const target = rangeSelectors.map(selectors => ({
-//       source: info.uri,
+  //     const info = await this.getDocumentInfo();
+  //     const root = this.element;
+  //     const rangeSelectors = await Promise.all(
+  //       ranges.map(range => this._integration.describe(root, range))
+  //     );
+  //     const target = rangeSelectors.map(selectors => ({
+  //       source: info.uri,
 
-//       // In the Hypothesis API the field containing the selectors is called
-//       // `selector`, despite being a list.
-//       selector: selectors,
-//     }));
+  //       // In the Hypothesis API the field containing the selectors is called
+  //       // `selector`, despite being a list.
+  //       selector: selectors,
+  //     }));
 
-//     /** @type {AnnotationData} */
-//     const annotation = {
-//       uri: info.uri,
-//       document: info.metadata,
-//       target,
-//       $highlight: highlight,
-//       $tag: 'a:' + generateHexString(8),
-//     };
+  //     /** @type {AnnotationData} */
+  //     const annotation = {
+  //       uri: info.uri,
+  //       document: info.metadata,
+  //       target,
+  //       $highlight: highlight,
+  //       $tag: 'a:' + generateHexString(8),
+  //     };
 
-//     // this._sidebarRPC.call('createAnnotation', annotation);
-//     // this.anchor(annotation);
+  //     // this._sidebarRPC.call('createAnnotation', annotation);
+  //     // this.anchor(annotation);
 
-//     // Removing the text selection triggers the `SelectionObserver` callback,
-//     // which causes the adder to be removed after some delay.
-//     removeTextSelection();
+  //     // Removing the text selection triggers the `SelectionObserver` callback,
+  //     // which causes the adder to be removed after some delay.
+  //     removeTextSelection();
 
-//     return annotation;
-//   }
+  //     return annotation;
+  //   }
 
   /**
    * Indicate in the sidebar that certain annotations are focused (ie. the
@@ -643,19 +643,19 @@ export default class AnnotatorGuest {
    *
    * @param {string[]} tags
    */
-//   _focusAnnotations(tags) {
-//     this._focusedAnnotations.clear();
-//     tags.forEach(tag => this._focusedAnnotations.add(tag));
+  //   _focusAnnotations(tags) {
+  //     this._focusedAnnotations.clear();
+  //     tags.forEach(tag => this._focusedAnnotations.add(tag));
 
-//     for (let anchor of this.anchors) {
-//       if (anchor.highlights) {
-//         const toggle = tags.includes(anchor.annotation.$tag);
-//         setHighlightsFocused(anchor.highlights, toggle);
-//       }
-//     }
+  //     for (let anchor of this.anchors) {
+  //       if (anchor.highlights) {
+  //         const toggle = tags.includes(anchor.annotation.$tag);
+  //         setHighlightsFocused(anchor.highlights, toggle);
+  //       }
+  //     }
 
-//     this._sidebarRPC.call('focusAnnotations', tags);
-//   }
+  //     this._sidebarRPC.call('focusAnnotations', tags);
+  //   }
 
   /**
    * Scroll to the closest off screen anchor.
@@ -663,15 +663,15 @@ export default class AnnotatorGuest {
    * @param {string[]} tags
    * @param {'down'|'up'} direction
    */
-//   _scrollToClosestOffScreenAnchor(tags, direction) {
-//     const anchors = this.anchors.filter(({ annotation }) =>
-//       tags.includes(annotation.$tag)
-//     );
-//     const closest = findClosestOffscreenAnchor(anchors, direction);
-//     if (closest) {
-//       this._integration.scrollToAnchor(closest);
-//     }
-//   }
+  //   _scrollToClosestOffScreenAnchor(tags, direction) {
+  //     const anchors = this.anchors.filter(({ annotation }) =>
+  //       tags.includes(annotation.$tag)
+  //     );
+  //     const closest = findClosestOffscreenAnchor(anchors, direction);
+  //     if (closest) {
+  //       this._integration.scrollToAnchor(closest);
+  //     }
+  //   }
 
   /**
    * Show or hide the adder toolbar when the selection changes.
@@ -684,7 +684,7 @@ export default class AnnotatorGuest {
     //   return;
     // }
 
-    const selection = /** @type {Selection} */ (document.getSelection());
+    const selection = /** @type {Selection} */ document.getSelection();
     const isBackwards = rangeUtil.isSelectionBackwards(selection);
     const focusRect = rangeUtil.selectionFocusRect(selection);
     if (!focusRect) {
@@ -700,6 +700,10 @@ export default class AnnotatorGuest {
     const selectionRange = window.getSelection()?.getRangeAt(0);
     this._isAdderVisible = true;
     this._adder.show(focusRect, isBackwards, selectionRange);
+  }
+
+  showPopup(element) {
+    this._adder.show(new DOMRect(100, 100, 100, 100), false, null);
   }
 
   _onClearSelection() {
@@ -722,19 +726,19 @@ export default class AnnotatorGuest {
    * @param {boolean} [toggle] - Toggle whether the annotations are selected
    *   instead of showing them regardless of whether they are currently selected.
    */
-//   selectAnnotations(tags, toggle = false) {
-//     if (toggle) {
-//       this._sidebarRPC.call('toggleAnnotationSelection', tags);
-//     } else {
-//       this._sidebarRPC.call('showAnnotations', tags);
-//     }
-//     this._sidebarRPC.call('openSidebar');
-//   }
+  //   selectAnnotations(tags, toggle = false) {
+  //     if (toggle) {
+  //       this._sidebarRPC.call('toggleAnnotationSelection', tags);
+  //     } else {
+  //       this._sidebarRPC.call('showAnnotations', tags);
+  //     }
+  //     this._sidebarRPC.call('openSidebar');
+  //   }
 
   /**
    * AB: this should handle click on annotation?
-   * @param tags 
-   * @param toggle 
+   * @param tags
+   * @param toggle
    */
   selectAnnotations(tags, toggle = false) {
     // if (toggle) {
@@ -760,9 +764,9 @@ export default class AnnotatorGuest {
    *
    * @param {SidebarLayout} sidebarLayout
    */
-//   fitSideBySide(sidebarLayout) {
-//     this._sideBySideActive = this._integration.fitSideBySide(sidebarLayout);
-//   }
+  //   fitSideBySide(sidebarLayout) {
+  //     this._sideBySideActive = this._integration.fitSideBySide(sidebarLayout);
+  //   }
 
   /**
    * Return true if side-by-side mode is currently active.
@@ -771,9 +775,9 @@ export default class AnnotatorGuest {
    * depending on whether the sidebar is expanded and whether there is room for
    * the content alongside the sidebar.
    */
-//   get sideBySideActive() {
-//     return this._sideBySideActive;
-//   }
+  //   get sideBySideActive() {
+  //     return this._sideBySideActive;
+  //   }
 
   /**
    * Return the tags of annotations that are currently displayed in a focused
@@ -781,7 +785,7 @@ export default class AnnotatorGuest {
    *
    * @return {Set<string>}
    */
-//   get focusedAnnotationTags() {
-//     return this._focusedAnnotations;
-//   }
+  //   get focusedAnnotationTags() {
+  //     return this._focusedAnnotations;
+  //   }
 }

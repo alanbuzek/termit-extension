@@ -6,12 +6,22 @@ import { EventBus } from "./hypothesis/utils/emitter";
 import { Sidebar } from "./hypothesis/sidebar";
 import Vocabulary from "../common/model/Vocabulary";
 import { preloadURL } from "./hypothesis/helpers";
-import { markTerm } from './marker';
+import { markTerm } from "./marker";
 // import { markTerm } from './marker';
 
 const contentState = {
   annotations: null,
   sidebar: null,
+  annotatorGuest: null,
+};
+
+export const globalActions = {
+  showPopup(element) {
+    if (!contentState.annotatorGuest) {
+      return;
+    }
+    contentState.annotatorGuest.showPopup(element);
+  },
 };
 
 const annotate = (vocabulary: Vocabulary) => {
@@ -85,18 +95,13 @@ window.addEventListener("load", async () => {
   ];
 
   styleSheetsToLoad.forEach((stylesheetPath) =>
-    preloadURL(
-      document,
-      "style",
-      chrome.runtime.getURL(stylesheetPath)
-    )
+    preloadURL(document, "style", chrome.runtime.getURL(stylesheetPath))
   );
 
   initSidebar();
 
-  new AnnotatorGuest(document.body);
+  contentState.annotatorGuest = new AnnotatorGuest(document.body);
 });
-
 
 function initSidebar() {
   const eventBus = new EventBus();
