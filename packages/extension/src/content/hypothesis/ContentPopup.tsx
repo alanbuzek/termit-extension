@@ -156,7 +156,7 @@ function nearestPositionedAncestor(el) {
  *
  * @implements {Destroyable}
  */
-export class Adder {
+export class ContentPopup {
   _outerContainer: HTMLElement;
   _shadowRoot: any;
   _view: any;

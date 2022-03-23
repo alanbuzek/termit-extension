@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import { loadStyles } from './adder';
+import { loadStyles } from './ContentPopup';
 
 import Toolbar from "../components/Toolbar";
 
