@@ -4,7 +4,7 @@ import Vocabulary from '../../common/model/Vocabulary';
 import { sendErrorsTo } from "../../shared/frame-error-capture";
 import { ListenerCollection } from "../../shared/listener-collection";
 import { MessageType } from "../../types";
-import { createShadowRoot } from "./adder";
+import { createShadowRoot } from "./ContentPopup";
 
 import { annotationCounts } from "./annotation-counts";
 import { BucketBar } from "./bucket-bar";
@@ -14,43 +14,8 @@ import { sidebarTrigger } from "./sidebar-trigger";
 import SidebarBox from "../components/SidebarBox";
 import { ToolbarController } from "./toolbar";
 
-/**
- * @typedef {import('./guest').Guest} Guest
- * @typedef {import('../types/annotator').AnchorPosition} AnchorPosition
- * @typedef {import('../types/annotator').SidebarLayout} SidebarLayout
- * @typedef {import('../types/annotator').Destroyable} Destroyable
- * @typedef {import('../types/port-rpc-events').GuestToHostEvent} GuestToHostEvent
- * @typedef {import('../types/port-rpc-events').HostToGuestEvent} HostToGuestEvent
- * @typedef {import('../types/port-rpc-events').HostToSidebarEvent} HostToSidebarEvent
- * @typedef {import('../types/port-rpc-events').SidebarToHostEvent} SidebarToHostEvent
- */
-
 // Minimum width to which the iframeContainer can be resized.
 export const MIN_RESIZE = 280;
-
-/**
- * Create the iframe that will load the sidebar application.
- *
- * @return {HTMLIFrameElement}
- */
-function createSidebarIframe(config): HTMLIFrameElement {
-  // const sidebarAppSrc = addConfigFragment(
-  //   config.sidebarAppUrl,
-  //   createAppConfig(config.sidebarAppUrl, config)
-  // );
-  const sidebarAppSrc = "";
-
-  const sidebarFrame = document.createElement("iframe");
-
-  // Enable media in annotations to be shown fullscreen
-  sidebarFrame.setAttribute("allowfullscreen", "");
-
-  sidebarFrame.src = sidebarAppSrc;
-  sidebarFrame.title = "Hypothesis annotation viewer";
-  sidebarFrame.className = "h-sidebar-iframe";
-
-  return sidebarFrame;
-}
 
 /**
  * The `Sidebar` class creates (1) the sidebar application iframe, (2) its container,
@@ -144,24 +109,21 @@ export class Sidebar {
     // this.iframeContainer.style.display = "none";
     this.iframeContainer.className = "annotator-frame";
 
-    // if (config.theme === "clean") {
-    //   this.iframeContainer.classList.add("annotator-frame--theme-clean");
-    // } else {
-    this.bucketBar = new BucketBar(this.iframeContainer, {
-      onFocusAnnotations: (tags) =>
-        this._guestRPC.forEach((rpc) => rpc.call("focusAnnotations", tags)),
-      onScrollToClosestOffScreenAnchor: (tags, direction) =>
-        this._guestRPC.forEach((rpc) =>
-          rpc.call("scrollToClosestOffScreenAnchor", tags, direction)
-        ),
-      onSelectAnnotations: (tags, toggle) =>
-        this._guestRPC.forEach((rpc) =>
-          rpc.call("selectAnnotations", tags, toggle)
-        ),
-    });
-    // }
 
-    // this.iframeContainer.appendChild(this.iframe);
+    // TODO: this will be needed
+    // this.bucketBar = new BucketBar(this.iframeContainer, {
+    //   onFocusAnnotations: (tags) =>
+    //     this._guestRPC.forEach((rpc) => rpc.call("focusAnnotations", tags)),
+    //   onScrollToClosestOffScreenAnchor: (tags, direction) =>
+    //     this._guestRPC.forEach((rpc) =>
+    //       rpc.call("scrollToClosestOffScreenAnchor", tags, direction)
+    //     ),
+    //   onSelectAnnotations: (tags, toggle) =>
+    //     this._guestRPC.forEach((rpc) =>
+    //       rpc.call("selectAnnotations", tags, toggle)
+    //     ),
+    // });
+
 
     // Wrap up the 'iframeContainer' element into a shadow DOM so it is not affected by host CSS styles
     this.hypothesisSidebar = document.createElement("hypothesis-sidebar");
@@ -225,16 +187,8 @@ export class Sidebar {
       this.toolbar.useMinimalControls = false;
     }
 
-    // if (this.iframeContainer) {
-    // If using our own container frame for the sidebar, add the toolbar to it.
     this.iframeContainer.prepend(toolbarContainer);
     this.toolbarWidth = this.toolbar.getWidth();
-    // console.log('added toolbar container: ', this.iframeContainer, ', toolbar Contatiner')
-    // } else {
-    //   // If using a host-page provided container for the sidebar, the toolbar is
-    //   // not shown.
-    //   this.toolbarWidth = 0;
-    // }
 
     this._listeners.add(window, "resize", () => this._onResize());
 
@@ -282,117 +236,11 @@ export class Sidebar {
     sendErrorsTo(null);
   }
 
-  /**
-   * Setup communication with a frame that has connected to the host.
-   *
-   * @param {'guest'|'sidebar'} source
-   * @param {MessagePort} port
-   */
-  onFrameConnected(source: "guest" | "sidebar", port: MessagePort) {
-    switch (source) {
-      case "guest":
-        this._connectGuest(port);
-        break;
-      case "sidebar":
-        this._sidebarRPC.connect(port);
-        break;
-    }
-  }
-
-  /**
-   * @param {MessagePort} port
-   */
-  _connectGuest(port: MessagePort) {
-    /** @type {PortRPC<GuestToHostEvent, HostToGuestEvent>} */
-    const guestRPC: PortRPC<GuestToHostEvent, HostToGuestEvent> = new PortRPC();
-
-    // guestRPC.on("textSelected", () => {
-    //   this._guestWithSelection = guestRPC;
-    //   this.toolbar.newAnnotationType = "annotation";
-    //   this._guestRPC
-    //     .filter((port) => port !== guestRPC)
-    //     .forEach((rpc) => rpc.call("clearSelection"));
-    // });
-
-    // guestRPC.on("textUnselected", () => {
-    //   this._guestWithSelection = null;
-    //   this.toolbar.newAnnotationType = "note";
-    //   this._guestRPC
-    //     .filter((port) => port !== guestRPC)
-    //     .forEach((rpc) => rpc.call("clearSelection"));
-    // });
-
-    // The listener will do nothing if the sidebar doesn't have a bucket bar
-    // (clean theme)
-    const bucketBar = this.bucketBar;
-    // Currently, we ignore `anchorsChanged` for all the guests except the first connected guest.
-    if (bucketBar) {
-      // guestRPC.on(
-      //   "anchorsChanged",
-      //   (
-      //     /** @param {AnchorPosition[]} positions  */
-      //     positions: AnchorPosition[]
-      //   ) => {
-      //     if (this._guestRPC.indexOf(guestRPC) === 0) {
-      //       bucketBar.update(positions);
-      //     }
-      //   }
-      // );
-    }
-
-    // guestRPC.on("close", () => {
-    //   guestRPC.destroy();
-    //   if (guestRPC === this._guestWithSelection) {
-    //     this._guestWithSelection = null;
-    //   }
-    //   this._guestRPC = this._guestRPC.filter((rpc) => rpc !== guestRPC);
-    // });
-
-    // guestRPC.connect(port);
-    this._guestRPC.push(guestRPC);
-  }
 
   _setupSidebarEvents() {
     annotationCounts(document.body, this._sidebarRPC);
     sidebarTrigger(document.body, () => this.open());
     features.init(this._sidebarRPC);
-
-    // this._sidebarRPC.on("connect", () => {
-    //   // Show the UI
-    //   if (this.iframeContainer) {
-    //     this.iframeContainer.style.display = "";
-    //   }
-
-    //   const showHighlights = this._config.showHighlights === "always";
-    //   this.setHighlightsVisible(showHighlights);
-
-    //   if (
-    //     this._config.openSidebar ||
-    //     this._config.annotations ||
-    //     this._config.query ||
-    //     this._config.group
-    //   ) {
-    //     this.open();
-    //   }
-    // });
-
-    // this._sidebarRPC.on("showHighlights", () =>
-    //   this.setHighlightsVisible(true)
-    // );
-
-    // this._sidebarRPC.on("openSidebar", () => this.open());
-
-    // this._sidebarRPC.on("closeSidebar", () => this.close());
-
-    // // Sidebar listens to the `openNotebook` event coming from the sidebar's
-    // // iframe and re-publishes it via the emitter to the Notebook
-    // this._sidebarRPC.on(
-    //   "openNotebook",
-    //   (/** @param {string} groupId */ groupId: string) => {
-    //     this.hide();
-    //     this._emitter.publish("openNotebook", groupId);
-    //   }
-    // );
 
     this._emitter.subscribe("closeNotebook", () => {
       this.show();
@@ -623,9 +471,6 @@ export class Sidebar {
    */
   setHighlightsVisible(visible: boolean) {
     this.toolbar.highlightsVisible = visible;
-
-    // Notify sidebar app of change which will in turn reflect state to guest frames.
-    // this._sidebarRPC.call("setHighlightsVisible", visible);
   }
 
   /**
