@@ -18,7 +18,7 @@ const handleElementClick = (element) => () => {
   globalActions.showPopup(element);
 };
 
-export const markTerm = ({ cssSelectors, termOccurrences }, results) => {
+export const markTerm = ({ cssSelectors, termOccurrences }, termClassName, results = null) => {
   const selectedElements = Array.from(
     document.querySelectorAll(cssSelectors[0])
   );
@@ -44,6 +44,7 @@ export const markTerm = ({ cssSelectors, termOccurrences }, results) => {
     const markInstance = new Mark(selectedElements[0]);
     termOccurrences.forEach((termOccurance) => {
       markInstance.mark(termOccurance.originalTerm, {
+        // TODO: we don't need this anymore?
         // accuracy: {
         //   value: "exactly",
         //   limiters: [",", ".", ":", ";", "'", '"', "?", "!", ")", "(", "-"],
@@ -69,7 +70,7 @@ export const markTerm = ({ cssSelectors, termOccurrences }, results) => {
         exclude: ["termit-h"],
         caseSensitive: true,
         separateWordSearch: false,
-        className: `termit-highlighted-word`,
+        className: termClassName,
         each(element) {
           console.log('registering listener')
           element.addEventListener("click", handleElementClick(element));

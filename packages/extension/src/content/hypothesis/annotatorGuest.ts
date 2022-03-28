@@ -30,7 +30,6 @@ import { normalizeURI } from "./utils/url";
  */
 export default class AnnotatorGuest {
   element: any;
-  _hostFrame: Window & typeof globalThis;
   _highlightsVisible: boolean;
   _isAdderVisible: boolean;
   _informHostOnNextSelectionClear: boolean;
@@ -48,18 +47,8 @@ export default class AnnotatorGuest {
   // _sideBySideActive: boolean;
   _listeners: any;
   _focusedAnnotations: Set<unknown>;
-  /**
-   * @param {HTMLElement} element -
-   *   The root element in which the `AnnotatorGuest` instance should be able to anchor
-   *   or create annotations. In an ordinary web page this typically `document.body`.
-   * @param {Record<string, any>} [config]
-   * @param {Window} [hostFrame] -
-   *   Host frame which this guest is associated with. This is expected to be
-   *   an ancestor of the guest frame. It may be same or cross origin.
-   */
-  constructor(element, config = {}, hostFrame = window) {
+  constructor(element) {
     this.element = element;
-    this._hostFrame = hostFrame;
     this._highlightsVisible = false;
     this._isAdderVisible = false;
     this._informHostOnNextSelectionClear = true;
@@ -73,6 +62,7 @@ export default class AnnotatorGuest {
       onShowAnnotations: (tags) => console.log("this.selectAnnotations(tags)"),
     });
 
+    // TODO: fix up selection observer handling
     this._selectionObserver = new SelectionObserver((range) => {
       // console.log('selection observer callback called: ', range);
       if (range) {
@@ -164,13 +154,8 @@ export default class AnnotatorGuest {
 
     this._selectionObserver.disconnect();
     this._adder.destroy();
-    // this._bucketBarClient.destroy();
-
-    // removeAllHighlights(this.element);
-
     this._integration.destroy();
   }
-
 
   /**
    * Show or hide the adder toolbar when the selection changes.
@@ -192,7 +177,8 @@ export default class AnnotatorGuest {
   }
 
   showPopup(element) {
-    this._adder.show(new DOMRect(100, 100, 100, 100), false, null);
+    const elementRect = element.getBoundingClientRect();
+    this._adder.show(new DOMRect(elementRect.left, elementRect.top, elementRect.width, elementRect.height), false, null);
   }
 
   _onClearSelection() {

@@ -1,7 +1,6 @@
 import classnames from "classnames";
 import React from "react";
 import { CreateTermFromAnnotation } from "../../common/component/annotator/CreateTermFromAnnotation";
-import SelectionPurposeDialog from "../../common/component/annotator/SelectionPurposeDialog";
 import TermDefinitionAnnotation from "../../common/component/annotator/TermDefinitionAnnotation";
 import TermOccurrenceAnnotation from "../../common/component/annotator/TermOccurrenceAnnotation";
 import HighlightedTextAdder from "./HighlightedTextAdder";
@@ -9,8 +8,6 @@ import { useState } from "react";
 import { overlay } from "..";
 import { useEffect } from "react";
 import { createAnnotation, markTerm } from "../marker";
-import JsonLdUtils from "../../common/util/JsonLdUtils";
-import { getPropertyForAnnotationType } from "../../common/component/annotator/AnnotationDomHelper";
 import { AnnotationType } from "../../common/util/Annotation";
 
 /**
@@ -57,21 +54,6 @@ export default function AdderToolbar({
   selectionRange,
 }) {
   const [currPopup, setCurrPopup] = useState(initialPopupType);
-
-  // Since the selection toolbar is only shown when there is a selection
-  // of static text, we can use a plain key without any modifier as
-  // the shortcut. This avoids conflicts with browser/OS shortcuts.
-  const annotateShortcut = isVisible ? "a" : null;
-  const highlightShortcut = isVisible ? "h" : null;
-  const showShortcut = isVisible ? "s" : null;
-  const hideShortcut = isVisible ? "Escape" : null;
-
-  // Add a shortcut to close the adder. Note, there is no button associated with this
-  // shortcut because any outside click will also hide the adder.
-  // useShortcut(hideShortcut, () => onCommand('hide'));
-
-  // nb. The adder is hidden using the `visibility` property rather than `display`
-  // so that we can compute its size in order to position it before display.
 
   const closePopup = () => {
     setCurrPopup(PopupType.PurposeSelection);

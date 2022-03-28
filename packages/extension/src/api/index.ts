@@ -1,8 +1,11 @@
+import Term, { TermData, CONTEXT as TERM_CONTEXT } from "../common/model/Term";
 import Vocabulary, {
   CONTEXT as VOCABULARY_CONTEXT,
   VocabularyData,
 } from "../common/model/Vocabulary";
+import { param, params } from "../common/util/Ajax";
 import JsonLdUtils from "../common/util/JsonLdUtils";
+import { IRI } from "../common/util/VocabularyUtils";
 import { mockVocabularies } from "./mockData/mockVocabularies";
 
 const fetchConfig = {
@@ -62,6 +65,35 @@ export function loadVocabularies() {
         : []
     )
     .then((data: VocabularyData[]) => data.map((v) => new Vocabulary(v)));
+}
+
+export function loadAllTerms(
+  vocabularyIri: IRI,
+  includeImported: boolean = false
+) {
+  const parameters = params(
+    Object.assign({
+      includeImported,
+      namespace: vocabularyIri.namespace,
+    })
+  );
+
+  console.log("paramaters: ", parameters);
+  api
+    .get(`/vocabularies/${vocabularyIri.fragment}/terms`, parameters)
+    .then((data: object[]) =>
+      data.length !== 0
+        ? JsonLdUtils.compactAndResolveReferencesAsArray<TermData>(
+            data,
+            TERM_CONTEXT
+          )
+        : []
+    )
+    .then((data: TermData[]) => {
+      const terms = {};
+      data.forEach((d) => (terms[d.iri!] = new Term(d)));
+      return data;
+    });
 }
 
 export function annotatePage(vocabulary, pageHtml) {

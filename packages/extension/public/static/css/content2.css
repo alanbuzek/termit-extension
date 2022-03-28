@@ -1,125 +1,150 @@
-#masterlingo-popup{
-    width: 300px;
-    height: auto;
-    position: absolute;
-    /* top: 750px;
+#masterlingo-popup {
+  width: 300px;
+  height: auto;
+  position: absolute;
+  /* top: 750px;
     right: 500px; */
-    z-index: 2147483;
-    background-color: white;
-    /* box-shadow: 0px 0px 2px #5c5c5c8e; */
-    border-radius: 5px;
-    border:1px solid rgb(229, 231, 235);
+  z-index: 2147483;
+  background-color: white;
+  /* box-shadow: 0px 0px 2px #5c5c5c8e; */
+  border-radius: 5px;
+  border: 1px solid rgb(229, 231, 235);
 }
-  
+
 #masterlingo-popup iframe {
-    width: 100%;
-    height: 100%;
-    border: none;
+  width: 100%;
+  height: 100%;
+  border: none;
 }
 
 #masterlingo-snackbar iframe {
-    width: 100%;
-    height: 100%;
-    border: none;
+  width: 100%;
+  height: 100%;
+  border: none;
 }
 
 /* TODO: maybe this won't need to be separated into 2 disctinct classes because of previously though mark.js constraints */
 termit-h.termit-highlighted-word,
 termit-h.termit-highlighted-word--not-due {
-    transition: all .3s;
-    cursor: pointer !important;
-    padding:0;
-    margin:0;
-    color: #333 !important;
-    /* border-radius: 5px;  */
-    /* background-color: inherit !important; */
+  transition: all 0.3s;
+  cursor: pointer !important;
+  padding: 0;
+  margin: 0;
+  color: #333 !important;
+  /* border-radius: 5px;  */
+  /* background-color: inherit !important; */
 }
 
-termit-h.termit-highlighted-word {
-    background-color: rgba(239,207,184,.8) !important;
-    border: 0.15em dotted #ef451b;
-}
+/* TODO: deal with this code */
+/* termit-h.termit-highlighted-word {
+  background-color: rgba(239, 207, 184, 0.8) !important;
+  border: 0.15em dotted #ef451b;
+} */
 
-termit-h.suggested-term-occurrence {
-    background-color: rgba(239,207,184,.8) !important;
-}
+/* 
+termit-h.termit-highlighted-word--not-due {
+  background-color: #f6fcd0 !important;
+} */
 
-termit-h.suggested-term-occurrence.proposed-occurrence {
-    border: 0.15em dotted #ef451b;
-}
+/* termit-h.termit-highlighted-word:hover {
+  background-color: rgb(219, 219, 219) !important;
+} */
 
-termit-h.termit-highlighted-word--not-due{
-    background-color: #f6fcd0 !important;
-}
-
-termit-h.termit-highlighted-word:hover {
-    background-color: rgb(219, 219, 219) !important;
+termit-h.assigned-term-occurrence.proposed-occurrence {
+  border: 0.15em dotted green;
 }
 
 termit-h.assigned-term-occurrence {
-    background: rgba(188,239,184,.8);
+  background: rgba(188, 239, 184, 0.8);
+}
+
+termit-h.suggested-term-occurrence {
+  background: rgba(239, 207, 184, 0.8);
+}
+
+termit-h.invalid-term-occurrence {
+  background: rgba(239, 66, 24, 0.7);
+}
+
+termit-h.loading-term-occurrence {
+  background: #e9eaec;
 }
 
 termit-h.assigned-term-occurrence.proposed-occurrence {
-    border: 0.15em dotted green;
+  border: 0.15em dotted green;
+}
+
+termit-h.suggested-term-occurrence.proposed-occurrence {
+  border: 0.15em dotted rgb(239, 69, 27);
+}
+
+termit-h.invalid-term-occurrence.proposed-occurrence {
+  border: 0.15em dotted rgb(239, 14, 0);
+}
+
+termit-h.loading-term-occurrence.proposed-occurrence {
+  border: 0.15em dotted rgb(239, 173, 62);
+}
+
+termit-h.term-definition {
+  background: rgba(80, 200, 255, 0.8);
 }
 
 .termit-info-window {
-   position: fixed;
-   background-color: rgb(163, 245, 156);
-   color: rgba(0, 0, 0, 0.938);
-   right: 10px;
-   bottom: 10px;
-   width: 650px;
-   height: 120px;
-   font-weight: 500;
-   font-size: 20px;
-   padding: 15px;
-   border-radius: 18px;
+  position: fixed;
+  background-color: rgb(163, 245, 156);
+  color: rgba(0, 0, 0, 0.938);
+  right: 10px;
+  bottom: 10px;
+  width: 650px;
+  height: 120px;
+  font-weight: 500;
+  font-size: 20px;
+  padding: 15px;
+  border-radius: 18px;
 }
 
 .termit-failures {
-    font-weight: bold;
+  font-weight: bold;
 }
 
 .termit-successes {
-    font-weight: bold;
+  font-weight: bold;
 }
 
 .frame-root {
-    overflow-y: hidden !important;
+  overflow-y: hidden !important;
 }
 
-
 #masterlingo-snackbar {
-    z-index: 2147483647;
-    width: 600px;
-    height: 414px;
-    /* background-color: #333; */
-    color: #fff;
-    text-align: center;
-    border-radius: 5px;
-    padding: 0px;
-    position: fixed;
-    left: 50%;
-    bottom: 50px;
-    transform: translateX(-50%);
-    font-size: 17px;
-    box-shadow: 0px 0px 2px #5c5c5c8e;
-    border:1px solid rgb(143, 143, 143);
+  z-index: 2147483647;
+  width: 600px;
+  height: 414px;
+  /* background-color: #333; */
+  color: #fff;
+  text-align: center;
+  border-radius: 5px;
+  padding: 0px;
+  position: fixed;
+  left: 50%;
+  bottom: 50px;
+  transform: translateX(-50%);
+  font-size: 17px;
+  box-shadow: 0px 0px 2px #5c5c5c8e;
+  border: 1px solid rgb(143, 143, 143);
 }
 
 /* TODO: figure out why this is not being imported to /build */
 #termit-overlay {
-    position: fixed; /* Sit on top of the page content */
-    display: none; /* Hidden by default */
-    width: 100%; /* Full width (cover the whole page) */
-    height: 100%; /* Full height (cover the whole page) */
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0,0,0,0.5); /* Black background with opacity */
-    z-index: 2; /* Specify a stack order in case you're using a different order for other elements */
-    cursor: pointer; /* Add a pointer on hover */
-  }
+  position: fixed; /* Sit on top of the page content */
+  display: none; /* Hidden by default */
+  width: 100%; /* Full width (cover the whole page) */
+  height: 100%; /* Full height (cover the whole page) */
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5); /* Black background with opacity */
+  z-index: 2; /* Specify a stack order in case you're using a different order for other elements */
+  cursor: pointer; /* Add a pointer on hover */
+}
