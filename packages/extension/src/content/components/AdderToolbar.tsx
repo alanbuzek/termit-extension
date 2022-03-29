@@ -5,10 +5,10 @@ import TermDefinitionAnnotation from "../../common/component/annotator/TermDefin
 import TermOccurrenceAnnotation from "../../common/component/annotator/TermOccurrenceAnnotation";
 import HighlightedTextAdder from "./HighlightedTextAdder";
 import { useState } from "react";
-import { overlay } from "..";
 import { useEffect } from "react";
-import { createAnnotation, markTerm } from "../marker";
+import { createAnnotation, markTerms } from "../marker";
 import { AnnotationType } from "../../common/util/Annotation";
+import { overlay } from '../helper/overlay';
 
 /**
  * Union of possible toolbar commands.
@@ -79,13 +79,13 @@ export default function AdderToolbar({
       overlay.off();
     },
     onSave() {
-      // markTerm()(newTerm);
+      // markTerms()(newTerm);
       const newAnnotation = createAnnotation(
         selectionRange,
         AnnotationType.OCCURRENCE
       );
       if (newAnnotation) {
-        markTerm(newAnnotation);
+        markTerms(newAnnotation);
       }
       closePopup();
       overlay.off();

@@ -1,4 +1,4 @@
-import { markTerm } from "../../content/marker";
+import { markTerms } from "../../content/marker";
 import VocabularyUtils from "./VocabularyUtils";
 
 export const AnnotationClass = {
@@ -19,6 +19,12 @@ export const AnnotationType = {
   OCCURRENCE: VocabularyUtils.TERM_OCCURRENCE,
   DEFINITION: VocabularyUtils.DEFINITION,
 };
+
+export enum AnnotationStatus {
+  SUCCESS,
+  FAILURE,
+  PENDING
+}
 
 export function isDefinitionAnnotation(type: string) {
   return type === AnnotationType.DEFINITION;
@@ -51,9 +57,9 @@ const getTermCreatorState = (termScore) => {
 };
 
 export class Annotation {
-  term = null;
-  typeOf = null;
-
+  public termOccurrence = null;
+  private typeOf: string = "";
+  private annotatationStatus: AnnotationStatus = AnnotationStatus.PENDING;
   // methods:
   // markAnnotation(); (called by contructor)
   // remove(); (will hide the annotation)
@@ -68,9 +74,10 @@ export class Annotation {
   // - reference to the node where it has been rendered
   // - term itself (if application)
 
-  constructor(term, typeOf) {
-    this.term = term;
-    this.typeOf = typeOf;
+  constructor(termOccurrence) {
+    this.termOccurrence = termOccurrence;
+    // TODO: support definitions as well
+    this.typeOf = VocabularyUtils.TERM_OCCURRENCE;
   }
 
   public getTermState() {
@@ -78,12 +85,12 @@ export class Annotation {
     // if (!this.state.termFetchFinished) {
     //   return AnnotationClass.LOADING;
     // }
-    if (this.term === null) {
+    if (this.termOccurrence === null) {
       return isDefinitionAnnotation(this.typeOf)
         ? AnnotationClass.PENDING_DEFINITION
         : AnnotationClass.SUGGESTED_OCCURRENCE;
     }
-    if (this.term) {
+    if (this.termOccurrence) {
       return isDefinitionAnnotation(this.typeOf)
         ? AnnotationClass.DEFINITION
         : AnnotationClass.ASSIGNED_OCCURRENCE;
@@ -98,16 +105,11 @@ export class Annotation {
     return AnnotationOrigin.SELECTED;
   }
 
-  public markAnnotation() {
+  public getClassName() {
     const termClassName = this.getTermState();
     const termCreatorClassName = this.getTermCreatorState();
 
-    const termFullClassName = `${termClassName} ${termCreatorClassName}`;
-
-    // TODO:
-    const termSelector = {};
-    //
-    markTerm(termSelector, termFullClassName);
+    return `${termClassName} ${termCreatorClassName}`;
   }
 
   public focusAnnotation() {
@@ -115,8 +117,16 @@ export class Annotation {
     throw new Error("To be implemented");
   }
 
-  public getStatus() {
-    // TODO
+  public markAnnotation() {
+    // TODO: if needed?
     throw new Error("To be implemented");
+  }
+
+  public set status(newStaus){
+    this.annotatationStatus = newStaus;
+  }
+
+  public get status(){
+    return this.annotatationStatus;
   }
 }

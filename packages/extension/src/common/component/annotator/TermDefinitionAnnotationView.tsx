@@ -1,6 +1,6 @@
 import * as React from "react";
 import Term from "../../model/Term";
-import TermLink from "../../component/term/TermLink";
+import TermLink from "../term/TermLink";
 import { useI18n } from "../hook/useI18n";
 
 interface TermDefinitionAnnotationViewProps {

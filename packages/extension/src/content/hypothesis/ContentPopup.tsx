@@ -3,7 +3,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import { IntlProvider } from "react-intl";
 import cs from "../../cs.locale";
-import { overlay } from '..';
+import { overlay } from '../helper/overlay';
 
 /**
  * Returns true when the device is a touch device such

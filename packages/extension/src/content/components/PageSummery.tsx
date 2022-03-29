@@ -15,7 +15,7 @@ export const getUrlInfo = (url) => {
   return { checkedHostname, urlObject };
 };
 
-const PageSummary = ({ annotations, annotatePage, flatTermOccs }) => {
+const PageSummary = ({ annotations, handleAnnotatePage }) => {
   const loading = false;
   const disabled = false;
 
@@ -67,7 +67,7 @@ const PageSummary = ({ annotations, annotatePage, flatTermOccs }) => {
             // TODO: remove timeout
             setTimeout(() => {
               // TODO: remove this fallback, adjust it to a different, proper default (To be specified)
-              annotatePage(selectedVocabulary || vocabularies[0]);
+              handleAnnotatePage(selectedVocabulary || vocabularies[0]);
             }, 1500);
           }}
           loading={annotationLoading}
@@ -82,7 +82,7 @@ const PageSummary = ({ annotations, annotatePage, flatTermOccs }) => {
     <div className="p-3 mb-4 rounded-md bg-gray-100 border-gray-600 border">
       {allowPannel}
       <h3>
-        There are <span className="text-blue-600">{flatTermOccs.length}</span>{" "}
+        There are <span className="text-blue-600">{annotations.length}</span>{" "}
         term occurrences on this page
       </h3>
     </div>

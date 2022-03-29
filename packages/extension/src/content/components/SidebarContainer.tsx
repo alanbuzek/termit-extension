@@ -16,19 +16,19 @@ import SidebarApp from "./SidebarApp";
  * This toolbar provides controls for opening and closing the sidebar, toggling
  * highlight visibility etc.
  */
-export default class SidebarBox {
+export default class SidebarContainer {
   _container: any;
   _state: any;
-  _annotatePage: any;
+  private handleAnnotatePage: any;
   _loadedStyles: boolean;
   /**
    * @param {HTMLElement} container - Element into which the toolbar is rendered
    * @param {ToolbarOptions} options
    */
-  constructor(container, state, annotatePage) {
+  constructor(container, state, handleAnnotatePage) {
     this._container = container;
     this._state = state;
-    this._annotatePage = annotatePage;
+    this.handleAnnotatePage = handleAnnotatePage;
     this._loadedStyles = false;
     this.render();
   }
@@ -40,7 +40,7 @@ export default class SidebarBox {
 
   render() {
     ReactDOM.render(
-      <SidebarApp annotatePage={this._annotatePage} state={this._state} />,
+      <SidebarApp handleAnnotatePage={this.handleAnnotatePage} state={this._state} />,
       this._container,
       () => {
         if (!this._loadedStyles) {

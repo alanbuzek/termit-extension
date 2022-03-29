@@ -1,11 +1,11 @@
 import { getCssSelector } from "css-selector-generator";
 import { globalActions } from "..";
 import { getPropertyForAnnotationType } from "../../common/component/annotator/AnnotationDomHelper";
-import { AnnotationType } from "../../common/util/Annotation";
+import { Annotation, AnnotationStatus, AnnotationType } from "../../common/util/Annotation";
 import JsonLdUtils from "../../common/util/JsonLdUtils";
 import Mark from "../../markjs";
 
-// TODO: use this later
+// TODO: this most likely will be able to be removed
 const classesMap = {
   unknownTermOcc: "suggested-term-occurrence selected-occurrence",
   knownTermOcc: "suggested-term-occurrence selected-occurrence",
@@ -14,16 +14,29 @@ const classesMap = {
   existingTermProposal: "proposed-occurrence assigned-term-occurrence",
 };
 
-const handleElementClick = (element) => () => {
-  globalActions.showPopup(element);
+const handleElementClick = (element, termOccurance) => () => {
+  globalActions.showPopup(element, termOccurance);
 };
 
-export const markTerm = ({ cssSelectors, termOccurrences }, termClassName, results = null) => {
-  const selectedElements = Array.from(
-    document.querySelectorAll(cssSelectors[0])
-  );
+const results = {
+  highlights: {
+    failures: 0,
+    successes: 0,
+    overselectedFailures: 0,
+  },
+  selectors: {
+    successes: 0,
+    failures: 0,
+    overselectedFailures: 0,
+  },
+};
 
-  if (results) {
+export const markTerms = ({ cssSelectors, termOccurrences }) => {
+  return new Promise((resolve, reject) => {
+    const selectedElements = Array.from(
+      document.querySelectorAll(cssSelectors[0])
+    );
+
     if (selectedElements.length === 1) {
       results.selectors.successes += 1;
     } else if (selectedElements.length === 0) {
@@ -38,17 +51,18 @@ export const markTerm = ({ cssSelectors, termOccurrences }, termClassName, resul
         selectedElements
       );
     }
-  }
 
-  if (selectedElements.length === 1) {
+    if (selectedElements.length !== 1) {
+      reject("Selector didn't select exactly one element");
+      return;
+    }
+
+    let annotations: Annotation[] = [];
     const markInstance = new Mark(selectedElements[0]);
-    termOccurrences.forEach((termOccurance) => {
-      markInstance.mark(termOccurance.originalTerm, {
-        // TODO: we don't need this anymore?
-        // accuracy: {
-        //   value: "exactly",
-        //   limiters: [",", ".", ":", ";", "'", '"', "?", "!", ")", "(", "-"],
-        // },
+    termOccurrences.forEach((termOccurrence) => {
+      const annotation = new Annotation(termOccurrence);
+
+      markInstance.mark(termOccurrence.originalTerm, {
         accuracy: "partially",
         filter(node, term, offestInCurrentNode) {
           let calculatedOffset = node.textContent.slice(0, offestInCurrentNode);
@@ -61,7 +75,7 @@ export const markTerm = ({ cssSelectors, termOccurrences }, termClassName, resul
           }
 
           const pureLeft = calculatedOffset.replace(/\s/g, "");
-          const pureRight = termOccurance.startOffset.replace(/\s/g, "");
+          const pureRight = termOccurrence.startOffset.replace(/\s/g, "");
 
           return pureLeft === pureRight;
         },
@@ -70,33 +84,42 @@ export const markTerm = ({ cssSelectors, termOccurrences }, termClassName, resul
         exclude: ["termit-h"],
         caseSensitive: true,
         separateWordSearch: false,
-        className: termClassName,
+        // TODO: determine term types and corresponding classes dynamically
+        className: annotation.getClassName(),
         each(element) {
-          console.log('registering listener')
-          element.addEventListener("click", handleElementClick(element));
+          console.log("registering listener");
+          element.addEventListener(
+            "click",
+            handleElementClick(element, termOccurrence)
+          );
         },
         done(numberOfMatches) {
-          if (!results) {
-            return;
-          }
           if (numberOfMatches === 1) {
             results.highlights.successes += 1;
+            annotation.status = AnnotationStatus.SUCCESS;
           } else if (numberOfMatches === 0) {
-            console.log("Failure: ", termOccurance, ", ", selectedElements[0]);
+            console.log("Failure: ", termOccurrence, ", ", selectedElements[0]);
             results.highlights.failures += 1;
+            annotation.status = AnnotationStatus.FAILURE;
           } else {
             results.highlights.overselectedFailures += 1;
             console.log(
               "Overseledcted Failure: ",
-              termOccurance,
+              termOccurrence,
               ", ",
               selectedElements[0]
             );
+            annotation.status = AnnotationStatus.FAILURE;
+          }
+
+          annotations.push(annotation);
+          if (annotations.length === termOccurrences.length) {
+            resolve(annotations);
           }
         },
       });
     });
-  }
+  });
 };
 
 export const createAnnotation = (
