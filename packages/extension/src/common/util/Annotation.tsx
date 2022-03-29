@@ -1,4 +1,5 @@
 import { markTerms } from "../../content/marker";
+import Term from '../model/Term';
 import VocabularyUtils from "./VocabularyUtils";
 
 export const AnnotationClass = {
@@ -26,39 +27,25 @@ export enum AnnotationStatus {
   PENDING
 }
 
+export type TermOccurrence = {
+  about: string;
+  content: string;
+  originalTerm: string;
+  property: string;
+  resource: string;
+  score: number;
+  // TODO: change startOffset to a number
+  startOffset: string;
+  typeof: string;
+}
+
+// TODO: we'll have to make sure that the mapping works ok here (e.g. ddo:definice vs full url)
 export function isDefinitionAnnotation(type: string) {
   return type === AnnotationType.DEFINITION;
 }
-
-// NOTE: this was taken from Annotation.jsx in termit-ui repo
-const getTermState = (typeOf, term) => {
-  // TODO: check if we need the loading state, probably not?
-  // if (!this.state.termFetchFinished) {
-  //   return AnnotationClass.LOADING;
-  // }
-  if (term === null) {
-    return isDefinitionAnnotation(typeOf)
-      ? AnnotationClass.PENDING_DEFINITION
-      : AnnotationClass.SUGGESTED_OCCURRENCE;
-  }
-  if (term) {
-    return isDefinitionAnnotation(typeOf)
-      ? AnnotationClass.DEFINITION
-      : AnnotationClass.ASSIGNED_OCCURRENCE;
-  }
-  return AnnotationClass.INVALID;
-};
-
-const getTermCreatorState = (termScore) => {
-  if (termScore) {
-    return AnnotationOrigin.PROPOSED;
-  }
-  return AnnotationOrigin.SELECTED;
-};
-
 export class Annotation {
-  public termOccurrence = null;
-  private typeOf: string = "";
+  public termOccurrence: TermOccurrence;
+  private term: Term | null = null;
   private annotatationStatus: AnnotationStatus = AnnotationStatus.PENDING;
   // methods:
   // markAnnotation(); (called by contructor)
@@ -74,10 +61,9 @@ export class Annotation {
   // - reference to the node where it has been rendered
   // - term itself (if application)
 
-  constructor(termOccurrence) {
+  constructor(termOccurrence, term = null) {
     this.termOccurrence = termOccurrence;
-    // TODO: support definitions as well
-    this.typeOf = VocabularyUtils.TERM_OCCURRENCE;
+    this.term = null;
   }
 
   public getTermState() {
@@ -85,13 +71,14 @@ export class Annotation {
     // if (!this.state.termFetchFinished) {
     //   return AnnotationClass.LOADING;
     // }
-    if (this.termOccurrence === null) {
-      return isDefinitionAnnotation(this.typeOf)
+
+    if (this.term === null) {
+      return isDefinitionAnnotation(this.termOccurrence.typeof)
         ? AnnotationClass.PENDING_DEFINITION
         : AnnotationClass.SUGGESTED_OCCURRENCE;
     }
     if (this.termOccurrence) {
-      return isDefinitionAnnotation(this.typeOf)
+      return isDefinitionAnnotation(this.termOccurrence.typeof)
         ? AnnotationClass.DEFINITION
         : AnnotationClass.ASSIGNED_OCCURRENCE;
     }
@@ -99,7 +86,8 @@ export class Annotation {
   }
 
   public getTermCreatorState() {
-    if (this.termScore) {
+    // TODO: this check may later not work with existing terms
+    if (this.termOccurrence.score) {
       return AnnotationOrigin.PROPOSED;
     }
     return AnnotationOrigin.SELECTED;
