@@ -1,5 +1,5 @@
 import ListenerCollection from "./utils/listenerCollection";
-import { ContentPopup } from "./ContentPopup";
+import { ContentPopupContainer } from "./ContentPopupContainer";
 import { createIntegration } from "./integrations";
 import * as rangeUtil from "./utils/rangeUtils";
 import SelectionObserver from "./utils/selectionObserver";
@@ -42,12 +42,13 @@ export default class Annotator {
   private integration: any;
   private bucketBarClient: any;
   private listeners: any;
+  private currentAnnotation: Annotation;
 
   public constructor(rootElement) {
     this.rootElement = rootElement;
     this.annotationsVisible = false;
     this.isPopupVisible = false;
-    this.contentPopup = new ContentPopup(this.rootElement, {
+    this.contentPopup = new ContentPopupContainer(this.rootElement, {
       // TODO: are these handlers needed?
       onAnnotate: () => console.log("this.createAnnotation()"),
       onHighlight: () => console.log("({ highlight: true })"),
@@ -111,9 +112,9 @@ export default class Annotator {
     this.contentPopup.show(focusRect, isBackwards, selectionRange);
   }
 
-  public showPopup(element, termOccurrence) {
-    this.termOccurrence = termOccurrence;
-    const elementRect = element.getBoundingClientRect();
+  public showPopup(annotation: Annotation) {
+    this.currentAnnotation = annotation;
+    const elementRect = this.currentAnnotation.getElement()!.getBoundingClientRect();
     this.contentPopup.show(
       new DOMRect(
         elementRect.left,

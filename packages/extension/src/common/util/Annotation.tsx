@@ -1,5 +1,5 @@
 import { markTerms } from "../../content/marker";
-import Term from '../model/Term';
+import Term from "../model/Term";
 import VocabularyUtils from "./VocabularyUtils";
 
 export const AnnotationClass = {
@@ -24,7 +24,7 @@ export const AnnotationType = {
 export enum AnnotationStatus {
   SUCCESS,
   FAILURE,
-  PENDING
+  PENDING,
 }
 
 export type TermOccurrence = {
@@ -37,7 +37,7 @@ export type TermOccurrence = {
   // TODO: change startOffset to a number
   startOffset: string;
   typeof: string;
-}
+};
 
 // TODO: we'll have to make sure that the mapping works ok here (e.g. ddo:definice vs full url)
 export function isDefinitionAnnotation(type: string) {
@@ -47,6 +47,7 @@ export class Annotation {
   public termOccurrence: TermOccurrence;
   private term: Term | null = null;
   private annotatationStatus: AnnotationStatus = AnnotationStatus.PENDING;
+  private element?: HTMLElement;
   // methods:
   // markAnnotation(); (called by contructor)
   // remove(); (will hide the annotation)
@@ -110,11 +111,20 @@ export class Annotation {
     throw new Error("To be implemented");
   }
 
-  public set status(newStaus){
+  public set status(newStaus) {
     this.annotatationStatus = newStaus;
   }
 
-  public get status(){
+  public get status() {
     return this.annotatationStatus;
   }
+
+  public setElement(newElement){
+    this.element = newElement;
+  }
+
+  public getElement(){
+    return this.element;
+  }
+  
 }

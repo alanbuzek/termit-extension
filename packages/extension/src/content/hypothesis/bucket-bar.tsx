@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import { loadStyles } from "./ContentPopup";
+import { loadStyles } from "./ContentPopupContainer";
 import Buckets from "../components/Buckets";
 import { computeBuckets } from "./utils/buckets";
 

@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import { loadStyles } from "../hypothesis/ContentPopup";
+import { loadStyles } from "../hypothesis/ContentPopupContainer";
 import SidebarApp from "./SidebarApp";
 
 /**

@@ -5,7 +5,7 @@ import { preloadContentStyles } from "./hypothesis/helpers";
 import { overlay } from "./helper/overlay";
 
 export type ContentState = {
-  sidebar: Sidebar | null;
+  sidebar?: Sidebar | null;
   annotator: Annotator | null;
 };
 
@@ -19,11 +19,8 @@ const contentState: ContentState = {
  * all important global content script calls should be done here
  */
 export const globalActions = {
-  showPopup(element, termOccurrence) {
-    if (!contentState.annotator) {
-      return;
-    }
-    contentState.annotator.showPopup(element, termOccurrence);
+  showPopup(annotation) {
+    contentState.annotator?.showPopup(annotation);
   },
 };
 

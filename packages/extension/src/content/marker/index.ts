@@ -14,8 +14,8 @@ const classesMap = {
   existingTermProposal: "proposed-occurrence assigned-term-occurrence",
 };
 
-const handleElementClick = (element, termOccurance) => () => {
-  globalActions.showPopup(element, termOccurance);
+const handleElementClick = (annotation) => () => {
+  globalActions.showPopup(annotation);
 };
 
 const results = {
@@ -90,8 +90,9 @@ export const markTerms = ({ cssSelectors, termOccurrences }) => {
           console.log("registering listener");
           element.addEventListener(
             "click",
-            handleElementClick(element, termOccurrence)
+            handleElementClick(annotation)
           );
+          annotation.setElement(element);
         },
         done(numberOfMatches) {
           if (numberOfMatches === 1) {
