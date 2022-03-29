@@ -1,7 +1,7 @@
 import Annotator from "./hypothesis/Annotator";
 import { Sidebar } from "./hypothesis/Sidebar";
 import Vocabulary from "../common/model/Vocabulary";
-import { preloadURL } from "./hypothesis/helpers";
+import { preloadContentStyles } from "./hypothesis/helpers";
 import { overlay } from "./helper/overlay";
 
 export type ContentState = {
@@ -29,17 +29,7 @@ export const globalActions = {
 
 window.addEventListener("load", async () => {
   overlay.init();
-
-  const styleSheetsToLoad = [
-    "/static/css/annotator.css",
-    "/static/css/styles.css",
-    "/static/css/bootstrap-termit.css",
-  ];
-
-  styleSheetsToLoad.forEach((stylesheetPath) =>
-    preloadURL(document, "style", chrome.runtime.getURL(stylesheetPath))
-  );
-
+  preloadContentStyles();
   initSidebar();
 
   contentState.annotator = new Annotator(document.body);
@@ -48,6 +38,7 @@ window.addEventListener("load", async () => {
 function initSidebar() {
   contentState.sidebar = new Sidebar(
     document.body,
+    // TODO: maybe not pass the whole state inside, or restructure state such that it doesn't contain whole classes instances of Annotator and Sidebar
     contentState,
     async (vocabulary: Vocabulary) => {
       await contentState.annotator?.annotatePage(vocabulary);
