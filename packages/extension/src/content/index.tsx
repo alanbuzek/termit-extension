@@ -30,6 +30,7 @@ const contentState: ContentState = {
   terms: null,
 };
 
+// TODO: on some of these actions, sidebar (or event annotator) will need to be updated to show the most up to date data (e.g., rerender the whole tree through reactDOM, roll out redux, or solve in another way, to be determined)
 // TODO: re-evaluate how things are done with respect to annotator, maybe can move all things there instead?
 /**
  * all important global content script calls should be done here

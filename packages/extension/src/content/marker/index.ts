@@ -132,7 +132,7 @@ export const createTermOccurrence = (
   annotationType = AnnotationType.OCCURRENCE
 ) => {
   let parentElement = range.startContainer;
-  if (parentElement) {
+  if (!parentElement) {
     throw new Error("No parent element to create annotation!");
   }
   const isTextNode = parentElement.nodeType === Node.TEXT_NODE;

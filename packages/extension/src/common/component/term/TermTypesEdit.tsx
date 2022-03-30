@@ -12,6 +12,7 @@ import { getShortLocale } from "../../util/IntlUtil";
 import IntlData from "../../model/IntlData";
 import _ from "lodash";
 import HelpIcon from "../misc/HelpIcon";
+import api from "../../../api";
 
 interface TermTypesEditProps extends HasI18n {
   termTypes: string[];
@@ -33,20 +34,33 @@ const getTypesForSelector = _.memoize(
       (t) => (typesMap[t] = new Term(availableTypes[t]))
     );
     const types = Object.keys(typesMap).map((k) => typesMap[k]);
+    
+    console.log('typesMap: ', typesMap);
+    console.log('availableTypes: ', availableTypes);
     types.forEach((t) => {
       if (t.subTerms) {
         // The tree-select needs parent for proper function
         // @ts-ignore
-        t.subTerms.forEach((st) => (typesMap[st].parent = t.iri));
+        t.subTerms.forEach((st) => {
+          // TODO
+          if (!typesMap[st]){
+            console.log('typeMap: ', typesMap, ', st: ', st)
+          } else {
+            typesMap[st].parent = t.iri;
+          }
+        });
       }
     });
     return types;
   }
 );
 
+// TODO: deal with this crashing component later
 export class TermTypesEdit extends React.Component<TermTypesEditProps> {
-  public componentDidMount(): void {
-    // this.props.loadTypes();
+  state = { availableTypes: null };
+  public async componentDidMount() {
+    const types = await api.loadTypes();
+    this.setState({ availableTypes: types });
   }
 
   public onChange = (val: Term | null) => {
@@ -65,9 +79,16 @@ export class TermTypesEdit extends React.Component<TermTypesEditProps> {
   }
 
   public render() {
-    const types = getTypesForSelector(this.props.availableTypes);
+    if (!this.state.availableTypes){
+      return null;
+    }
+
+    const types = getTypesForSelector(this.state.availableTypes);
     const selected = this.resolveSelectedTypes(types);
     const { i18n, intl } = this.props;
+
+  
+    console.log('types: ', types, ', this.props.termTypes: ', this.props.termTypes)
     return (
       <FormGroup>
         <Label className="attribute-label">

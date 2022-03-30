@@ -13,8 +13,9 @@ import {
   AnnotationType,
 } from "../../common/util/Annotation";
 import { overlay } from "../helper/overlay";
-import { ContentState, globalActions } from '..';
-import Term from '../../common/model/Term';
+import { ContentState, globalActions } from "..";
+import Term from "../../common/model/Term";
+import VocabularyUtils from "../../common/util/VocabularyUtils";
 
 /**
  * Union of possible toolbar commands.
@@ -85,13 +86,13 @@ function ContentPopup({
         // 4. create term annotation
         return (
           <CreateTermFromAnnotation
+            // TODO: do we need 'show' and other props?
             show
             onClose={() => {
               closePopup();
               overlay.off();
             }}
             onSave={() => {
-              // markTerms()(newTerm);
               const newAnnotation = createTermOccurrence(
                 selectionRange,
                 AnnotationType.OCCURRENCE
@@ -105,11 +106,8 @@ function ContentPopup({
             // TODO: all this should either be deleted if not needed or use real, not hard-coded values
             onMinimize={() => 0}
             onTermCreated={() => 0}
-            vocabularyIri={{
-              // TODO: make this not hardcoded once global state contains currently selected vocabulary
-              fragment: "slovnik-document-376-2014",
-              namespace: "http://onto.fel.cvut.cz/ontologies/slovnik/",
-            }}
+            // TODO: handle fallback when no vocabulary is selected
+            vocabularyIri={VocabularyUtils.create(contentState.vocabulary!.iri)}
             createTerm={() => Promise.resolve()}
             i18n={() => ""}
             formatMessag={() => Promise.resolve()}
@@ -150,7 +148,9 @@ function ContentPopup({
             // TODO: do we need is open? or will that be fully managed by the above layer (more likely)
             isOpen={true}
             onRemove={closePopup}
-            onSelectTerm={(term: Term) => globalActions.assignTermToSuggestedOccurrence(term, annotation)}
+            onSelectTerm={(term: Term) =>
+              globalActions.assignTermToSuggestedOccurrence(term, annotation)
+            }
             onCreateTerm={() => {
               showAt(0, 0, true);
               setCurrPopup(PopupType.CreateTermModal);

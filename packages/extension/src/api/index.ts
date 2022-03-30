@@ -6,8 +6,10 @@ import Vocabulary, {
 import { param, params } from "../common/util/Ajax";
 import { Annotation } from "../common/util/Annotation";
 import JsonLdUtils from "../common/util/JsonLdUtils";
+import Utils from '../common/util/Utils';
 import { IRI } from "../common/util/VocabularyUtils";
 import { mockTerms, mockTerms2 } from "./mockData/mockTerms";
+import mockTypes from './mockData/mockTypes';
 import { mockVocabularies } from "./mockData/mockVocabularies";
 
 // TODO: remove all Promise.resolve() statements and uncomment real back-end calls when ready
@@ -131,10 +133,38 @@ export async function createTermOccurrence(annotation: Annotation) {
   // TODO: save term occurrence to the backend
 }
 
+export function loadTypes() {
+  // TODO: add caching layer, at least within one browser session
+  // return api
+  //   .get("/language/types")
+
+  return Promise.resolve(mockTypes)
+    .then((data: object[]) =>
+      data.length !== 0
+        ? JsonLdUtils.compactAndResolveReferencesAsArray<TermData>(
+            data,
+            TERM_CONTEXT
+          )
+        : []
+    )
+    .then((data: TermData[]) => {
+      return data.map((term: TermData) => {
+        if (term.subTerms) {
+          // @ts-ignore
+          term.subTerms = Utils.sanitizeArray(term.subTerms).map(
+            (subTerm) => subTerm.iri
+          );
+        }
+        return new Term(term);
+      });
+    });
+}
+
 export default {
   loadVocabularies,
   annotatePage,
   loadAllTerms,
   getLabel,
   createTermOccurrence,
+  loadTypes,
 };

@@ -75,7 +75,8 @@ class ResultItem extends React.Component<ResultItemProps> {
           <div className="tree-result-item-toggle-button">{button}</div>
         )}
 
-        <TooltipItem
+        {/* TODO: handle this? */}
+        {/* <TooltipItem
           targetId={"tooltip-" + Utils.hashCode(value)}
           option={option}
           label={label}
@@ -85,7 +86,7 @@ class ResultItem extends React.Component<ResultItemProps> {
           tooltipKey={this.props.tooltipKey}
           addonBefore={this.props.addonBefore}
           addonAfter={this.props.addonAfter}
-        />
+        /> */}
 
         {option.fetchingChild && (
           <span className="Select-loading-zone" aria-hidden="true">
