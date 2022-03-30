@@ -218,8 +218,6 @@ export class ContentPopupContainer {
      * @type {string[]}
      */
     this.annotationsForSelection = [];
-
-    this.render();
   }
 
   /** Hide the adder */

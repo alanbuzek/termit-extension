@@ -33,7 +33,7 @@ type ContentPopupProps = {
   arrowDirection: any;
   isVisible: any;
   onCommand: any;
-  initialPopupType: any;
+  initialPopupType: PopupType;
   showAt: any;
   hide: any;
   selectionRange: any;
@@ -59,24 +59,23 @@ type ContentPopupProps = {
  *
  * @param {AdderToolbarProps} props
  */
-export default function ContentPopup({
+function ContentPopup({
   arrowDirection,
   isVisible,
   onCommand,
-  initialPopupType = PopupType.PurposeSelection,
+  initialPopupType,
   showAt,
   hide,
   selectionRange,
   annotation,
 }: ContentPopupProps) {
   const [currPopup, setCurrPopup] = useState(initialPopupType);
-
   const closePopup = () => {
-    setCurrPopup(PopupType.PurposeSelection);
     hide();
   };
 
   const renderContentPopup = () => {
+    console.log("currPopup2: ", currPopup);
     switch (currPopup) {
       case PopupType.CreateTermModal:
         // 4. create term annotation
@@ -133,7 +132,7 @@ export default function ContentPopup({
             term={annotation?.term}
             score={`${annotation?.termOccurrence.score}`}
             text={
-              annotation?.termOccurrence.content || selectionRange.toString()
+              annotation?.termOccurrence.content || selectionRange?.toString()
             }
             // TODO: tweak these defaults
             annotationClass={
@@ -200,3 +199,16 @@ export default function ContentPopup({
     </div>
   );
 }
+
+// this ensures the wrapped component is mounted anew and no previous state is preserved, when calling hide() and show() in ContentPopupContainer
+function isVisibleWrapper(WrappedComponent) {
+  return ({ isVisible, ...props }) => {
+    if (!isVisible) {
+      return null;
+    }
+
+    return <WrappedComponent isVisible={true} {...props} />;
+  };
+}
+
+export default isVisibleWrapper(ContentPopup);
