@@ -71,7 +71,8 @@ function vocabularyMatches(
   term: Term | TermInfo,
   vocabularies: string[] | undefined
 ) {
-  return false;
+  // TODO: put this back when data stops being hardcoded
+  return true;
   // return !vocabularies || vocabularies.indexOf(term.vocabulary!.iri!) !== -1;
 }
 

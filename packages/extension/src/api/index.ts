@@ -6,7 +6,11 @@ import Vocabulary, {
 import { param, params } from "../common/util/Ajax";
 import JsonLdUtils from "../common/util/JsonLdUtils";
 import { IRI } from "../common/util/VocabularyUtils";
+import { mockTerms, mockTerms2 } from "./mockData/mockTerms";
 import { mockVocabularies } from "./mockData/mockVocabularies";
+
+// TODO: remove all Promise.resolve() statements and uncomment real back-end calls when ready
+// TODO (optional): use fetch-mock or similar library to mock api server responses, will likely be needed to testing 
 
 const fetchConfig = {
   method: "POST",
@@ -79,8 +83,9 @@ export function loadAllTerms(
   );
 
   console.log("paramaters: ", parameters);
-  api
-    .get(`/vocabularies/${vocabularyIri.fragment}/terms`, parameters)
+  // api
+  //   .get(`/vocabularies/${vocabularyIri.fragment}/terms`, parameters)
+  return Promise.resolve(mockTerms2)
     .then((data: object[]) =>
       data.length !== 0
         ? JsonLdUtils.compactAndResolveReferencesAsArray<TermData>(
@@ -90,9 +95,9 @@ export function loadAllTerms(
         : []
     )
     .then((data: TermData[]) => {
-      const terms = {};
+      const terms: { [key: string]: Term } = {};
       data.forEach((d) => (terms[d.iri!] = new Term(d)));
-      return data;
+      return terms;
     });
 }
 
@@ -105,7 +110,25 @@ export function annotatePage(vocabulary, pageHtml) {
   });
 }
 
+/**
+ * Fetches RDFS:label of a resource with the specified identifier.
+ * @param iri Resource identifier
+ */
+export function getLabel(iri: string) {
+  // TODO: consider implementing labelCache later if needed
+  // if (field === "label" && getState().labelCache[iri]) {
+  //   return Promise.resolve(getState().labelCache[iri]);
+  // }
+
+  const mockDataLabel = 'Decree No';
+
+  return Promise.resolve(mockDataLabel);
+  // return api.get("/data/label", param("iri", iri));
+}
+
 export default {
   loadVocabularies,
   annotatePage,
+  loadAllTerms,
+  getLabel,
 };

@@ -35,14 +35,16 @@
 // }
 
 export function getShortLocale(language: string): string {
-  const i = language.indexOf("-");
-  if (i > 0) {
-    return language.substring(0, language.indexOf("-"));
-  } else {
-    return language;
-  }
+  return "cs";
+  // TODO: put this back later, it crashed on language being null
+  // const i = language.indexOf("-");
+  // if (i > 0) {
+  //   return language.substring(0, language.indexOf("-"));
+  // } else {
+  //   return language;
+  // }
 }
 
 export default {
   getShortLocale,
-}
+};

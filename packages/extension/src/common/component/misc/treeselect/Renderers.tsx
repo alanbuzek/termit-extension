@@ -6,10 +6,11 @@ import UnusedTermInfo from "../../term/UnusedTermInfo";
 // import TermQualityBadge from "../../term/TermQualityBadge";
 import TermLink from "../../term/TermLink";
 import Vocabulary from "../../../model/Vocabulary";
-import { TermQualityBadge } from '../../term/TermQualityBadge';
+import TermQualityBadge from '../../term/TermQualityBadge';
 // import VocabularyLink from "../..vocabulary/VocabularyLink";
 // import VocabularyNameBadge from "../../vocabulary/VocabularyNameBadge";
 import React from 'react';
+import VocabularyNameBadge from '../../vocabulary/VocabularyNameBadge';
 
 interface TreeOption {
   disabled: boolean;
@@ -106,7 +107,7 @@ export function createTermsWithImportsOptionRendererAndUnusedTermsAndQualityBadg
 
     const addonBefore = (
       <span>
-        {/* {qualityBadge ? <TermQualityBadge term={option} /> : undefined}
+        {qualityBadge ? <TermQualityBadge term={option} /> : undefined}
         {!currentVocabularyIri ||
         currentVocabularyIri === option.vocabulary!.iri ? undefined : (
           <ImportedTermInfo term={option} />
@@ -115,16 +116,16 @@ export function createTermsWithImportsOptionRendererAndUnusedTermsAndQualityBadg
           <>
             <UnusedTermInfo term={option} />
           </>
-        ) : undefined} */}
+        ) : undefined}
       </span>
     );
 
     const addonAfter = (
       <span>
-        {/* {!currentVocabularyIri ||
+        {!currentVocabularyIri ||
         currentVocabularyIri === option.vocabulary!.iri ? undefined : (
           <VocabularyNameBadge vocabulary={option.vocabulary} />
-        )} */}
+        )}
       </span>
     );
 
@@ -153,9 +154,9 @@ export function createTermValueRenderer(vocabularyIri: string) {
   return (option: Term) => (
     <>
       <TermLink term={option} />
-      {/* {vocabularyIri !== option.vocabulary?.iri ? (
+      {vocabularyIri !== option.vocabulary?.iri ? (
         <VocabularyNameBadge vocabulary={option.vocabulary} />
-      ) : null} */}
+      ) : null}
     </>
   );
 }

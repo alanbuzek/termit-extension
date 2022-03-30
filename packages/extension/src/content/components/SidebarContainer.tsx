@@ -1,5 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
+import { ContentState } from '..';
 import { loadStyles } from "../hypothesis/ContentPopupContainer";
 import SidebarApp from "./SidebarApp";
 
@@ -18,7 +19,7 @@ import SidebarApp from "./SidebarApp";
  */
 export default class SidebarContainer {
   _container: any;
-  _state: any;
+  _state: ContentState;
   private handleAnnotatePage: any;
   _loadedStyles: boolean;
   /**

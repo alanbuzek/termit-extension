@@ -5,6 +5,7 @@
   "dependencies": {
     "@babel/runtime": "^7.10.4",
     "@hypothesis/frontend-shared": "^4.5.0",
+    "@opendata-mvcr/assembly-line-shared": "^0.2.5",
     "@types/jest": "^26.0.23",
     "@types/node": "^15.12.2",
     "@types/react": "^17.0.11",

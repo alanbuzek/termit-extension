@@ -18,6 +18,7 @@ import AssetFactory from "../../util/AssetFactory";
 import { langString } from "../../model/MultilingualString";
 // import TermItState from "../../model/TermItState";
 import { isTermValid, LabelExists } from "../term/TermValidationUtils";
+import { ContentState } from '../../../content';
 
 interface CreateTermFromAnnotationProps extends HasI18n {
   show: boolean;
@@ -26,7 +27,7 @@ interface CreateTermFromAnnotationProps extends HasI18n {
   onTermCreated: (term: Term) => void;
   vocabularyIri: IRI;
   language: string;
-
+  contentState: ContentState;
   createTerm: (term: Term, vocabularyIri: IRI) => Promise<any>;
 }
 

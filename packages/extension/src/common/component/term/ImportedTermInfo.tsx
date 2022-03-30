@@ -7,6 +7,7 @@ import { UncontrolledTooltip } from "reactstrap";
 // import { useI18n } from "../hook/useI18n";
 import { useI18n } from '../hook/useI18n';
 import Utils from '../../util/Utils';
+import AssetLabel from '../misc/AssetLabel';
 
 interface ImportedTermInfoProps {
   term: Term;
@@ -17,10 +18,11 @@ const ImportedTermInfo: React.FC<ImportedTermInfoProps> = (props) => {
   const id = "imported-term-info-" + Utils.hashCode(props.term.iri);
   return (
     <div className="imported-term-info" id={id}>
+      {/* TODO: add tooltip */}
       {/* <UncontrolledTooltip target={id}> */}
-        {i18n("glossary.importedTerm.tooltip")}
-        &nbsp;
-        {/* <AssetLabel iri={props.term.vocabulary!.iri!} /> */}
+        {/* {i18n("glossary.importedTerm.tooltip")}
+        &nbsp; */}
+        <AssetLabel iri={props.term.vocabulary!.iri!} />
       {/* </UncontrolledTooltip> */}
       <GoFileSymlinkDirectory />
     </div>

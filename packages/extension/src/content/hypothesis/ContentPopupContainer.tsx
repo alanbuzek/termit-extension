@@ -5,6 +5,7 @@ import { IntlProvider } from "react-intl";
 import cs from "../../cs.locale";
 import { overlay } from "../helper/overlay";
 import { Annotation } from "../../common/util/Annotation";
+import { ContentState } from '..';
 
 // TODO: probably don't need this for now
 /**
@@ -169,6 +170,7 @@ export class ContentPopupContainer {
   private isVisible: boolean;
   private arrowDirection: string;
   private currentAnnotation: Annotation | null = null;
+  private contentState: ContentState;
   annotationsForSelection: never[];
   /**
    * Create the toolbar's container and hide it.
@@ -179,7 +181,8 @@ export class ContentPopupContainer {
    * @param {AdderOptions} options - Options object specifying onAnnotate and onHighlight
    *        event handlers.
    */
-  constructor(element, options) {
+  constructor(element: HTMLElement, contentState: ContentState) {
+    this.contentState = contentState;
     this.outerContainer = document.createElement("hypothesis-adder");
     element.appendChild(this.outerContainer);
     this.shadowRoot = createShadowRoot(this.outerContainer);
@@ -419,6 +422,7 @@ export class ContentPopupContainer {
           selectionRange={selectionRange}
           annotation={this.currentAnnotation}
           initialPopupType={initialPopupType}
+          contentState={this.contentState}
         />
       </IntlProvider>,
       this.shadowRoot,

@@ -9,11 +9,12 @@ import ValidationResult from "../../model/ValidationResult";
 // import Routing from "../util/Routing";
 import { ConsolidatedResults } from "../../model/ConsolidatedResults";
 import Validation from "../../util/Validation";
-import { HasI18n } from '../hoc/withI18n';
+import withI18n, { HasI18n } from "../hoc/withI18n";
 
 interface TermQualityBadgeProps extends HasI18n {
   term: Term | null;
-  validationResults: ConsolidatedResults;
+  // TODO: add this later if needed
+  validationResults?: ConsolidatedResults;
 }
 
 export class TermQualityBadge extends React.Component<TermQualityBadgeProps> {
@@ -47,6 +48,7 @@ export class TermQualityBadge extends React.Component<TermQualityBadgeProps> {
   }
 
   public onBadgeClick = () => {
+    // TODO: implement of drop this if not neeeded
     // const namespace = Utils.extractQueryParam(
     //   this.props.location.search,
     //   "namespace"
@@ -84,10 +86,5 @@ export class TermQualityBadge extends React.Component<TermQualityBadgeProps> {
   }
 }
 
-export default TermQualityBadge;
-
-// export default connect((state: TermItState) => {
-//   return {
-//     validationResults: state.validationResults[state.vocabulary.iri],
-//   };
-// })(injectIntl(withI18n(withRouter(TermQualityBadge))));
+// export default injectIntl(withI18n(TermQualityBadge));
+export default injectIntl(withI18n(TermQualityBadge)) as any;

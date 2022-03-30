@@ -7,6 +7,8 @@ import Vocabulary from "../../common/model/Vocabulary";
 import { markTerms } from "../marker";
 import backgroundApi from "../../shared/backgroundApi";
 import { Annotation } from "../../common/util/Annotation";
+import { ContentState } from "..";
+import Term from "../../common/model/Term";
 
 /**
  * `Annotator` is the central class of the annotator that handles anchoring (locating)
@@ -42,18 +44,25 @@ export default class Annotator {
   private integration: any;
   private bucketBarClient: any;
   private listeners: any;
-  private currentAnnotation: Annotation;
+  private currentAnnotation?: Annotation;
+  private contentState: ContentState;
 
-  public constructor(rootElement) {
+  public constructor(rootElement: HTMLElement, contentState: ContentState) {
+    this.contentState = contentState;
     this.rootElement = rootElement;
     this.annotationsVisible = false;
     this.isPopupVisible = false;
-    this.contentPopup = new ContentPopupContainer(this.rootElement, {
+    this.contentPopup = new ContentPopupContainer(
+      this.rootElement,
+      this.contentState,
       // TODO: are these handlers needed?
-      onAnnotate: () => console.log("this.createAnnotation()"),
-      onHighlight: () => console.log("({ highlight: true })"),
-      onShowAnnotations: (tags) => console.log("this.selectAnnotations(tags)"),
-    });
+      // {
+      //   onAnnotate: () => console.log("this.createAnnotation()"),
+      //   onHighlight: () => console.log("({ highlight: true })"),
+      //   onShowAnnotations: (tags) =>
+      //     console.log("this.selectAnnotations(tags)"),
+      // }
+    );
 
     // TODO: fix up selection observer handling
     this.selectionObserver = new SelectionObserver((range) => {
@@ -114,7 +123,9 @@ export default class Annotator {
 
   public showPopup(annotation: Annotation) {
     this.currentAnnotation = annotation;
-    const elementRect = this.currentAnnotation.getElement()!.getBoundingClientRect();
+    const elementRect = this.currentAnnotation
+      .getElement()!
+      .getBoundingClientRect();
     this.contentPopup.show(
       new DOMRect(
         elementRect.left,
@@ -144,7 +155,7 @@ export default class Annotator {
       .forEach((annotation) => this.annotations.push(annotation));
   }
 
-  public getAnnotations(){
+  public getAnnotations() {
     return this.annotations;
   }
 

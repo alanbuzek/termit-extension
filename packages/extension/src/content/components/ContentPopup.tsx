@@ -13,6 +13,7 @@ import {
   AnnotationType,
 } from "../../common/util/Annotation";
 import { overlay } from "../helper/overlay";
+import { ContentState } from '..';
 
 /**
  * Union of possible toolbar commands.
@@ -31,6 +32,7 @@ type ContentPopupProps = {
   annotation: Annotation;
   // TODO: replace these any s with real types
   arrowDirection: any;
+  contentState: ContentState;
   isVisible: any;
   onCommand: any;
   initialPopupType: PopupType;
@@ -68,6 +70,7 @@ function ContentPopup({
   hide,
   selectionRange,
   annotation,
+  contentState,
 }: ContentPopupProps) {
   const [currPopup, setCurrPopup] = useState(initialPopupType);
   const closePopup = () => {
@@ -113,6 +116,7 @@ function ContentPopup({
             formatTime={() => ""}
             locale="cs-CZ"
             language={"cs"}
+            contentState={contentState}
           />
         );
       case PopupType.PurposeSelection:
@@ -151,6 +155,7 @@ function ContentPopup({
             }}
             onToggleDetailOpen={() => 0}
             onClose={closePopup}
+            contentState={contentState}
           />
         );
       case PopupType.TermDefinition:
@@ -165,6 +170,7 @@ function ContentPopup({
             onSelectTerm={() => 0}
             onToggleDetailOpen={() => 0}
             onClose={closePopup}
+            contentState={contentState}
           />
         );
       default:

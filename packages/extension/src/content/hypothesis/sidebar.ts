@@ -6,6 +6,7 @@ import { MessageType } from "../../types";
 import { createShadowRoot } from "./ContentPopupContainer";
 import SidebarContainer from "../components/SidebarContainer";
 import { ToolbarController } from "./toolbar";
+import { ContentState } from '..';
 
 // Minimum width to which the iframeContainer can be resized.
 export const MIN_RESIZE = 280;
@@ -36,7 +37,7 @@ export class Sidebar {
    */
   constructor(
     element: HTMLElement,
-    state: any,
+    state: ContentState,
     handleAnnotatePage: (vocabulary: Vocabulary) => void,
     config: Record<string, any> = {}
   ) {

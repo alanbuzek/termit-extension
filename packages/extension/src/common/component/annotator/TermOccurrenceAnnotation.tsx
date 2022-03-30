@@ -10,6 +10,7 @@ import { GoPencil } from "react-icons/go";
 import { useI18n } from '../hook/useI18n';
 import SimplePopupWithActions from './SimplePopupWithActions';
 import Term from '../../model/Term';
+import { ContentState } from '../../../content';
 
 interface TermOccurrenceAnnotationProps {
   term?: Term | null;
@@ -24,6 +25,7 @@ interface TermOccurrenceAnnotationProps {
   onCreateTerm: () => void;
   onToggleDetailOpen: () => void;
   onClose: () => void;
+  contentState: ContentState;
 }
 
 function createActionButtons(
@@ -111,6 +113,10 @@ export const TermOccurrenceAnnotation: React.FC<TermOccurrenceAnnotationProps> =
         onChange={props.onSelectTerm}
         onCreateTerm={props.onCreateTerm}
         i18n={i18n}
+        vocabulary={props.contentState.vocabulary!}
+        terms={props.contentState.terms}
+        canCreateTerm
+        selectVocabularyTerm={(v) => console.log('vocabulary term selected: ', v)}
       />
     ) : (
       <TermOccurrenceAnnotationView
