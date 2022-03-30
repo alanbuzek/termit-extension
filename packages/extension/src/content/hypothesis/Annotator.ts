@@ -35,7 +35,7 @@ export default class Annotator {
   private rootElement: any;
   private annotationsVisible: boolean;
   private isPopupVisible: boolean;
-  private contentPopup: any;
+  private contentPopup: ContentPopupContainer;
   private selectionObserver: any;
   // TODO: add annotation type
   private annotations: Annotation[] = [];
@@ -123,7 +123,8 @@ export default class Annotator {
         elementRect.height
       ),
       false,
-      null
+      null,
+      annotation
     );
   }
 

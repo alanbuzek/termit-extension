@@ -5,10 +5,14 @@ import TermDefinitionAnnotation from "../../common/component/annotator/TermDefin
 import TermOccurrenceAnnotation from "../../common/component/annotator/TermOccurrenceAnnotation";
 import HighlightedTextAdder from "./HighlightedTextAdder";
 import { useState } from "react";
-import { useEffect } from "react";
 import { createAnnotation, markTerms } from "../marker";
-import { AnnotationType } from "../../common/util/Annotation";
-import { overlay } from '../helper/overlay';
+import {
+  Annotation,
+  AnnotationClass,
+  AnnotationOrigin,
+  AnnotationType,
+} from "../../common/util/Annotation";
+import { overlay } from "../helper/overlay";
 
 /**
  * Union of possible toolbar commands.
@@ -22,6 +26,18 @@ export enum PopupType {
   TermOccurrence,
   PurposeSelection,
 }
+
+type ContentPopupProps = {
+  annotation: Annotation;
+  // TODO: replace these any s with real types
+  arrowDirection: any;
+  isVisible: any;
+  onCommand: any;
+  initialPopupType: any;
+  showAt: any;
+  hide: any;
+  selectionRange: any;
+};
 
 /**
  * @typedef AdderToolbarProps
@@ -47,12 +63,12 @@ export default function ContentPopup({
   arrowDirection,
   isVisible,
   onCommand,
-  annotationCount = 0,
   initialPopupType = PopupType.PurposeSelection,
   showAt,
   hide,
   selectionRange,
-}) {
+  annotation,
+}: ContentPopupProps) {
   const [currPopup, setCurrPopup] = useState(initialPopupType);
 
   const closePopup = () => {
@@ -60,94 +76,48 @@ export default function ContentPopup({
     hide();
   };
 
-  const [newTerm, setNewTerm] = useState(null);
-  useEffect(() => {
-    if (!window.getSelection()?.toString() || newTerm) {
-      return;
-    }
-
-    let newTermTemplate = {
-      cssSelectors: [],
-      termOccurrences: [],
-    };
-  });
-
-  const mockCreateTermAnnotationProps = {
-    show: true,
-    onClose() {
-      closePopup();
-      overlay.off();
-    },
-    onSave() {
-      // markTerms()(newTerm);
-      const newAnnotation = createAnnotation(
-        selectionRange,
-        AnnotationType.OCCURRENCE
-      );
-      if (newAnnotation) {
-        markTerms(newAnnotation);
-      }
-      closePopup();
-      overlay.off();
-    },
-    onMinimize: () => 0,
-    onTermCreated: () => 0,
-    vocabularyIri: {
-      fragment: "slovnik-document-376-2014",
-      namespace: "http://onto.fel.cvut.cz/ontologies/slovnik/",
-    },
-    language: "cs",
-    createTerm: () => 0,
-    i18n: () => 0,
-    formatMessage: () => 0,
-    formatDate: () => 0,
-    formatTime: () => 0,
-    locale: "cs-CZ",
-  };
-
   const renderContentPopup = () => {
-    const mockTermOccurrenceAnnotationProps = {
-      target: "id4540-5",
-      term: null,
-      score: "1.0",
-      text: "Obec",
-      annotationClass: "suggested-term-occurrence",
-      annotationOrigin: "proposed-occurrence",
-      isOpen: true,
-      onRemove: closePopup,
-      onSelectTerm: () => 0,
-      onCreateTerm: () => {
-        showAt(0, 0, true);
-        setCurrPopup(PopupType.CreateTermModal);
-      },
-      onToggleDetailOpen: () => 0,
-      onClose: closePopup,
-    };
-    const termDefinitionMockProps = {
-      target: "idphu3n",
-      term: null,
-      text: "Drnholec",
-      isOpen: true,
-      onRemove: closePopup,
-      onSelectTerm: () => 0,
-      onToggleDetailOpen: () => 0,
-      onClose: closePopup,
-    };
-
     switch (currPopup) {
       case PopupType.CreateTermModal:
         // 4. create term annotation
-        return <CreateTermFromAnnotation {...mockCreateTermAnnotationProps} />;
-      case PopupType.PurposeSelection:
-        // 4. create term annotation
         return (
-          // <SelectionPurposeDialog
-          //   show
-          //   onCreateTerm={() => 0}
-          //   onMarkOccurrence={() => setCurrPopup(PopupType.TermOccurrence)}
-          //   onMarkDefinition={() => setCurrPopup(PopupType.TermDefinition)}
-          //   onCancel={closePopup}
-          // />
+          <CreateTermFromAnnotation
+            show
+            onClose={() => {
+              closePopup();
+              overlay.off();
+            }}
+            onSave={() => {
+              // markTerms()(newTerm);
+              const newAnnotation = createAnnotation(
+                selectionRange,
+                AnnotationType.OCCURRENCE
+              );
+              if (newAnnotation) {
+                markTerms(newAnnotation);
+              }
+              closePopup();
+              overlay.off();
+            }}
+            // TODO: all this should either be deleted if not needed or use real, not hard-coded values
+            onMinimize={() => 0}
+            onTermCreated={() => 0}
+            vocabularyIri={{
+              // TODO: make this not hardcoded once global state contains currently selected vocabulary
+              fragment: "slovnik-document-376-2014",
+              namespace: "http://onto.fel.cvut.cz/ontologies/slovnik/",
+            }}
+            createTerm={() => Promise.resolve()}
+            i18n={() => ""}
+            formatMessag={() => Promise.resolve()}
+            formatDate={() => ""}
+            formatTime={() => ""}
+            locale="cs-CZ"
+            language={"cs"}
+          />
+        );
+      case PopupType.PurposeSelection:
+        return (
           <HighlightedTextAdder
             onMarkOccurrence={() => {
               setCurrPopup(PopupType.TermOccurrence);
@@ -159,10 +129,45 @@ export default function ContentPopup({
         );
       case PopupType.TermOccurrence:
         return (
-          <TermOccurrenceAnnotation {...mockTermOccurrenceAnnotationProps} />
+          <TermOccurrenceAnnotation
+            term={annotation?.term}
+            score={`${annotation?.termOccurrence.score}`}
+            text={
+              annotation?.termOccurrence.content || selectionRange.toString()
+            }
+            // TODO: tweak these defaults
+            annotationClass={
+              annotation?.getTermState() || AnnotationClass.SUGGESTED_OCCURRENCE
+            }
+            annotationOrigin={
+              annotation?.getTermCreatorState() || AnnotationOrigin.PROPOSED
+            }
+            // TODO: do we need is open? or will that be fully managed by the above layer (more likely)
+            isOpen={true}
+            onRemove={closePopup}
+            onSelectTerm={() => 0}
+            onCreateTerm={() => {
+              showAt(0, 0, true);
+              setCurrPopup(PopupType.CreateTermModal);
+            }}
+            onToggleDetailOpen={() => 0}
+            onClose={closePopup}
+          />
         );
       case PopupType.TermDefinition:
-        return <TermDefinitionAnnotation {...termDefinitionMockProps} />;
+        return (
+          <TermDefinitionAnnotation
+            term={annotation?.term}
+            text={
+              annotation?.termOccurrence.content || selectionRange.toString()
+            }
+            isOpen={true}
+            onRemove={closePopup}
+            onSelectTerm={() => 0}
+            onToggleDetailOpen={() => 0}
+            onClose={closePopup}
+          />
+        );
       default:
         return null;
     }

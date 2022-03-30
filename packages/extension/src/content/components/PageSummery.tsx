@@ -68,7 +68,7 @@ const PageSummary = ({ annotations, handleAnnotatePage }) => {
             setTimeout(() => {
               // TODO: remove this fallback, adjust it to a different, proper default (To be specified)
               handleAnnotatePage(selectedVocabulary || vocabularies[0]);
-            }, 1500);
+            }, 200);
           }}
           loading={annotationLoading}
         >

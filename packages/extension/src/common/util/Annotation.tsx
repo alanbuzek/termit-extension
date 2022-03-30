@@ -45,7 +45,7 @@ export function isDefinitionAnnotation(type: string) {
 }
 export class Annotation {
   public termOccurrence: TermOccurrence;
-  private term: Term | null = null;
+  public term: Term | null = null;
   private annotatationStatus: AnnotationStatus = AnnotationStatus.PENDING;
   private element?: HTMLElement;
   // methods:

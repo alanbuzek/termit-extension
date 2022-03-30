@@ -10,11 +10,8 @@ import { GoPencil } from "react-icons/go";
 import { useI18n } from '../hook/useI18n';
 import SimplePopupWithActions from './SimplePopupWithActions';
 import Term from '../../model/Term';
-// import IfUserAuthorized from "../authorization/IfUserAuthorized";
-// import { useI18n } from "../hook/useI18n";
 
 interface TermOccurrenceAnnotationProps {
-  target: string;
   term?: Term | null;
   score?: string;
   resource?: string;
@@ -22,7 +19,6 @@ interface TermOccurrenceAnnotationProps {
   annotationClass: string;
   annotationOrigin: string;
   isOpen: boolean;
-
   onRemove: () => void;
   onSelectTerm: (term: Term | null) => void;
   onCreateTerm: () => void;
@@ -128,7 +124,6 @@ export const TermOccurrenceAnnotation: React.FC<TermOccurrenceAnnotationProps> =
     return (
       <SimplePopupWithActions
         isOpen={props.isOpen}
-        target={props.target}
         toggle={props.onToggleDetailOpen}
         component={popupBody}
         actions={createActionButtons(

@@ -7,7 +7,6 @@ interface PopupWithActionsProps {
   actions: JSX.Element[];
   component: JSX.Element;
   isOpen: boolean;
-  target: any;
   toggle: any;
 }
 

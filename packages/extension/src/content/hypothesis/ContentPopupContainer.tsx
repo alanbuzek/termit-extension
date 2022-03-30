@@ -1,9 +1,10 @@
-import ContentPopup from "../components/ContentPopup";
+import ContentPopup, { PopupType } from "../components/ContentPopup";
 import React from "react";
 import ReactDOM from "react-dom";
 import { IntlProvider } from "react-intl";
 import cs from "../../cs.locale";
 import { overlay } from "../helper/overlay";
+import { Annotation } from "../../common/util/Annotation";
 
 // TODO: probably don't need this for now
 /**
@@ -167,6 +168,7 @@ export class ContentPopupContainer {
   private height: () => any;
   private isVisible: boolean;
   private arrowDirection: string;
+  private currentAnnotation: Annotation | null = null;
   annotationsForSelection: never[];
   /**
    * Create the toolbar's container and hide it.
@@ -249,7 +251,13 @@ export class ContentPopupContainer {
    *        rigth-to-left, such that the focus point is mosty likely at the
    *        top-left edge of targetRect.
    */
-  public show(selectionRect, isRTLselection, selectionRange) {
+  public show(
+    selectionRect,
+    isRTLselection,
+    selectionRange,
+    annotation: Annotation | null = null
+  ) {
+    this.currentAnnotation = annotation;
     const { left, top, arrowDirection } = this.calculateTarget(
       selectionRect,
       isRTLselection
@@ -393,6 +401,15 @@ export class ContentPopupContainer {
       return false;
     };
 
+    let initialPopupType = PopupType.PurposeSelection;
+    if (this.currentAnnotation) {
+      if (!this.currentAnnotation.term){
+        initialPopupType = PopupType.TermOccurrence;
+      } else {
+        initialPopupType = PopupType.TermDefinition;
+      }
+    }
+
     ReactDOM.render(
       <IntlProvider locale="cs-CZ" defaultLocale="en" messages={cs}>
         <ContentPopup
@@ -402,6 +419,8 @@ export class ContentPopupContainer {
           showAt={this.showAt.bind(this)}
           hide={this.hide.bind(this)}
           selectionRange={selectionRange}
+          annotation={this.currentAnnotation}
+          initialPopupType={initialPopupType}
         />
       </IntlProvider>,
       this.shadowRoot,
