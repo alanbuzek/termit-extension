@@ -22,7 +22,9 @@ const ImportedTermInfo: React.FC<ImportedTermInfoProps> = (props) => {
       {/* <UncontrolledTooltip target={id}> */}
         {/* {i18n("glossary.importedTerm.tooltip")}
         &nbsp; */}
-        <AssetLabel iri={props.term.vocabulary!.iri!} />
+        {/* TODO: use AssetLabel */}
+        {props.term.label.cs}
+        {/* <AssetLabel iri={props.term.vocabulary!.iri!} /> */}
       {/* </UncontrolledTooltip> */}
       <GoFileSymlinkDirectory />
     </div>

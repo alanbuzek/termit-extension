@@ -4,13 +4,14 @@ import Vocabulary, {
   VocabularyData,
 } from "../common/model/Vocabulary";
 import { param, params } from "../common/util/Ajax";
+import { Annotation } from "../common/util/Annotation";
 import JsonLdUtils from "../common/util/JsonLdUtils";
 import { IRI } from "../common/util/VocabularyUtils";
 import { mockTerms, mockTerms2 } from "./mockData/mockTerms";
 import { mockVocabularies } from "./mockData/mockVocabularies";
 
 // TODO: remove all Promise.resolve() statements and uncomment real back-end calls when ready
-// TODO (optional): use fetch-mock or similar library to mock api server responses, will likely be needed to testing 
+// TODO (optional): use fetch-mock or similar library to mock api server responses, will likely be needed to testing
 
 const fetchConfig = {
   method: "POST",
@@ -120,10 +121,14 @@ export function getLabel(iri: string) {
   //   return Promise.resolve(getState().labelCache[iri]);
   // }
 
-  const mockDataLabel = 'Decree No';
+  const mockDataLabel = "Decree No";
 
   return Promise.resolve(mockDataLabel);
   // return api.get("/data/label", param("iri", iri));
+}
+
+export async function createTermOccurrence(annotation: Annotation) {
+  // TODO: save term occurrence to the backend
 }
 
 export default {
@@ -131,4 +136,5 @@ export default {
   annotatePage,
   loadAllTerms,
   getLabel,
+  createTermOccurrence,
 };

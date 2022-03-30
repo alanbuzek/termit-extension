@@ -33,7 +33,7 @@ export type TermOccurrence = {
   originalTerm: string;
   property: string;
   resource: string;
-  score: number;
+  score?: number;
   // TODO: change startOffset to a number
   startOffset: string;
   typeof: string;
@@ -119,12 +119,22 @@ export class Annotation {
     return this.annotatationStatus;
   }
 
-  public setElement(newElement){
+  public setElement(newElement) {
     this.element = newElement;
   }
 
-  public getElement(){
+  public getElement() {
     return this.element;
   }
-  
+
+  public assignTerm(term: Term) {
+    this.term = term;
+    this.termOccurrence.typeof = AnnotationClass.ASSIGNED_OCCURRENCE;
+    delete this.termOccurrence.score;
+    this.updateAppearrance();
+  }
+
+  private updateAppearrance() {
+    this.element!.className = this.getClassName();
+  }
 }

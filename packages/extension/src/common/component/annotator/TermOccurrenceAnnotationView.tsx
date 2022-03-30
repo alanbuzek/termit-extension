@@ -22,6 +22,7 @@ const TermOccurrenceAnnotationView: React.FC<TermOccurrenceAnnotationViewProps> 
                   {i18n("annotation.term.assigned-occurrence.termLabel")}
                 </td>
                 <td>
+                  {/* TODO */}
                   {/* <TermLink term={props.term!} /> */}
                 </td>
               </tr>

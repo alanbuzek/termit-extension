@@ -3,7 +3,7 @@ import { Sidebar } from "./hypothesis/Sidebar";
 import Vocabulary from "../common/model/Vocabulary";
 import { preloadContentStyles } from "./hypothesis/helpers";
 import { overlay } from "./helper/overlay";
-import { Annotation } from "../common/util/Annotation";
+import { Annotation, AnnotationClass } from "../common/util/Annotation";
 import api from "../api";
 import VocabularyUtils from "../common/util/VocabularyUtils";
 import Term from "../common/model/Term";
@@ -12,10 +12,12 @@ import Term from "../common/model/Term";
 let sidebar: Sidebar | null = null;
 let annotator: Annotator | null = null;
 
+export type TermsMap = { [key: string]: Term }; 
+
 export type ContentState = {
   vocabulary: Vocabulary | null;
   annotations: Annotation[] | null;
-  terms: { [key: string]: Term } | null;
+  terms: TermsMap | null;
 };
 
 const contentState: ContentState = {
@@ -46,6 +48,13 @@ export const globalActions = {
     console.log('contentState: ', contentState);
     sidebar!.render();
   },
+  async assignTermToSuggestedOccurrence(term: Term, annotation: Annotation){
+    annotation.assignTerm(term);
+    annotator!.hidePopup();
+    await api.createTermOccurrence(annotation);
+
+    // TODO: maybe the annotace service needs to be run again to help out with that?
+  }
 };
 
 window.addEventListener("load", async () => {

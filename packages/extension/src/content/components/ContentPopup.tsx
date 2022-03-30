@@ -13,7 +13,8 @@ import {
   AnnotationType,
 } from "../../common/util/Annotation";
 import { overlay } from "../helper/overlay";
-import { ContentState } from '..';
+import { ContentState, globalActions } from '..';
+import Term from '../../common/model/Term';
 
 /**
  * Union of possible toolbar commands.
@@ -148,7 +149,7 @@ function ContentPopup({
             // TODO: do we need is open? or will that be fully managed by the above layer (more likely)
             isOpen={true}
             onRemove={closePopup}
-            onSelectTerm={() => 0}
+            onSelectTerm={(term: Term) => globalActions.assignTermToSuggestedOccurrence(term, annotation)}
             onCreateTerm={() => {
               showAt(0, 0, true);
               setCurrPopup(PopupType.CreateTermModal);

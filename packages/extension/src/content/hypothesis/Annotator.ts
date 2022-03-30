@@ -139,6 +139,10 @@ export default class Annotator {
     );
   }
 
+  public hidePopup() {
+    this.contentPopup.hide();
+  }
+
   public async annotatePage(vocabulary: Vocabulary) {
     const termOccSelectors = await backgroundApi.getPageAnnotations(
       vocabulary.iri,
