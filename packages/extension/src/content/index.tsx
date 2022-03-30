@@ -3,16 +3,20 @@ import { Sidebar } from "./hypothesis/Sidebar";
 import Vocabulary from "../common/model/Vocabulary";
 import { preloadContentStyles } from "./hypothesis/helpers";
 import { overlay } from "./helper/overlay";
-import { Annotation, AnnotationClass } from "../common/util/Annotation";
+import {
+  Annotation,
+  AnnotationType,
+} from "../common/util/Annotation";
 import api from "../api";
 import VocabularyUtils from "../common/util/VocabularyUtils";
 import Term from "../common/model/Term";
+import { createTermOccurrence, markTerms } from "./marker";
 
 // global important classes
 let sidebar: Sidebar | null = null;
 let annotator: Annotator | null = null;
 
-export type TermsMap = { [key: string]: Term }; 
+export type TermsMap = { [key: string]: Term };
 
 export type ContentState = {
   vocabulary: Vocabulary | null;
@@ -45,16 +49,28 @@ export const globalActions = {
     contentState.terms = vocabularyTerms;
     // this makes sure to re-render sidebar on data update
     // TODO: is this needed? what is the best way this to ensure this is working?
-    console.log('contentState: ', contentState);
+    console.log("contentState: ", contentState);
     sidebar!.render();
   },
-  async assignTermToSuggestedOccurrence(term: Term, annotation: Annotation){
+  async assignTermToSuggestedOccurrence(term: Term, annotation: Annotation) {
     annotation.assignTerm(term);
     annotator!.hidePopup();
     await api.createTermOccurrence(annotation);
 
     // TODO: maybe the annotace service needs to be run again to help out with that?
-  }
+  },
+  async createNewUnknownOccurrence(selectionRange: Range) {
+    const newTermOccurrence = createTermOccurrence(
+      selectionRange,
+      AnnotationType.OCCURRENCE
+    );
+    const [newAnnotation] = await markTerms(newTermOccurrence);
+    contentState.annotations!.push(newAnnotation);
+    this.showPopup(newAnnotation);
+
+    // TODO: this will most likely not need to be persisted, as the user will likely create a term or assign occurrence to existing term from this unknown occurrence, but double check this to be sure
+    // await api.createTermOccurrence(annotation);
+  },
 };
 
 window.addEventListener("load", async () => {

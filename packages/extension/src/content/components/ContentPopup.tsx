@@ -5,7 +5,7 @@ import TermDefinitionAnnotation from "../../common/component/annotator/TermDefin
 import TermOccurrenceAnnotation from "../../common/component/annotator/TermOccurrenceAnnotation";
 import HighlightedTextAdder from "./HighlightedTextAdder";
 import { useState } from "react";
-import { createAnnotation, markTerms } from "../marker";
+import { createTermOccurrence, markTerms } from "../marker";
 import {
   Annotation,
   AnnotationClass,
@@ -92,7 +92,7 @@ function ContentPopup({
             }}
             onSave={() => {
               // markTerms()(newTerm);
-              const newAnnotation = createAnnotation(
+              const newAnnotation = createTermOccurrence(
                 selectionRange,
                 AnnotationType.OCCURRENCE
               );
@@ -124,6 +124,7 @@ function ContentPopup({
         return (
           <HighlightedTextAdder
             onMarkOccurrence={() => {
+              globalActions.createNewUnknownOccurrence(selectionRange);
               setCurrPopup(PopupType.TermOccurrence);
             }}
             onMarkDefinition={() => {

@@ -1,7 +1,11 @@
 import { getCssSelector } from "css-selector-generator";
 import { globalActions } from "..";
 import { getPropertyForAnnotationType } from "../../common/component/annotator/AnnotationDomHelper";
-import { Annotation, AnnotationStatus, AnnotationType } from "../../common/util/Annotation";
+import {
+  Annotation,
+  AnnotationStatus,
+  AnnotationType,
+} from "../../common/util/Annotation";
 import JsonLdUtils from "../../common/util/JsonLdUtils";
 import Mark from "../../markjs";
 
@@ -31,7 +35,10 @@ const results = {
   },
 };
 
-export const markTerms = ({ cssSelectors, termOccurrences }) => {
+export const markTerms = ({
+  cssSelectors,
+  termOccurrences,
+}): Promise<Annotation[]> => {
   return new Promise((resolve, reject) => {
     const selectedElements = Array.from(
       document.querySelectorAll(cssSelectors[0])
@@ -88,10 +95,7 @@ export const markTerms = ({ cssSelectors, termOccurrences }) => {
         className: annotation.getClassName(),
         each(element) {
           console.log("registering listener");
-          element.addEventListener(
-            "click",
-            handleElementClick(annotation)
-          );
+          element.addEventListener("click", handleElementClick(annotation));
           annotation.setElement(element);
         },
         done(numberOfMatches) {
@@ -123,49 +127,50 @@ export const markTerms = ({ cssSelectors, termOccurrences }) => {
   });
 };
 
-export const createAnnotation = (
+export const createTermOccurrence = (
   range,
   annotationType = AnnotationType.OCCURRENCE
 ) => {
   let parentElement = range.startContainer;
   if (parentElement) {
-    const isTextNode = parentElement.nodeType === Node.TEXT_NODE;
-    const selectedString = range.toString();
-    let startOffsetIdx;
-    if (isTextNode) {
-      const nodeText = parentElement.wholeText;
-      parentElement = parentElement.parentNode;
-      startOffsetIdx =
-        parentElement.textContent.indexOf(nodeText) + range.startOffset;
-    } else {
-      startOffsetIdx = range.startOffset;
-    }
-    const generatedCssSelector = getCssSelector(parentElement);
-    const newTerm: {
-      cssSelectors: string[];
-      termOccurrences: {
-        about: string;
-        originalTerm: string;
-        property: string;
-        startOffset: number;
-        typeof: string;
-        content: string;
-      }[];
-    } = { cssSelectors: [], termOccurrences: [] };
-
-    // TODO: annotation type should not be hard-coded
-    const termOccurrence = {
-      about: JsonLdUtils.generateBlankNodeId(),
-      content: selectedString,
-      originalTerm: selectedString,
-      // property: "ddo:je-výskytem-termu",
-      property: getPropertyForAnnotationType(annotationType),
-      startOffset: parentElement.textContent.slice(0, startOffsetIdx),
-      // typeof: "ddo:výskyt-termu",
-      typeof: annotationType,
-    };
-    newTerm.cssSelectors.push(generatedCssSelector);
-    newTerm.termOccurrences.push(termOccurrence);
-    return newTerm;
+    throw new Error("No parent element to create annotation!");
   }
+  const isTextNode = parentElement.nodeType === Node.TEXT_NODE;
+  const selectedString = range.toString();
+  let startOffsetIdx;
+  if (isTextNode) {
+    const nodeText = parentElement.wholeText;
+    parentElement = parentElement.parentNode;
+    startOffsetIdx =
+      parentElement.textContent.indexOf(nodeText) + range.startOffset;
+  } else {
+    startOffsetIdx = range.startOffset;
+  }
+  const generatedCssSelector = getCssSelector(parentElement);
+  const newTerm: {
+    cssSelectors: string[];
+    termOccurrences: {
+      about: string;
+      originalTerm: string;
+      property: string;
+      startOffset: number;
+      typeof: string;
+      content: string;
+    }[];
+  } = { cssSelectors: [], termOccurrences: [] };
+
+  // TODO: annotation type should not be hard-coded
+  const termOccurrence = {
+    about: JsonLdUtils.generateBlankNodeId(),
+    content: selectedString,
+    originalTerm: selectedString,
+    // property: "ddo:je-výskytem-termu",
+    property: getPropertyForAnnotationType(annotationType),
+    startOffset: parentElement.textContent.slice(0, startOffsetIdx),
+    // typeof: "ddo:výskyt-termu",
+    typeof: annotationType,
+  };
+  newTerm.cssSelectors.push(generatedCssSelector);
+  newTerm.termOccurrences.push(termOccurrence);
+  return newTerm;
 };
