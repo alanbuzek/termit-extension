@@ -19,6 +19,7 @@ import { langString } from "../../model/MultilingualString";
 // import TermItState from "../../model/TermItState";
 import { isTermValid, LabelExists } from "../term/TermValidationUtils";
 import { ContentState } from '../../../content';
+import { Annotation } from '../../util/Annotation';
 
 interface CreateTermFromAnnotationProps extends HasI18n {
   show: boolean;
@@ -28,7 +29,7 @@ interface CreateTermFromAnnotationProps extends HasI18n {
   vocabularyIri: IRI;
   language: string;
   contentState: ContentState;
-  createTerm: (term: Term, vocabularyIri: IRI) => Promise<any>;
+  createTerm: (term: Term) => Promise<any>;
 }
 
 interface CreateTermFromAnnotationState extends TermData {
@@ -71,13 +72,11 @@ export class CreateTermFromAnnotation extends React.Component<
   };
 
   public onSave = () => {
-    // const newTerm = new Term(this.state);
-    console.log('on save inside called')
-    this.props.onSave();
-    // this.props.createTerm(newTerm, this.props.vocabularyIri).then(() => {
-    //   this.props.onTermCreated(newTerm);
-    //   this.onCancel();
-    // });
+    const newTerm = new Term(this.state);
+    this.props.createTerm(newTerm).then(() => {
+      this.props.onTermCreated(newTerm);
+      this.onCancel();
+    });
   };
 
   public onCancel = () => {

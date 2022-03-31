@@ -8,9 +8,9 @@ import {
   AnnotationType,
 } from "../common/util/Annotation";
 import api from "../api";
-import VocabularyUtils from "../common/util/VocabularyUtils";
+import VocabularyUtils, { IRI } from "../common/util/VocabularyUtils";
 import Term from "../common/model/Term";
-import { createTermOccurrence, markTerms } from "./marker";
+import { createTermOccurrence as termOccurrenceFromRange, markTerms } from "./marker";
 
 // global important classes
 let sidebar: Sidebar | null = null;
@@ -61,7 +61,7 @@ export const globalActions = {
     // TODO: maybe the annotace service needs to be run again to help out with that?
   },
   async createNewUnknownOccurrence(selectionRange: Range) {
-    const newTermOccurrence = createTermOccurrence(
+    const newTermOccurrence = termOccurrenceFromRange(
       selectionRange,
       AnnotationType.OCCURRENCE
     );
@@ -72,6 +72,11 @@ export const globalActions = {
     // TODO: this will most likely not need to be persisted, as the user will likely create a term or assign occurrence to existing term from this unknown occurrence, but double check this to be sure
     // await api.createTermOccurrence(annotation);
   },
+  async createTerm(term: Term, vocabularyIri: IRI, annotation: Annotation){
+    await api.createTerm(term, vocabularyIri);
+    contentState.terms![term.iri] = term;
+    annotation.assignTerm(term);
+  }
 };
 
 window.addEventListener("load", async () => {

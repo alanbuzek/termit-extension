@@ -1,16 +1,18 @@
+import { constants } from 'buffer';
 import Term, { TermData, CONTEXT as TERM_CONTEXT } from "../common/model/Term";
 import Vocabulary, {
   CONTEXT as VOCABULARY_CONTEXT,
   VocabularyData,
 } from "../common/model/Vocabulary";
-import { param, params } from "../common/util/Ajax";
+import { content, param, params } from "../common/util/Ajax";
 import { Annotation } from "../common/util/Annotation";
 import JsonLdUtils from "../common/util/JsonLdUtils";
-import Utils from '../common/util/Utils';
-import { IRI } from "../common/util/VocabularyUtils";
+import Utils from "../common/util/Utils";
+import VocabularyUtils, { IRI } from "../common/util/VocabularyUtils";
 import { mockTerms, mockTerms2 } from "./mockData/mockTerms";
-import mockTypes from './mockData/mockTypes';
+import mockTypes from "./mockData/mockTypes";
 import { mockVocabularies } from "./mockData/mockVocabularies";
+import Constants from '../common/util/Constants'
 
 // TODO: remove all Promise.resolve() statements and uncomment real back-end calls when ready
 // TODO (optional): use fetch-mock or similar library to mock api server responses, will likely be needed to testing
@@ -160,6 +162,33 @@ export function loadTypes() {
     });
 }
 
+function resolveTermCreationUrl(term: Term, targetVocabularyIri: IRI) {
+  let url = `/vocabularies/${targetVocabularyIri.fragment}/terms`;
+  const parents = Utils.sanitizeArray(term.parentTerms);
+  if (parents.length > 0) {
+    // Use one of the parents, it does not matter which one
+    url += `/${VocabularyUtils.create(parents[0].iri!).fragment}/subterms`;
+  }
+  return url;
+}
+
+export function createTerm(term: Term, vocabularyIri: IRI) {
+  const url = resolveTermCreationUrl(term, vocabularyIri);
+  const data = Object.assign(term.toJsonLd(), {
+    vocabulary: {
+      iri: vocabularyIri.namespace + vocabularyIri.fragment,
+    },
+  });
+
+  return Promise.resolve();
+  // return api.post(
+  //   url,
+  //   content(data)
+  //     .contentType(Constants.JSON_LD_MIME_TYPE)
+  //     .param("namespace", vocabularyIri.namespace)
+  // )
+}
+
 export default {
   loadVocabularies,
   annotatePage,
@@ -167,4 +196,5 @@ export default {
   getLabel,
   createTermOccurrence,
   loadTypes,
+  createTerm
 };

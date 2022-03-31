@@ -15,7 +15,7 @@ import {
 import { overlay } from "../helper/overlay";
 import { ContentState, globalActions } from "..";
 import Term from "../../common/model/Term";
-import VocabularyUtils from "../../common/util/VocabularyUtils";
+import VocabularyUtils, { IRI } from "../../common/util/VocabularyUtils";
 
 /**
  * Union of possible toolbar commands.
@@ -78,6 +78,7 @@ function ContentPopup({
   const closePopup = () => {
     hide();
   };
+  const vocabularyIri = VocabularyUtils.create(contentState.vocabulary!.iri);
 
   const renderContentPopup = () => {
     console.log("currPopup2: ", currPopup);
@@ -107,8 +108,10 @@ function ContentPopup({
             onMinimize={() => 0}
             onTermCreated={() => 0}
             // TODO: handle fallback when no vocabulary is selected
-            vocabularyIri={VocabularyUtils.create(contentState.vocabulary!.iri)}
-            createTerm={() => Promise.resolve()}
+            vocabularyIri={vocabularyIri}
+            createTerm={(term: Term) => {
+              return globalActions.createTerm(term, vocabularyIri, annotation);
+            }}
             i18n={() => ""}
             formatMessag={() => Promise.resolve()}
             formatDate={() => ""}
