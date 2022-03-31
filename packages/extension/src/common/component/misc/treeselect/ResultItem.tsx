@@ -70,11 +70,12 @@ class ResultItem extends React.Component<ResultItemProps> {
         className={this.props.className}
         onMouseEnter={this.onMouseEnter}
         style={this.props.style}
+        onClick={this.onClick}
       >
         {this.props.renderAsTree && (
           <div className="tree-result-item-toggle-button">{button}</div>
         )}
-
+        {label}
         {/* TODO: handle this? */}
         {/* <TooltipItem
           targetId={"tooltip-" + Utils.hashCode(value)}
