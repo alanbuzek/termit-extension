@@ -201,7 +201,7 @@ export function createTerm(term: Term, vocabularyIri: IRI) {
   // )
 }
 
-export function removeTermOccurrence(annotation: Annotation){
+export function removeOccurrence(annotation: Annotation){
   // TODO
   return Promise.resolve();
 }
@@ -215,6 +215,6 @@ export default {
   loadTypes,
   createTerm,
   updateTermOccurrence,
-  removeTermOccurrence,
+  removeOccurrence,
   createDefinitionOccurrence
 };

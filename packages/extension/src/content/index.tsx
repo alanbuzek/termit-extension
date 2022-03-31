@@ -98,8 +98,8 @@ export const globalActions = {
     contentState.terms![term.iri] = term;
     annotation.assignTerm(term, true);
   },
-  async removeTermOccurrence(annotation: Annotation){
-    await api.removeTermOccurrence(annotation);
+  async removeOccurrence(annotation: Annotation){
+    await api.removeOccurrence(annotation);
     await annotation.removeOccurrence();
     const annotationIdx = contentState.annotations!.indexOf(annotation);
     contentState.annotations?.splice(annotationIdx, 1);

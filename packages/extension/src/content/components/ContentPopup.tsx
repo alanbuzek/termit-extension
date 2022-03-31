@@ -144,8 +144,8 @@ function ContentPopup({
             // TODO: do we need is open? or will that be fully managed by the above layer (more likely)
             isOpen={true}
             onRemove={() => {
-              globalActions.removeTermOccurrence(annotation);
-              hide();
+              globalActions.removeOccurrence(annotation);
+              closePopup();
             }}
             onSelectTerm={(term: Term) =>
               globalActions.assignTermToSuggestedTermOccurrence(term, annotation)
@@ -167,7 +167,10 @@ function ContentPopup({
               annotation?.termOccurrence.content || selectionRange.toString()
             }
             isOpen={true}
-            onRemove={closePopup}
+            onRemove={() => {
+              closePopup();
+              return globalActions.removeOccurrence(annotation);
+            }}
             onSelectTerm={(term: Term) => {
               return globalActions.assignTermToSuggestedDefinitionOccurrence(term, annotation)
             }}
