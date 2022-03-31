@@ -29,6 +29,7 @@ const fetchConfig = {
   redirect: "follow", // manual, *follow, error
   referrerPolicy: "no-referrer", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
 };
+// TODO: get this from some config file, env variable...
 const serverUrl = "http://localhost:8888";
 
 const callFetch = (path, config) => {

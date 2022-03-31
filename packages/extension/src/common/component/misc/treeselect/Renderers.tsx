@@ -97,6 +97,7 @@ export function createTermsWithImportsOptionRendererAndUnusedTermsAndQualityBadg
       option.className
     );
 
+    option.disabled = false;
     const eventHandlers = option.disabled
       ? {}
       : {
@@ -108,10 +109,12 @@ export function createTermsWithImportsOptionRendererAndUnusedTermsAndQualityBadg
     const addonBefore = (
       <span>
         {qualityBadge ? <TermQualityBadge term={option} /> : undefined}
-        {!currentVocabularyIri ||
+        {/* {!currentVocabularyIri ||
         currentVocabularyIri === option.vocabulary!.iri ? undefined : (
           <ImportedTermInfo term={option} />
-        )}
+        )} */}
+        {/* TODO: remove this hardcoded line below and uncomment what is above */}
+        <ImportedTermInfo term={option} />
         {unusedTerms.indexOf(option.iri) !== -1 ? (
           <>
             <UnusedTermInfo term={option} />

@@ -5,21 +5,15 @@ import {
   Button,
   ButtonToolbar,
   Col,
-  Modal,
-  ModalBody,
-  ModalHeader,
   Row,
 } from "reactstrap";
 import TermMetadataCreateForm from "../term/TermMetadataCreateForm";
 import { injectIntl } from "react-intl";
-// import { createTerm } from "../../action/AsyncTermActions";
 import { IRI } from "../../util/VocabularyUtils";
 import AssetFactory from "../../util/AssetFactory";
 import { langString } from "../../model/MultilingualString";
-// import TermItState from "../../model/TermItState";
 import { isTermValid, LabelExists } from "../term/TermValidationUtils";
 import { ContentState } from '../../../content';
-import { Annotation } from '../../util/Annotation';
 
 interface CreateTermFromAnnotationProps extends HasI18n {
   show: boolean;
@@ -148,20 +142,5 @@ export class CreateTermFromAnnotation extends React.Component<
   }
 }
 
-// export default connect(
-//   (state: TermItState) => ({ language: state.configuration.language }),
-//   (dispatch: ThunkDispatch) => {
-//     return {
-//       createTerm: (term: Term, vocabularyIri: IRI) =>
-//         dispatch(createTerm(term, vocabularyIri)),
-//     };
-//   },
-//   undefined,
-//   { forwardRef: true }
-// )(
-//   injectIntl(withI18n(CreateTermFromAnnotation, { forwardRef: true }), {
-//     forwardRef: true,
-//   })
-// );
 
 export default injectIntl(withI18n(CreateTermFromAnnotation)) as any;
