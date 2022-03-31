@@ -1,4 +1,4 @@
-import { markTerms } from "../../content/marker";
+import { markTerms, unmarkTerm } from "../../content/marker";
 import Term from "../model/Term";
 import VocabularyUtils from "./VocabularyUtils";
 
@@ -132,6 +132,10 @@ export class Annotation {
     this.termOccurrence.typeof = AnnotationClass.ASSIGNED_OCCURRENCE;
     delete this.termOccurrence.score;
     this.updateAppearrance();
+  }
+
+  public async removeOccurrence(){
+    return unmarkTerm(this.element!);
   }
 
   private updateAppearrance() {

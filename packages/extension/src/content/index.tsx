@@ -10,7 +10,7 @@ import {
 import api from "../api";
 import VocabularyUtils, { IRI } from "../common/util/VocabularyUtils";
 import Term from "../common/model/Term";
-import { createTermOccurrence as termOccurrenceFromRange, markTerms } from "./marker";
+import {termOccurrenceFromRange, markTerms } from "./marker";
 
 // global important classes
 let sidebar: Sidebar | null = null;
@@ -76,6 +76,12 @@ export const globalActions = {
     await api.createTerm(term, vocabularyIri);
     contentState.terms![term.iri] = term;
     annotation.assignTerm(term);
+  },
+  async removeTermOccurrence(annotation: Annotation){
+    await api.removeTermOccurrence(annotation);
+    await annotation.removeOccurrence();
+    const annotationIdx = contentState.annotations!.indexOf(annotation);
+    contentState.annotations?.splice(annotationIdx, 1);
   }
 };
 

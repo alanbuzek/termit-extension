@@ -35,6 +35,10 @@ const results = {
   },
 };
 
+export const unmarkTerm = (element: HTMLElement) => {
+  return new Promise((resolve) => new Mark(element).unmark({ done: resolve }));
+};
+
 export const markTerms = ({
   cssSelectors,
   termOccurrences,
@@ -128,7 +132,7 @@ export const markTerms = ({
 };
 
 // TODO: move this to some sort of a Utils file?
-export const createTermOccurrence = (
+export const termOccurrenceFromRange = (
   range,
   annotationType = AnnotationType.OCCURRENCE
 ) => {

@@ -150,7 +150,10 @@ function ContentPopup({
             }
             // TODO: do we need is open? or will that be fully managed by the above layer (more likely)
             isOpen={true}
-            onRemove={closePopup}
+            onRemove={() => {
+              globalActions.removeTermOccurrence(annotation);
+              hide();
+            }}
             onSelectTerm={(term: Term) =>
               globalActions.assignTermToSuggestedOccurrence(term, annotation)
             }
