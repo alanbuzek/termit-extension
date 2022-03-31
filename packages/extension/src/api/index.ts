@@ -134,6 +134,13 @@ export function getLabel(iri: string) {
 
 export async function createTermOccurrence(annotation: Annotation) {
   // TODO: save term occurrence to the backend
+  return Promise.resolve();
+}
+
+
+export async function updateTermOccurrence(annotation: Annotation) {
+  // TODO: update term occurrence to the backend
+  return Promise.resolve();
 }
 
 export function loadTypes() {
@@ -197,5 +204,6 @@ export default {
   getLabel,
   createTermOccurrence,
   loadTypes,
-  createTerm
+  createTerm,
+  updateTermOccurrence
 };

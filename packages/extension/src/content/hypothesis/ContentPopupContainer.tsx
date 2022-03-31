@@ -404,13 +404,16 @@ export class ContentPopupContainer {
 
     let initialPopupType = PopupType.PurposeSelection;
     if (this.currentAnnotation) {
-      if (!this.currentAnnotation.term){
-        initialPopupType = PopupType.TermOccurrence;
-      } else {
-        initialPopupType = PopupType.TermDefinition;
-      }
-    }
+      initialPopupType = PopupType.TermOccurrence;
 
+      // TODO: figure out what is the best way to have track if an annotation is a definition
+      // if (this.currentAnnotation.term){
+      //   initialPopupType = PopupType.TermOccurrence;
+      // } else {
+      //   initialPopupType = PopupType.TermDefinition;
+      // }
+    }
+    
     ReactDOM.render(
       <IntlProvider locale="cs-CZ" defaultLocale="en" messages={cs}>
         <ContentPopup

@@ -127,6 +127,7 @@ export const markTerms = ({
   });
 };
 
+// TODO: move this to some sort of a Utils file?
 export const createTermOccurrence = (
   range,
   annotationType = AnnotationType.OCCURRENCE

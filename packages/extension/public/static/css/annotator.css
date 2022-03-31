@@ -1,3 +1,39 @@
+/* Intelligent tree styles below -> */
+.result-item{
+  padding-left: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+  width: 100%;
+}
+.VirtualizedTreeSelectTooltip{
+  max-width: 300px;
+  text-align: start;
+  word-break: break-all;
+}
+
+.toggleButton{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}
+
+.Select.is-invalid ~ .invalid-feedback {
+  display: block;
+}
+
+.highlighted{
+  font-weight: bold;
+  background: none;
+}
+
+.VirtualizedSelectOption{
+  cursor: default;
+}
+/* End */
+
 /* My styles pulled from termit */
 html {
   height: 100%;

@@ -56,8 +56,7 @@ export const globalActions = {
   async assignTermToSuggestedOccurrence(term: Term, annotation: Annotation) {
     annotation.assignTerm(term);
     annotator!.hidePopup();
-    await api.createTermOccurrence(annotation);
-
+    await api.updateTermOccurrence(annotation);
     // TODO: maybe the annotace service needs to be run again to help out with that?
   },
   async createNewUnknownOccurrence(selectionRange: Range) {
@@ -69,8 +68,9 @@ export const globalActions = {
     contentState.annotations!.push(newAnnotation);
     this.showPopup(newAnnotation);
 
-    // TODO: this will most likely not need to be persisted, as the user will likely create a term or assign occurrence to existing term from this unknown occurrence, but double check this to be sure
-    // await api.createTermOccurrence(annotation);
+    // TODO: this maybe not need to be persisted, as the user will likely create a term or assign occurrence to existing term from this unknown occurrence, but double check this to be sure
+    // TODO: if we don't persist it initially, it will make things a bit more complicated in figuring out if we need to create the term occurrence or just update it instead
+    await api.createTermOccurrence(newAnnotation);
   },
   async createTerm(term: Term, vocabularyIri: IRI, annotation: Annotation){
     await api.createTerm(term, vocabularyIri);
