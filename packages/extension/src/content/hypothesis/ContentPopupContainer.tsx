@@ -4,7 +4,7 @@ import ReactDOM from "react-dom";
 import { IntlProvider } from "react-intl";
 import cs from "../../cs.locale";
 import { overlay } from "../helper/overlay";
-import { Annotation } from "../../common/util/Annotation";
+import { Annotation, AnnotationType } from "../../common/util/Annotation";
 import { ContentState } from '..';
 
 // TODO: probably don't need this for now
@@ -404,7 +404,11 @@ export class ContentPopupContainer {
 
     let initialPopupType = PopupType.PurposeSelection;
     if (this.currentAnnotation) {
-      initialPopupType = PopupType.TermOccurrence;
+      if (this.currentAnnotation.termOccurrence.typeof == AnnotationType.DEFINITION){
+        initialPopupType = PopupType.TermDefinition;
+      } else {
+        initialPopupType = PopupType.TermOccurrence;
+      }
 
       // TODO: figure out what is the best way to have track if an annotation is a definition
       // if (this.currentAnnotation.term){

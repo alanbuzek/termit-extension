@@ -132,9 +132,9 @@ export const markTerms = ({
 };
 
 // TODO: move this to some sort of a Utils file?
-export const termOccurrenceFromRange = (
+export const occurrenceFromRange = (
   range,
-  annotationType = AnnotationType.OCCURRENCE
+  annotationType
 ) => {
   let parentElement = range.startContainer;
   if (!parentElement) {

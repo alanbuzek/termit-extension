@@ -41,6 +41,7 @@ export type TermOccurrence = {
 
 // TODO: we'll have to make sure that the mapping works ok here (e.g. ddo:definice vs full url)
 export function isDefinitionAnnotation(type: string) {
+  console.log("type: ", type, ", definintion: ", AnnotationType.DEFINITION);
   return type === AnnotationType.DEFINITION;
 }
 export class Annotation {
@@ -74,6 +75,7 @@ export class Annotation {
     // }
 
     if (this.term === null) {
+      // this.termOccurrence.typeof maybe be subject to change
       return isDefinitionAnnotation(this.termOccurrence.typeof)
         ? AnnotationClass.PENDING_DEFINITION
         : AnnotationClass.SUGGESTED_OCCURRENCE;
@@ -127,18 +129,22 @@ export class Annotation {
     return this.element;
   }
 
-  public assignTerm(term: Term) {
+  public assignTerm(term: Term, isTermOccurrence: boolean) {
     this.term = term;
-    this.termOccurrence.typeof = AnnotationClass.ASSIGNED_OCCURRENCE;
+    this.termOccurrence.typeof = isTermOccurrence
+      ? AnnotationType.OCCURRENCE
+      : AnnotationType.DEFINITION;
     delete this.termOccurrence.score;
-    this.updateAppearrance();
+    this.updateAppearance();
   }
 
-  public async removeOccurrence(){
+  public async removeOccurrence() {
     return unmarkTerm(this.element!);
   }
 
-  private updateAppearrance() {
+  private updateAppearance() {
     this.element!.className = this.getClassName();
+
+    console.log('updated now: ', this);
   }
 }

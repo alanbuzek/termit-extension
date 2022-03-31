@@ -5,12 +5,11 @@ import TermDefinitionAnnotation from "../../common/component/annotator/TermDefin
 import TermOccurrenceAnnotation from "../../common/component/annotator/TermOccurrenceAnnotation";
 import HighlightedTextAdder from "./HighlightedTextAdder";
 import { useState } from "react";
-import { createTermOccurrence, markTerms } from "../marker";
+import { markTerms } from "../marker";
 import {
   Annotation,
   AnnotationClass,
   AnnotationOrigin,
-  AnnotationType,
 } from "../../common/util/Annotation";
 import { overlay } from "../helper/overlay";
 import { ContentState, globalActions } from "..";
@@ -94,14 +93,7 @@ function ContentPopup({
               overlay.off();
             }}
             onSave={() => {
-              const newAnnotation = createTermOccurrence(
-                selectionRange,
-                AnnotationType.OCCURRENCE
-              );
-              if (newAnnotation) {
-                markTerms(newAnnotation);
-              }
-              closePopup();
+              // TODO: do we still need this callback?
               overlay.off();
             }}
             // TODO: all this should either be deleted if not needed or use real, not hard-coded values
@@ -125,10 +117,11 @@ function ContentPopup({
         return (
           <HighlightedTextAdder
             onMarkOccurrence={() => {
-              globalActions.createNewUnknownOccurrence(selectionRange);
+              globalActions.createUnknownTermOccurrence(selectionRange);
               setCurrPopup(PopupType.TermOccurrence);
             }}
             onMarkDefinition={() => {
+              globalActions.createUnknownDefinitionOccurrence(selectionRange);
               setCurrPopup(PopupType.TermDefinition);
             }}
           />
@@ -155,7 +148,7 @@ function ContentPopup({
               hide();
             }}
             onSelectTerm={(term: Term) =>
-              globalActions.assignTermToSuggestedOccurrence(term, annotation)
+              globalActions.assignTermToSuggestedTermOccurrence(term, annotation)
             }
             onCreateTerm={() => {
               showAt(0, 0, true);
@@ -175,7 +168,9 @@ function ContentPopup({
             }
             isOpen={true}
             onRemove={closePopup}
-            onSelectTerm={() => 0}
+            onSelectTerm={(term: Term) => {
+              return globalActions.assignTermToSuggestedDefinitionOccurrence(term, annotation)
+            }}
             onToggleDetailOpen={() => 0}
             onClose={closePopup}
             contentState={contentState}

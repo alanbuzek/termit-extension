@@ -5,12 +5,13 @@ import { preloadContentStyles } from "./hypothesis/helpers";
 import { overlay } from "./helper/overlay";
 import {
   Annotation,
+  AnnotationClass,
   AnnotationType,
 } from "../common/util/Annotation";
 import api from "../api";
 import VocabularyUtils, { IRI } from "../common/util/VocabularyUtils";
 import Term from "../common/model/Term";
-import {termOccurrenceFromRange, markTerms } from "./marker";
+import {occurrenceFromRange, markTerms } from "./marker";
 
 // global important classes
 let sidebar: Sidebar | null = null;
@@ -53,14 +54,21 @@ export const globalActions = {
     console.log("contentState: ", contentState);
     sidebar!.render();
   },
-  async assignTermToSuggestedOccurrence(term: Term, annotation: Annotation) {
-    annotation.assignTerm(term);
+  async assignTermToSuggestedTermOccurrence(term: Term, annotation: Annotation) {
+    annotation.assignTerm(term, true);
+    // TODO: is hiding popup needed?
     annotator!.hidePopup();
     await api.updateTermOccurrence(annotation);
     // TODO: maybe the annotace service needs to be run again to help out with that?
   },
-  async createNewUnknownOccurrence(selectionRange: Range) {
-    const newTermOccurrence = termOccurrenceFromRange(
+  async assignTermToSuggestedDefinitionOccurrence(term: Term, annotation: Annotation){
+    console.log('term in global actions: ', term);
+    annotation.assignTerm(term, false);
+    annotator!.hidePopup();
+    await api.updateTermOccurrence(annotation);
+  },
+  async createUnknownTermOccurrence(selectionRange: Range) {
+    const newTermOccurrence = occurrenceFromRange(
       selectionRange,
       AnnotationType.OCCURRENCE
     );
@@ -72,17 +80,31 @@ export const globalActions = {
     // TODO: if we don't persist it initially, it will make things a bit more complicated in figuring out if we need to create the term occurrence or just update it instead
     await api.createTermOccurrence(newAnnotation);
   },
+  async createUnknownDefinitionOccurrence(selectionRange: Range) {
+    const newDefinitionOccurrence = occurrenceFromRange(
+      selectionRange,
+      AnnotationType.DEFINITION
+    );
+    const [newAnnotation] = await markTerms(newDefinitionOccurrence);
+    contentState.annotations!.push(newAnnotation);
+    this.showPopup(newAnnotation);
+
+    // TODO: this maybe not need to be persisted, as the user will likely create a term or assign occurrence to existing term from this unknown occurrence, but double check this to be sure
+    // TODO: if we don't persist it initially, it will make things a bit more complicated in figuring out if we need to create the term occurrence or just update it instead
+    await api.createDefinitionOccurrence(newAnnotation);
+  },
   async createTerm(term: Term, vocabularyIri: IRI, annotation: Annotation){
     await api.createTerm(term, vocabularyIri);
     contentState.terms![term.iri] = term;
-    annotation.assignTerm(term);
+    annotation.assignTerm(term, true);
   },
   async removeTermOccurrence(annotation: Annotation){
     await api.removeTermOccurrence(annotation);
     await annotation.removeOccurrence();
     const annotationIdx = contentState.annotations!.indexOf(annotation);
     contentState.annotations?.splice(annotationIdx, 1);
-  }
+  },
+
 };
 
 window.addEventListener("load", async () => {

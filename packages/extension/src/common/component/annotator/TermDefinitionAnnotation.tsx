@@ -8,7 +8,8 @@ import AnnotationTerms from "./AnnotationTerms";
 import { GoPencil } from "react-icons/go";
 // import IfUserAuthorized from "../authorization/IfUserAuthorized";
 import { useI18n } from "../hook/useI18n";
-import TermDefinitionAnnotationView from './TermDefinitionAnnotationView';
+import TermDefinitionAnnotationView from "./TermDefinitionAnnotationView";
+import { ContentState } from "../../../content";
 
 interface TermDefinitionAnnotationProps {
   target: string;
@@ -16,11 +17,11 @@ interface TermDefinitionAnnotationProps {
   resource?: string;
   text: string;
   isOpen: boolean;
-
   onRemove: () => void;
   onSelectTerm: (term: Term | null) => void;
   onToggleDetailOpen: () => void;
   onClose: () => void;
+  contentState: ContentState;
 }
 
 function createActionButtons(
@@ -36,15 +37,15 @@ function createActionButtons(
       //   renderUnauthorizedAlert={false}
       //   key="annotation.definition.edit"
       // >
-        <Button
-          className="m-annotation-definition-edit"
-          color="primary"
-          title={i18n("edit")}
-          size="sm"
-          onClick={onEdit}
-        >
-          <GoPencil />
-        </Button>
+      <Button
+        className="m-annotation-definition-edit"
+        color="primary"
+        title={i18n("edit")}
+        size="sm"
+        onClick={onEdit}
+      >
+        <GoPencil />
+      </Button>
       // </IfUserAuthorized>
     );
   }
@@ -53,15 +54,15 @@ function createActionButtons(
     //   renderUnauthorizedAlert={false}
     //   key="annotation.definition.remove"
     // >
-      <Button
-        className="m-annotation-definition-remove"
-        color="primary"
-        title={i18n("remove")}
-        size="sm"
-        onClick={props.onRemove}
-      >
-        <TiTrash />
-      </Button>
+    <Button
+      className="m-annotation-definition-remove"
+      color="primary"
+      title={i18n("remove")}
+      size="sm"
+      onClick={props.onRemove}
+    >
+      <TiTrash />
+    </Button>
     // </IfUserAuthorized>
   );
   actions.push(
@@ -91,10 +92,20 @@ export const TermDefinitionAnnotation: React.FC<TermDefinitionAnnotationProps> =
     }, [term]);
     const bodyContent = editing ? (
       <AnnotationTerms
-        onChange={props.onSelectTerm}
+        onChange={() => ({})}
         canCreateTerm={false}
         selectedTerm={term}
         i18n={i18n}
+        terms={props.contentState.terms!}
+        vocabulary={props.contentState.vocabulary!}
+        selectVocabularyTerm={(term: Term | null) => {
+          console.log('term came in: ', term);
+          
+          if (!term){
+            return;
+          }
+          return props.onSelectTerm(term);
+        }}
       />
     ) : (
       <TermDefinitionAnnotationView

@@ -90,6 +90,10 @@ termit-h.term-definition {
   background: rgba(80, 200, 255, 0.8);
 }
 
+termit-h.pending-term-definition {
+  background: rgba(150,130,255,.2);
+}
+
 .termit-info-window {
   position: fixed;
   background-color: rgb(163, 245, 156);

@@ -137,6 +137,10 @@ export async function createTermOccurrence(annotation: Annotation) {
   return Promise.resolve();
 }
 
+export async function createDefinitionOccurrence(annotation: Annotation){
+  // TODO
+  return Promise.resolve();
+}
 
 export async function updateTermOccurrence(annotation: Annotation) {
   // TODO: update term occurrence to the backend
@@ -211,5 +215,6 @@ export default {
   loadTypes,
   createTerm,
   updateTermOccurrence,
-  removeTermOccurrence
+  removeTermOccurrence,
+  createDefinitionOccurrence
 };
