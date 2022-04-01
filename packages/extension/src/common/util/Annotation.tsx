@@ -104,8 +104,12 @@ export class Annotation {
   }
 
   public focusAnnotation() {
-    // TODO:
-    throw new Error("To be implemented");
+    this.element?.scrollIntoView({block: "center", inline: "nearest"});
+    this.element?.classList.add("annotation-focused");
+    this.element?.click();
+    setTimeout(() => {
+      this.element?.classList.remove("annotation-focused");
+    }, 4000);
   }
 
   public markAnnotation() {
@@ -145,6 +149,6 @@ export class Annotation {
   private updateAppearance() {
     this.element!.className = this.getClassName();
 
-    console.log('updated now: ', this);
+    console.log("updated now: ", this);
   }
 }

@@ -25,15 +25,19 @@ const SidebarApp = ({
         handleAnnotatePage={handleAnnotatePage}
         vocabulary={state.vocabulary}
       />
+      <hr className="my-2"></hr>
       {state.annotations?.map((annotation) => {
         return (
-          <div className="shadow-md rounded-md p-3 border border-gray-400 mb-3 cursor-pointer bg-white hover:bg-gray-300 relative hover:shadow-none">
+          <div
+            className="shadow-md rounded-md p-3 border border-gray-400 mb-3 cursor-pointer bg-white hover:bg-gray-300 relative hover:shadow-none"
+            onClick={() => annotation.focusAnnotation()}
+          >
             <div className="mb-0 text-lg font-semibold">
               {annotation.termOccurrence?.originalTerm}
             </div>
             {annotation.term && (
               <div className="flex items-center mt-1.5">
-                <span className='font-semibold mr-2'>Term:</span>
+                <span className="font-semibold mr-2">Term:</span>
                 <TermLink term={annotation.term} />
                 <svg
                   xmlns="http://www.w3.org/2000/svg"

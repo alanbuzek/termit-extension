@@ -39,8 +39,8 @@ const PageSummary = ({
 
   const [annotationLoading, setAnnotationLoading] = useState(false);
   const { checkedHostname } = getUrlInfo(window.location.href);
-  const allowPannel = (
-    <label className="flex justify-between rounded-lg px-3 py-2 items-center mb-4 bg-gray-200">
+  const allowPanel = (
+    <label className="flex justify-between rounded-lg px-3 py-2 items-center mb-1.5 bg-gray-200">
       <div
         className={` text-base flex items-center ${
           loading && !disabled ? "text-gray-400" : "text-gray-800"
@@ -63,7 +63,7 @@ const PageSummary = ({
   if (!annotations) {
     return (
       <div className="p-3 mb-4 rounded-md bg-gray-100 border-gray-600 border">
-        {/* {allowPannel} */}
+        {/* {allowPanel} */}
         <p className="font-semibold">This page hasn't be annotated yet.</p>
         <VocabularySelect
           id={"vocabularySelect1"}
@@ -91,7 +91,7 @@ const PageSummary = ({
 
   return (
     <div>
-      {allowPannel}
+      {allowPanel}
       <div className="p-3 mb-4 rounded-md bg-gray-100 border-gray-600 border">
         <div className="text-base font-semibold text-gray-800 rounded-md mb-2">
           Vocabulary: <AssetLink asset={vocabulary} path="/" />
