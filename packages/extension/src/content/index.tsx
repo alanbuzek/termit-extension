@@ -60,12 +60,16 @@ export const globalActions = {
     annotator!.hidePopup();
     await api.updateTermOccurrence(annotation);
     // TODO: maybe the annotace service needs to be run again to help out with that?
+
+    sidebar?.render();
   },
   async assignTermToSuggestedDefinitionOccurrence(term: Term, annotation: Annotation){
     console.log('term in global actions: ', term);
     annotation.assignTerm(term, false);
     annotator!.hidePopup();
     await api.updateTermOccurrence(annotation);
+
+    sidebar?.render();
   },
   async createUnknownTermOccurrence(selectionRange: Range) {
     const newTermOccurrence = occurrenceFromRange(
@@ -79,6 +83,8 @@ export const globalActions = {
     // TODO: this maybe not need to be persisted, as the user will likely create a term or assign occurrence to existing term from this unknown occurrence, but double check this to be sure
     // TODO: if we don't persist it initially, it will make things a bit more complicated in figuring out if we need to create the term occurrence or just update it instead
     await api.createTermOccurrence(newAnnotation);
+
+    sidebar?.render();
   },
   async createUnknownDefinitionOccurrence(selectionRange: Range) {
     const newDefinitionOccurrence = occurrenceFromRange(
@@ -89,20 +95,25 @@ export const globalActions = {
     contentState.annotations!.push(newAnnotation);
     this.showPopup(newAnnotation);
 
-    // TODO: this maybe not need to be persisted, as the user will likely create a term or assign occurrence to existing term from this unknown occurrence, but double check this to be sure
-    // TODO: if we don't persist it initially, it will make things a bit more complicated in figuring out if we need to create the term occurrence or just update it instead
+    // TODO: this maybe not need to be persisted, as per the comment in createUnknownTermOccurrence()
     await api.createDefinitionOccurrence(newAnnotation);
+
+    sidebar?.render();
   },
   async createTerm(term: Term, vocabularyIri: IRI, annotation: Annotation){
     await api.createTerm(term, vocabularyIri);
     contentState.terms![term.iri] = term;
     annotation.assignTerm(term, true);
+    
+    sidebar?.render();
   },
   async removeOccurrence(annotation: Annotation){
     await api.removeOccurrence(annotation);
     await annotation.removeOccurrence();
     const annotationIdx = contentState.annotations!.indexOf(annotation);
     contentState.annotations?.splice(annotationIdx, 1);
+
+    sidebar?.render();
   },
 
 };

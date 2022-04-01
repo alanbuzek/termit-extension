@@ -70,7 +70,9 @@ export const SelectionPurposeDialog: React.FC<SelectionPurposeDialogProps> = (
               className="flex-grow-1"
               onClick={props.onMarkOccurrence}
             >
-              {i18n("annotator.selectionPurpose.occurrence")}
+              {/* TODO: */}
+              {/* {i18n("annotator.selectionPurpose.occurrence")} */}
+              Label
             </Button>
             <Button
               id="annotator-selection-dialog-mark-definition"

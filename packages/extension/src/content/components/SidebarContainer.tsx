@@ -1,6 +1,8 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import { ContentState } from '..';
+import { IntlProvider } from "react-intl";
+import { ContentState } from "..";
+import cs from "../../cs.locale";
 import { loadStyles } from "../hypothesis/ContentPopupContainer";
 import SidebarApp from "./SidebarApp";
 
@@ -41,7 +43,12 @@ export default class SidebarContainer {
 
   render() {
     ReactDOM.render(
-      <SidebarApp handleAnnotatePage={this.handleAnnotatePage} state={this._state} />,
+      <IntlProvider locale="cs-CZ" defaultLocale="en" messages={cs}>
+        <SidebarApp
+          handleAnnotatePage={this.handleAnnotatePage}
+          state={this._state}
+        />
+      </IntlProvider>,
       this._container,
       () => {
         if (!this._loadedStyles) {
