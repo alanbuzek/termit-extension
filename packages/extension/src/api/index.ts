@@ -30,7 +30,7 @@ const fetchConfig = {
   referrerPolicy: "no-referrer", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
 };
 // TODO: get this from some config file, env variable...
-const serverUrl = "http://localhost:8888";
+const serverUrl = "http://localhost:8080";
 
 const callFetch = (path, config) => {
   return fetch(`${serverUrl}/${path}`, config).then((res) => res.json());
