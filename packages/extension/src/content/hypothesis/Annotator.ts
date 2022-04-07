@@ -143,14 +143,9 @@ export default class Annotator {
     this.contentPopup.hide();
   }
 
-  public async annotatePage(vocabulary: Vocabulary) {
-    const termOccSelectors = await backgroundApi.getPageAnnotations(
-      vocabulary.iri,
-      document.body.outerHTML
-    );
-
+  public async annotatePage(vocabulary: Vocabulary, termOccSelectors: any) {
     const annotationsData = await Promise.all(
-      termOccSelectors.map((termOccSelector) => markTerms(termOccSelector))
+      termOccSelectors.map((termOccSelector) => markTerms(termOccSelector, this.contentState.terms))
     );
 
     // add all annotatations to the set for later reference

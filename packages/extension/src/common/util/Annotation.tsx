@@ -37,6 +37,7 @@ export type TermOccurrence = {
   // TODO: change startOffset to a number
   startOffset: string;
   typeof: string;
+  cssSelector: string;
 };
 
 // TODO: we'll have to make sure that the mapping works ok here (e.g. ddo:definice vs full url)
@@ -65,7 +66,7 @@ export class Annotation {
 
   constructor(termOccurrence, term = null) {
     this.termOccurrence = termOccurrence;
-    this.term = null;
+    this.term = term;
   }
 
   public getTermState() {

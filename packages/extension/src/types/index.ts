@@ -1,5 +1,5 @@
 export enum MessageType {
-  GetAnnotations,
+  GetPageAnnotationsAnalysis,
   SaveAnnotaionResult,
   OpenToolbar
 }

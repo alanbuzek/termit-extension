@@ -42,7 +42,7 @@ export const unmarkTerm = (element: HTMLElement) => {
 export const markTerms = ({
   cssSelectors,
   termOccurrences,
-}): Promise<Annotation[]> => {
+}, termsMap): Promise<Annotation[]> => {
   return new Promise((resolve, reject) => {
     const selectedElements = Array.from(
       document.querySelectorAll(cssSelectors[0])
@@ -71,7 +71,8 @@ export const markTerms = ({
     let annotations: Annotation[] = [];
     const markInstance = new Mark(selectedElements[0]);
     termOccurrences.forEach((termOccurrence) => {
-      const annotation = new Annotation(termOccurrence);
+      termOccurrence.cssSelector = cssSelectors[0];
+      const annotation = new Annotation(termOccurrence, termsMap[termOccurrence.term]);
 
       markInstance.mark(termOccurrence.originalTerm, {
         accuracy: "partially",
