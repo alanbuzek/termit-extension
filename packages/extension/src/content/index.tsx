@@ -99,7 +99,9 @@ export const globalActions = {
     contentState.annotations = annotator!.getAnnotations();
 
     // TODO: fix bug where this opens on the wrong side
-    // sidebar!.open();
+    setTimeout(() => {
+      sidebar!.open();
+    }, 200)
     
     sidebar!.render();
   },
