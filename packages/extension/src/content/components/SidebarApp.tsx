@@ -1,11 +1,7 @@
 import React from "react";
-import { useState } from "react";
-import { useEffect } from "react";
 import { ContentState } from "..";
-import api from "../../api";
 import TermLink from "../../common/component/term/TermLink";
 import Vocabulary from "../../common/model/Vocabulary";
-import { Annotation } from "../../common/util/Annotation";
 import PageSummary from "./PageSummery";
 
 const SidebarApp = ({

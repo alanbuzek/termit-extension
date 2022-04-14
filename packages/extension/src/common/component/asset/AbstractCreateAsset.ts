@@ -1,4 +1,5 @@
 import * as React from "react";
+import api from "../../../api";
 // import Constants from "../../util/Constants";
 // import last from "last";
 
@@ -8,12 +9,7 @@ export interface AbstractCreateAssetState {
   generateIri: boolean;
 }
 
-let loadIdentifier = <T extends { name: string; assetType: string }>(
-  parameters: T
-) => {
-  return Promise.resolve({ data: "mock.identifier" });
-};
-
+let loadIdentifier = api.loadIdentifier;
 // This will cause the existing still running identifier requests to be ignored in favor of the most recent call
 // loadIdentifier = last(loadIdentifier);
 

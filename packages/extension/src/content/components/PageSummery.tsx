@@ -31,7 +31,10 @@ const PageSummary = ({
 
   const [vocabularies, setVocabularies] = useState<Vocabulary[]>([]);
   useEffect(() => {
-    loadVocabularies().then((vocab) => setVocabularies(vocab));
+    loadVocabularies().then((vocab) => {
+      setVocabularies(vocab)
+      console.log('vocab: ', vocab);
+    });
   }, []);
   const [selectedVocabulary, setSelectedVocabulary] = useState();
   const onVocabularyChange = (vIri: string) =>
@@ -78,7 +81,7 @@ const PageSummary = ({
             // TODO: remove timeout
             setTimeout(() => {
               // TODO: remove this fallback, adjust it to a different, proper default (To be specified)
-              handleAnnotatePage(selectedVocabulary || vocabularies[3]);
+              handleAnnotatePage(selectedVocabulary || vocabularies[0]);
             }, 200);
           }}
           loading={annotationLoading}
