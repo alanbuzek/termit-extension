@@ -4,12 +4,11 @@ import Vocabulary, {
   CONTEXT as VOCABULARY_CONTEXT,
   VocabularyData,
 } from "../common/model/Vocabulary";
-import { content, param, params } from "../common/util/Ajax";
+import Ajax, { content, contentType, param, params } from "../common/util/Ajax";
 import { Annotation } from "../common/util/Annotation";
 import JsonLdUtils from "../common/util/JsonLdUtils";
 import Utils from "../common/util/Utils";
 import VocabularyUtils, { IRI } from "../common/util/VocabularyUtils";
-import { mockTerms, mockTerms2 } from "./mockData/mockTerms";
 import mockTypes from "./mockData/mockTypes";
 import { mockVocabularies } from "./mockData/mockVocabularies";
 import Constants from "../common/util/Constants";
@@ -18,81 +17,8 @@ import mockExistingOccurrences from "./mockData/mockExistingOccurrences";
 // TODO: remove all Promise.resolve() statements and uncomment real back-end calls when ready
 // TODO (optional): use fetch-mock or similar library to mock api server responses, will likely be needed to testing
 
-const defaultTermitHeaders = {
-  "Content-Type": "application/json",
-  authorization:
-    "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXJtaXQtYWRtaW5Aa2Jzcy5mZWxrLmN2dXQuY3oiLCJqdGkiOiJodHRwOi8vb250by5mZWwuY3Z1dC5jei9vbnRvbG9naWVzL2FwcGxpY2F0aW9uL3Rlcm1pdC9zeXN0ZW0tYWRtaW4tdXNlciIsImlhdCI6MTY0OTg3NDA3NCwiZXhwIjoxNjQ5OTYwNDc0LCJyb2xlIjoiUk9MRV9GVUxMX1VTRVItUk9MRV9BRE1JTi1ST0xFX1JFU1RSSUNURURfVVNFUiJ9.2EzsVO6Ajr18ZiE2JJR2UA34KLGoXcJqfJgYVImfxZA",
-  Accept: "application/ld+json",
-  // 'Content-Type': 'application/x-www-form-urlencoded',
-};
-const fetchConfig = {
-  method: "POST",
-  mode: "cors", // no-cors, *cors, same-origin
-  cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
-  credentials: "same-origin", // include, *same-origin, omit
-  headers: new Headers(defaultTermitHeaders),
-  redirect: "follow", // manual, *follow, error
-  referrerPolicy: "no-referrer", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
-};
-
-const annotaceFetchConfig = {
-  method: "POST",
-  mode: "cors", // no-cors, *cors, same-origin
-  cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
-  credentials: "same-origin", // include, *same-origin, omit
-  headers: new Headers({
-    "Content-Type": "application/json",
-    // Accept: "application/ld+json",
-    // 'Content-Type': 'application/x-www-form-urlencoded',
-  }),
-  redirect: "follow", // manual, *follow, error
-  referrerPolicy: "no-referrer", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
-};
-
-const callFetch = (rootUrl: string, path: string, config) => {
-  console.log("config: ", config);
-  return fetch(`${rootUrl}${path}`, config).then((res) => res.json());
-};
-
-const createApi = (rootUrl: string, isAnnotace: boolean = false) => ({
-  get(path, config = {}) {
-    return callFetch(rootUrl, path, {
-      ...(isAnnotace ? annotaceFetchConfig : fetchConfig),
-      ...config,
-      method: "GET",
-    });
-  },
-  post(path, body, config = {}) {
-    return callFetch(rootUrl, path, {
-      ...(isAnnotace ? annotaceFetchConfig : fetchConfig),
-      ...config,
-      body: body ? JSON.stringify(body) : null,
-      method: "POST",
-    });
-  },
-  put(path, body, config = {}) {
-    return callFetch(rootUrl, path, {
-      ...(isAnnotace ? annotaceFetchConfig : fetchConfig),
-      ...config,
-      body: JSON.stringify(body),
-      method: "GET",
-    });
-  },
-  del(path, config = {}) {
-    return callFetch(rootUrl, path, {
-      ...(isAnnotace ? annotaceFetchConfig : fetchConfig),
-      ...config,
-      method: "DELETE",
-    });
-  },
-});
-
-// TODO: get these from some config file, env variable...
-const termitServerUrl = "http://localhost:8082/termit/rest";
-const annotaceServerUrl = "http://localhost:8080";
-
-const termitApi = createApi(termitServerUrl);
-const annotaceApi = createApi(annotaceServerUrl, true);
+const termitApi = new Ajax({ baseURL: Constants.TERMIT_SERVER_URL });
+const annotaceApi = new Ajax({ baseURL: Constants.ANNOTACE_SERVER_URL });
 
 export function loadVocabularies() {
   return (
@@ -131,35 +57,42 @@ export function loadAllTerms(
     })
   );
 
-  console.log("paramaters: ", parameters);
-  // termitApi
-  //   .get(`/vocabularies/${vocabularyIri.fragment}/terms`, parameters)
-  return Promise.resolve(mockTerms2)
-    .then((data: object[]) =>
-      data.length !== 0
-        ? JsonLdUtils.compactAndResolveReferencesAsArray<TermData>(
-            data,
-            TERM_CONTEXT
-          )
-        : []
-    )
-    .then((data: TermData[]) => {
-      const terms: { [key: string]: Term } = {};
-      data.forEach((d) => (terms[d.iri!] = new Term(d)));
-      return terms;
-    });
+  return (
+    termitApi
+      .get(`/vocabularies/${vocabularyIri.fragment}/terms`, parameters)
+      // return Promise.resolve(mockTerms2)
+      .then((data: object[]) =>
+        data.length !== 0
+          ? JsonLdUtils.compactAndResolveReferencesAsArray<TermData>(
+              data,
+              TERM_CONTEXT
+            )
+          : []
+      )
+      .then((data: TermData[]) => {
+        const terms: { [key: string]: Term } = {};
+        data.forEach((d) => (terms[d.iri!] = new Term(d)));
+        return terms;
+      })
+  );
 }
 
 export function runPageAnnotationAnalysis(
   vocabulary: string,
   pageHtml: string
 ) {
-  return annotaceApi.post("/annotate?enableKeywordExtraction=true", {
-    content: pageHtml,
-    vocabularyRepository: vocabulary,
-    vocabularyContexts: [],
-    language: "cs",
-  });
+  return annotaceApi.post(
+    "/annotate",
+    content({
+      content: pageHtml,
+      vocabularyRepository: vocabulary,
+      vocabularyContexts: [],
+      // TODO: language
+      language: "cs",
+    }).param("enableKeywordExtraction", "true")
+    .accept(Constants.JSON_MIME_TYPE)
+    .contentType(Constants.JSON_MIME_TYPE)
+  );
 }
 
 export function savePageAnnotationResults(pageAnnotationAnalysisResult: any) {
@@ -251,11 +184,6 @@ export function getLabel(iri: string) {
   // return termitApi.get("/data/label", param("iri", iri));
 }
 
-export async function createTermOccurrence(annotation: Annotation) {
-  // TODO: save term occurrence to the backend
-  return Promise.resolve();
-}
-
 export async function createDefinitionOccurrence(annotation: Annotation) {
   // TODO
   return Promise.resolve();
@@ -311,14 +239,36 @@ export function createTerm(term: Term, vocabularyIri: IRI) {
     },
   });
 
-  return termitApi.post(url + `?namespace=${vocabularyIri.namespace}`, data, {
-    headers: new Headers({
-      ...defaultTermitHeaders,
-      "Content-Type": Constants.JSON_LD_MIME_TYPE,
-    }),
-  });
+  return termitApi.post(
+    url,
+    content(data)
+      .contentType(Constants.JSON_LD_MIME_TYPE)
+      .param("namespace", vocabularyIri.namespace)
+  );
 }
 
+export async function createTermOccurrence(term: Term, vocabularyIri: IRI) {
+  // TODO
+  // const url = resolveTermCreationUrl(term, vocabularyIri);
+  // const data = Object.assign(term.toJsonLd(), {
+  //   vocabulary: {
+  //     iri: vocabularyIri.namespace + vocabularyIri.fragment,
+  //   },
+  // });
+  // const resourceIRI = VocabularyUtils.create(
+  //   "http://onto.fel.cvut.cz/ontologies/slovnik/my-new-slovnik/document/soubor/rozvrh.png"
+  // );
+  // return termitApi.post(
+  //   `/vocabularies/${vocabularyIri.fragment}/occurrences?namespace=${vocabularyIri.namespace}&resourceNormalizedName=${resourceIRI.fragment}`,
+  //   null,
+  //   {
+  //     headers: new Headers({
+  //       ...defaultTermitHeaders,
+  //       // "Content-Type": Constants.JSON_LD_MIME_TYPE,
+  //     }),
+  //   }
+  // );
+}
 export function removeOccurrence(annotation: Annotation) {
   // TODO
   return Promise.resolve();
@@ -327,12 +277,7 @@ export function removeOccurrence(annotation: Annotation) {
 export function loadIdentifier<T extends { name: string; assetType: string }>(
   parameters: T
 ) {
-  return termitApi.post(
-    `/identifiers?${Object.entries(parameters).map(
-      ([key, value]) => `${key}=${value}`
-    ).join('&')}`,
-    null
-  );
+  return termitApi.post(`/identifiers`, params(parameters));
 }
 
 export default {
