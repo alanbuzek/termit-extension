@@ -1,7 +1,6 @@
-import { ResponseType } from "axios";
-import Constants from "./Constants";
-
-// NOTE: deleted some content from the original termit-ui file
+import Constants, { getEnv } from "./Constants";
+import SecurityUtils from "./SecurityUtils";
+import _ from "lodash";
 
 class RequestConfigBuilder {
   private mContent?: any;
@@ -135,7 +134,11 @@ export function ifModifiedSince(value?: string) {
   );
 }
 
-export function paramsSerializer(paramData: {}) {
+export function paramsSerializer(paramData: {} | undefined) {
+  if (!paramData) {
+    return "";
+  }
+
   const keys = Object.keys(paramData);
   let options = "";
 
@@ -157,5 +160,213 @@ export function paramsSerializer(paramData: {}) {
     }
   });
 
-  return options ? options.slice(0, -1) : options;
+  return options ? `?${options.slice(0, -1)}` : options;
 }
+
+const callFetch = (baseURL: string, path: string, config) => {
+  // pre-request interceptor
+  config.headers[Constants.Headers.AUTHORIZATION] = SecurityUtils.loadToken();
+
+  return fetch(`${baseURL}${path}`, config).then((response: Response) => {
+    // TODO: add validate get status
+    if (!response.ok) {
+      if (response.status === Constants.STATUS_UNAUTHORIZED) {
+        SecurityUtils.clearToken();
+        // TODO: how to handle unauthorized?
+        console.log("user unauthorized!");
+      }
+      throw new Error("Fetch failed");
+    }
+    if (response.headers && response.headers[Constants.Headers.AUTHORIZATION]) {
+      SecurityUtils.saveToken(
+        response.headers[Constants.Headers.AUTHORIZATION]
+      );
+    }
+
+    if (response.status !== 201) {
+      return response.json();
+    }
+
+    return;
+  });
+};
+
+const fetchConfig = {
+  method: "POST",
+  mode: "cors", // no-cors, *cors, same-origin
+  cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
+  credentials: "same-origin", // include, *same-origin, omit
+  headers: {
+    "Content-Type": "application/json",
+    Accept: "application/ld+json",
+  },
+  redirect: "follow", // manual, *follow, error
+  referrerPolicy: "no-referrer", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+};
+
+const createFetchInstance = ({ baseURL }: { baseURL: string }) => ({
+  head(path, config = {}) {
+    return callFetch(
+      baseURL,
+      path,
+      Object.assign(fetchConfig, config, { method: "HEAD" })
+    );
+  },
+  get(path, config = {}) {
+    return callFetch(
+      baseURL,
+      path,
+      Object.assign(fetchConfig, config, { method: "GET" })
+    );
+  },
+  post(path, body, config = {}) {
+    return callFetch(
+      baseURL,
+      path,
+      Object.assign(fetchConfig, config, {
+        body: body ? JSON.stringify(body) : null,
+        method: "POST",
+      })
+    );
+  },
+  put(path, body, config = {}) {
+    return callFetch(
+      baseURL,
+      path,
+      Object.assign(fetchConfig, config, {
+        body: body ? JSON.stringify(body) : null,
+        method: "PUT",
+      })
+    );
+  },
+  del(path, config = {}) {
+    return callFetch(
+      baseURL,
+      path,
+      Object.assign(fetchConfig, config, { method: "DELETE" })
+    );
+  },
+});
+
+export class Ajax {
+  protected fetchInstance;
+
+  constructor({ baseURL }: { baseURL: string }) {
+    this.fetchInstance = createFetchInstance({
+      baseURL,
+    });
+  }
+
+  /**
+   * Custom status validator for Axios, which accepts 304 Not Modified as a non-error status.
+   * @param status HTTP response status
+   */
+  private static validateGetStatus(status: number): boolean {
+    return (status >= 200 && status < 300) || status === 304;
+  }
+
+  /**
+   * Performs a HTTP HEAD request and returns the raw Axios response object.
+   * @param path URL path
+   * @param config Request configuration
+   */
+  public head(
+    path: string,
+    config: RequestConfigBuilder = new RequestConfigBuilder()
+  ) {
+    const conf = {};
+    return this.fetchInstance.head(
+      path + paramsSerializer(config.getParams()),
+      conf
+    );
+  }
+
+  /**
+   * Gets response from the server and returns its content.
+   */
+  public get(
+    path: string,
+    config: RequestConfigBuilder = new RequestConfigBuilder()
+  ) {
+    return this.getResponse(path, config);
+  }
+
+  /**
+   * Gets response from the server and returns it.
+   */
+  public getResponse(
+    path: string,
+    config: RequestConfigBuilder = new RequestConfigBuilder()
+  ) {
+    const conf = {
+      params: config.getParams(),
+      headers: config.getHeaders(),
+      responseType: config.getResponseType(),
+      validateStatus: Ajax.validateGetStatus,
+    };
+    return this.fetchInstance.get(path + paramsSerializer(params), conf);
+  }
+
+  public post(path: string, config: RequestConfigBuilder) {
+    const conf = {
+      headers: config.getHeaders(),
+    };
+    delete conf.headers[Constants.Headers.ACCEPT];
+    const par = new URLSearchParams();
+    // @ts-ignore
+    const paramData: object =
+      config.getParams() !== undefined ? config.getParams() : {};
+    Object.keys(paramData).forEach((n) => par.append(n, paramData[n]));
+
+    const formData: object =
+      config.getFormData() !== undefined ? config.getFormData()! : {};
+    if (config.getContentType() === Constants.X_WWW_FORM_URLENCODED) {
+      // TODO: we probably don't need this (hasn't been tested)
+      return this.fetchInstance.post(path, par, conf);
+    } else if (config.getContentType() === Constants.MULTIPART_FORM_DATA) {
+      // TODO: we probably don't need this (hasn't been tested)
+      return this.fetchInstance.post(path, formData, conf);
+    } else {
+      const query: string = config.getParams() ? "?" + par.toString() : "";
+      return this.fetchInstance.post(
+        path + paramsSerializer(config.getParams()),
+        config.getContent(),
+        conf
+      );
+    }
+  }
+
+  public put(path: string, config: RequestConfigBuilder) {
+    const conf = {
+      headers: config.getHeaders(),
+    };
+    const pathWithParams = path + paramsSerializer(config.getParams());
+    if (
+      config.getContentType() === Constants.MULTIPART_FORM_DATA &&
+      config.getFormData()
+    ) {
+      return this.fetchInstance.put(pathWithParams, config.getFormData(), conf);
+    }
+    return this.fetchInstance.put(pathWithParams, config.getContent(), conf);
+  }
+
+  public delete(path: string, config?: RequestConfigBuilder) {
+    let conf: any;
+    if (config) {
+      conf = {
+        params: config.getParams(),
+      };
+      if (config.getContent()) {
+        conf.data = config.getContent();
+        conf.headers = config.getHeaders();
+        delete conf.headers[Constants.Headers.ACCEPT];
+      }
+    }
+    return this.fetchInstance.del(
+      path + paramsSerializer(config?.getParams()),
+      conf
+    );
+  }
+}
+
+export default Ajax;

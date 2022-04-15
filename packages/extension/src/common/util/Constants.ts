@@ -29,7 +29,10 @@ const DEFAULT_LANGUAGE = "en";
 
 const constants = {
   // Will be replaced with actual server url during build
+  // TODO: add to env variable
   // SERVER_URL: getEnv("SERVER_URL"),
+  TERMIT_SERVER_URL: 'http://localhost:8082/termit/rest',
+  ANNOTACE_SERVER_URL: 'http://localhost:8080',
   // Prefix of the server REST API
   API_PREFIX,
   PUBLIC_API_PREFIX: `${API_PREFIX}/public`,

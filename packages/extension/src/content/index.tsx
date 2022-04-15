@@ -112,8 +112,9 @@ export const globalActions = {
     annotation.assignTerm(term, true);
     // TODO: is hiding popup needed?
     annotator!.hidePopup();
-    await api.updateTermOccurrence(annotation);
+    // await api.updateTermOccurrence(annotation);
     // TODO: maybe the annotace service needs to be run again to help out with that?
+    await api.createTermOccurrence(term, VocabularyUtils.create(contentState.vocabulary!.iri));
 
     sidebar?.render();
   },
@@ -143,7 +144,7 @@ export const globalActions = {
 
     // TODO: this maybe not need to be persisted, as the user will likely create a term or assign occurrence to existing term from this unknown occurrence, but double check this to be sure
     // TODO: if we don't persist it initially, it will make things a bit more complicated in figuring out if we need to create the term occurrence or just update it instead
-    await api.createTermOccurrence(newAnnotation);
+    // await api.createTermOccurrence(newAnnotation.term);
 
     sidebar?.render();
   },
@@ -168,6 +169,8 @@ export const globalActions = {
     await api.createTerm(term, vocabularyIri);
     contentState.terms![term.iri] = term;
     annotation.assignTerm(term, true);
+    overlay.off();
+    annotator?.hidePopup();
 
     sidebar?.render();
   },

@@ -1,13 +1,13 @@
 import * as React from "react";
-import { getLocalized } from '../../model/MultilingualString';
+import { getLocalized } from "../../model/MultilingualString";
 
 import Term, { TermInfo } from "../../model/Term";
 import User from "../../model/User";
-import { getShortLocale } from '../../util/IntlUtil';
+import { getShortLocale } from "../../util/IntlUtil";
 import VocabularyUtils from "../../util/VocabularyUtils";
-import { useI18n } from '../hook/useI18n';
-import AssetLink from '../misc/AssetLink';
-import OutgoingLink from '../misc/OutgoingLink';
+import { useI18n } from "../hook/useI18n";
+import AssetLink from "../misc/AssetLink";
+import OutgoingLink from "../misc/OutgoingLink";
 
 interface TermLinkProps {
   term: Term | TermInfo;
@@ -20,23 +20,20 @@ export function getTermPath(term: Term | TermInfo, user?: User | null) {
   return getTermPathWithTab(term, user, undefined);
 }
 
-function getTermPathWithTab(
-  term: Term | TermInfo,
-  activeTab?: string
-) {
+function getTermPathWithTab(term: Term | TermInfo, activeTab?: string) {
   // TODO: show real path here
-  return "/";
   // if (!term.vocabulary) {
   // return Routing.getTransitionPath(Routes.dashboard);
   // }
-  // const vocIri = VocabularyUtils.create(term.vocabulary!.iri!);
-  // const iri = VocabularyUtils.create(term.iri);
-  // const queryParams = [];
-  // queryParams.push(["namespace", vocIri.namespace!]);
-  // if (activeTab) {
-  //   queryParams.push(["activeTab", activeTab]);
-  // }
+  const vocIri = VocabularyUtils.create(term.vocabulary!.iri!);
+  const iri = VocabularyUtils.create(term.iri);
+  const queryParams: string[][] = [];
+  queryParams.push(["namespace", vocIri.namespace!]);
+  if (activeTab) {
+    queryParams.push(["activeTab", activeTab]);
+  }
 
+  return `http://localhost:3000/#/vocabularies/${vocIri.fragment}/terms/${iri.fragment}`;
   // return Routing.getTransitionPath(
   //   Authentication.isLoggedIn(user)
   //     ? Routes.vocabularyTermDetail

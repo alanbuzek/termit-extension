@@ -140,6 +140,7 @@ export class Annotation {
       ? AnnotationType.OCCURRENCE
       : AnnotationType.DEFINITION;
     delete this.termOccurrence.score;
+    console.log('assigning term: ', term);
     this.updateAppearance();
   }
 

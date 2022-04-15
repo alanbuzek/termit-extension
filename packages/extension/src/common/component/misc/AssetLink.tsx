@@ -47,6 +47,7 @@ export default class AssetLink<T extends AssetType> extends React.Component<
               id={this.props.id}
               title={this.props.tooltip ? this.props.tooltip : undefined}
               href={props.path}
+              target="_blank"
             >
               {props.asset.label}
             </a>
