@@ -64,7 +64,7 @@ export const globalActions = {
     contentState.annotations = annotator!.getAnnotations();
     contentState.website = await api.createWebsiteInDocument(
       { url: document.URL },
-      VocabularyUtils.create(vocabulary!.iri)
+      VocabularyUtils.create(vocabulary.document!.iri)
     );
     await api.savePageAnnotationResults(result);
     contentState.hasBeenAnnotated = true;

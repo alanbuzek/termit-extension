@@ -37,6 +37,7 @@ export function loadVocabularies() {
           : [];
       })
       .then((data: VocabularyData[]) => {
+        console.log('data2: ', data);
         console.log(
           "RESULT: ",
           data.map((v) => new Vocabulary(v))
@@ -89,9 +90,10 @@ export function runPageAnnotationAnalysis(
       vocabularyContexts: [],
       // TODO: language
       language: "cs",
-    }).param("enableKeywordExtraction", "true")
-    .accept(Constants.JSON_MIME_TYPE)
-    .contentType(Constants.JSON_MIME_TYPE)
+    })
+      .param("enableKeywordExtraction", "true")
+      .accept(Constants.JSON_MIME_TYPE)
+      .contentType(Constants.JSON_MIME_TYPE)
   );
 }
 
@@ -115,6 +117,7 @@ export async function createWebsiteInDocument(
   website: Website,
   documentIri: IRI
 ) {
+  // TODO: maybe don't need to load the identifier again?
   const websiteIri = await loadIdentifier({
     name: website.url,
     contextIri: documentIri,
@@ -124,7 +127,10 @@ export async function createWebsiteInDocument(
   website.iri = websiteIri;
 
   // TODO: transform website into a format that we need
-  // await termitApi.post(`/resources/${documentIri.fragment}/websites`, content(website).param("namespace", documentIri.namespace));
+  await termitApi.post(
+    `/resources/${documentIri.fragment}/websites`,
+    content(website).param("namespace", documentIri.namespace)
+  );
 
   return website;
 }
