@@ -4,15 +4,15 @@ import Vocabulary, {
   CONTEXT as VOCABULARY_CONTEXT,
   VocabularyData,
 } from "../common/model/Vocabulary";
-import Ajax, { content, contentType, param, params } from "../common/util/Ajax";
+import Ajax, { content, param, params } from "../common/util/Ajax";
 import { Annotation } from "../common/util/Annotation";
 import JsonLdUtils from "../common/util/JsonLdUtils";
 import Utils from "../common/util/Utils";
 import VocabularyUtils, { IRI } from "../common/util/VocabularyUtils";
 import mockTypes from "./mockData/mockTypes";
-import { mockVocabularies } from "./mockData/mockVocabularies";
 import Constants from "../common/util/Constants";
 import mockExistingOccurrences from "./mockData/mockExistingOccurrences";
+import Website from '../common/model/Website';
 
 // TODO: remove all Promise.resolve() statements and uncomment real back-end calls when ready
 // TODO (optional): use fetch-mock or similar library to mock api server responses, will likely be needed to testing
@@ -26,9 +26,6 @@ export function loadVocabularies() {
       .get("/vocabularies")
       // return Promise.resolve(mockVocabularies)
       .then((data: object[]) => {
-        console.log("mockVocabularies: ", mockVocabularies);
-        console.log("data: ", data);
-
         return data.length !== 0
           ? JsonLdUtils.compactAndResolveReferencesAsArray<VocabularyData>(
               data,
@@ -103,33 +100,30 @@ export function savePageAnnotationResults(pageAnnotationAnalysisResult: any) {
 }
 
 // TODO: move interface elsewhere
-export interface Website {
-  // TODO: adjust when finalized in termit
-  url: string;
-  iri?: string;
-  document?: string;
-}
 
 /**
  * Creates a website file within a resource (vocabulary)
  */
 export async function createWebsiteInDocument(
-  website: Website,
+  url: string,
   documentIri: IRI
 ) {
+  const website = new Website({ url });
+
   // TODO: maybe don't need to load the identifier again?
   const websiteIri = await loadIdentifier({
-    name: website.url,
+    name: url,
     contextIri: documentIri,
     assetType: "WEBSITE",
   });
 
+  website.label = `Website at ${url}`;
   website.iri = websiteIri;
 
   // TODO: transform website into a format that we need
   await termitApi.post(
     `/resources/${documentIri.fragment}/websites`,
-    content(website).param("namespace", documentIri.namespace)
+    content(website.toJsonLd()).param("namespace", documentIri.namespace)
   );
 
   return website;

@@ -63,7 +63,7 @@ export const globalActions = {
     await annotator!.annotatePage(vocabulary, result);
     contentState.annotations = annotator!.getAnnotations();
     contentState.website = await api.createWebsiteInDocument(
-      { url: document.URL },
+      document.URL,
       VocabularyUtils.create(vocabulary.document!.iri)
     );
     await api.savePageAnnotationResults(result);
@@ -101,8 +101,8 @@ export const globalActions = {
     // TODO: fix bug where this opens on the wrong side
     setTimeout(() => {
       sidebar!.open();
-    }, 200)
-    
+    }, 200);
+
     sidebar!.render();
   },
   async assignTermToSuggestedTermOccurrence(
@@ -114,7 +114,10 @@ export const globalActions = {
     annotator!.hidePopup();
     // await api.updateTermOccurrence(annotation);
     // TODO: maybe the annotace service needs to be run again to help out with that?
-    await api.createTermOccurrence(term, VocabularyUtils.create(contentState.vocabulary!.iri));
+    await api.createTermOccurrence(
+      term,
+      VocabularyUtils.create(contentState.vocabulary!.iri)
+    );
 
     sidebar?.render();
   },

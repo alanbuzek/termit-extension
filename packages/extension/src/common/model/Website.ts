@@ -4,8 +4,8 @@ import Document, { DocumentData } from "./Document";
 import VocabularyUtils from "../util/VocabularyUtils";
 
 const ctx = {
-  content: VocabularyUtils.CONTENT,
   owner: VocabularyUtils.IS_PART_OF_DOCUMENT,
+  url: VocabularyUtils.WEBSITE_URL
 };
 
 /**
@@ -15,23 +15,19 @@ const ctx = {
  */
 export const OWN_CONTEXT = ctx;
 
-
 export interface WebsiteData extends ResourceData {
-  origin?: string;
-  content?: string;
+  url?: string;
   owner?: DocumentData;
 }
 
 export default class Website extends Resource implements WebsiteData {
-  public origin: string;
-  public content?: string;
   public owner?: DocumentData;
+  public url?: string;
 
   constructor(data: WebsiteData) {
     super(data);
-    this.origin = data.origin ? data.origin : "";
-    this.content = data.content;
     this.owner = data.owner;
+    this.url = data.url;
   }
 
   public clone() {
@@ -50,9 +46,10 @@ export default class Website extends Resource implements WebsiteData {
       );
       // Replace reference to myself with an IRI reference only to prevent serialization cycle errors
       jsonLd.owner.websites.splice(ind, 1, { iri: this.iri });
-      jsonLd.owner.websites = Document.replaceCircularReferencesToOwnerWithOwnerId(
-        jsonLd.owner.websites
-      );
+      jsonLd.owner.websites =
+        Document.replaceCircularReferencesToOwnerWithOwnerId(
+          jsonLd.owner.websites
+        );
     }
     return jsonLd;
   }

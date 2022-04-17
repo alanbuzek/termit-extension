@@ -100,6 +100,7 @@ const VocabularyUtils = {
   LAST_MODIFIED: _NS_POPIS_DAT + "má-datum-a-čas-poslední-modifikace",
   IMPORTS_VOCABULARY: _NS_POPIS_DAT + "importuje-slovník",
   NS_TERMIT: _NS_TERMIT,
+  WEBSITE_URL: _NS_DC + "Location",
   USER: _NS_TERMIT + "uživatel-termitu",
   USER_ADMIN: _NS_TERMIT + "administrátor-termitu",
   USER_LOCKED: _NS_TERMIT + "uzam\u010den\u00fd-u\u017eivatel-termitu",
