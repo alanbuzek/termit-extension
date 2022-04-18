@@ -8,11 +8,13 @@ import {
   AnnotationClass,
   AnnotationType,
 } from "../common/util/Annotation";
-import api, { Website } from "../api";
+import api from "../api";
 import VocabularyUtils, { IRI } from "../common/util/VocabularyUtils";
 import Term from "../common/model/Term";
 import { occurrenceFromRange, markTerms } from "./marker";
 import backgroundApi from "../shared/backgroundApi";
+import Website from "../common/model/Website";
+import browserApi from "../shared/browserApi";
 
 // global important classes
 let sidebar: Sidebar | null = null;
@@ -59,6 +61,7 @@ export const globalActions = {
     );
     contentState.terms = vocabularyTerms;
     contentState.vocabulary = vocabulary;
+    // TODO: make this call only once (not from inside of sidebar)
 
     await annotator!.annotatePage(vocabulary, result);
     contentState.annotations = annotator!.getAnnotations();
@@ -66,6 +69,9 @@ export const globalActions = {
       document.URL,
       VocabularyUtils.create(vocabulary.document!.iri)
     );
+    contentState.vocabulary.document?.websites.push(contentState.website);
+    // update cahce
+    await browserApi.storageSet("vocabularies", contentState.vocabularies);
     await api.savePageAnnotationResults(result);
     contentState.hasBeenAnnotated = true;
 
@@ -83,7 +89,7 @@ export const globalActions = {
     contentState.vocabularies = await api.loadVocabularies();
     // TODO: how to handle multiple vocabularies? schema adjustments, state adjustments
     const foundVocabulary = contentState.vocabularies.find(
-      (vocab) => vocab.document?.iri === (website as Website).document
+      (vocab) => vocab.document?.iri === (website as Website).owner?.iri
     );
     if (!foundVocabulary) {
       throw new Error("Matching vocabulary of an existing website not found!");
@@ -188,11 +194,14 @@ export const globalActions = {
 };
 
 window.addEventListener("load", async () => {
+  contentState.vocabularies = await api.loadVocabularies();
+
   overlay.init();
   preloadContentStyles();
   initSidebar();
 
-  globalActions.attemptAnnotatingExistingWebsite();
+  // TODO:
+  // globalActions.attemptAnnotatingExistingWebsite();
 
   annotator = new Annotator(document.body, contentState);
 });

@@ -20,25 +20,21 @@ export const getUrlInfo = (url) => {
 const PageSummary = ({
   annotations,
   vocabulary,
+  vocabularies,
   handleAnnotatePage,
 }: {
   vocabulary?: Vocabulary;
+  vocabularies?: Vocabulary[];
   annotations?: Annotation[];
   handleAnnotatePage: (v: Vocabulary) => void;
 }) => {
   const loading = false;
   const disabled = false;
 
-  const [vocabularies, setVocabularies] = useState<Vocabulary[]>([]);
-  useEffect(() => {
-    loadVocabularies().then((vocab) => {
-      setVocabularies(vocab)
-      console.log('vocab: ', vocab);
-    });
-  }, []);
+ 
   const [selectedVocabulary, setSelectedVocabulary] = useState();
   const onVocabularyChange = (vIri: string) =>
-    setSelectedVocabulary(vocabularies[vIri]);
+    setSelectedVocabulary(vocabularies![vIri]);
 
   const [annotationLoading, setAnnotationLoading] = useState(false);
   const { checkedHostname } = getUrlInfo(window.location.href);

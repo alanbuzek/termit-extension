@@ -11,6 +11,9 @@ const SidebarApp = ({
   state: ContentState;
   handleAnnotatePage: (vocabulary: Vocabulary) => void;
 }) => {
+  if (!state.vocabularies){
+    return;
+  }
   return (
     <div
       className="h-full w-full p-3 overflow-x-auto"
@@ -20,6 +23,7 @@ const SidebarApp = ({
         annotations={state.annotations}
         handleAnnotatePage={handleAnnotatePage}
         vocabulary={state.vocabulary}
+        vocabularies={state.vocabularies}
       />
       <hr className="my-2"></hr>
       {state.annotations?.map((annotation) => {

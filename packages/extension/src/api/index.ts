@@ -12,7 +12,9 @@ import VocabularyUtils, { IRI } from "../common/util/VocabularyUtils";
 import mockTypes from "./mockData/mockTypes";
 import Constants from "../common/util/Constants";
 import mockExistingOccurrences from "./mockData/mockExistingOccurrences";
-import Website from '../common/model/Website';
+import Website from "../common/model/Website";
+import browserApi from "../shared/browserApi";
+import { cachedCall } from "./cache";
 
 // TODO: remove all Promise.resolve() statements and uncomment real back-end calls when ready
 // TODO (optional): use fetch-mock or similar library to mock api server responses, will likely be needed to testing
@@ -20,29 +22,24 @@ import Website from '../common/model/Website';
 const termitApi = new Ajax({ baseURL: Constants.TERMIT_SERVER_URL });
 const annotaceApi = new Ajax({ baseURL: Constants.ANNOTACE_SERVER_URL });
 
-export function loadVocabularies() {
-  return (
-    termitApi
-      .get("/vocabularies")
-      // return Promise.resolve(mockVocabularies)
-      .then((data: object[]) => {
-        return data.length !== 0
-          ? JsonLdUtils.compactAndResolveReferencesAsArray<VocabularyData>(
-              data,
-              VOCABULARY_CONTEXT
-            )
-          : [];
-      })
-      .then((data: VocabularyData[]) => {
-        console.log('data2: ', data);
-        console.log(
-          "RESULT: ",
-          data.map((v) => new Vocabulary(v))
-        );
-        return data.map((v) => new Vocabulary(v));
-      })
-  );
-}
+export const loadVocabularies = cachedCall("vocabularies", async () => {
+  const vocabularies = await termitApi
+    .get("/vocabularies")
+    .then((data: object[]) => {
+      return data.length !== 0
+        ? JsonLdUtils.compactAndResolveReferencesAsArray<VocabularyData>(
+            data,
+            VOCABULARY_CONTEXT
+          )
+        : [];
+    })
+    .then((data: VocabularyData[]) => {
+
+      return data.map((v) => new Vocabulary(v));
+    });
+
+  return vocabularies;
+});
 
 export function loadAllTerms(
   vocabularyIri: IRI,
@@ -104,10 +101,7 @@ export function savePageAnnotationResults(pageAnnotationAnalysisResult: any) {
 /**
  * Creates a website file within a resource (vocabulary)
  */
-export async function createWebsiteInDocument(
-  url: string,
-  documentIri: IRI
-) {
+export async function createWebsiteInDocument(url: string, documentIri: IRI) {
   const website = new Website({ url });
 
   // TODO: maybe don't need to load the identifier again?
