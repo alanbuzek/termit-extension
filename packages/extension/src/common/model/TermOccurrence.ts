@@ -163,6 +163,7 @@ export const createTermOccurrences = (
   });
 };
 
+// TODO: remove example
 const example = {
   iri: VocabularyUtils.WEBSITE_TERM_OCCURRENCE + "/instance-205549560",
   target: {

@@ -1,7 +1,9 @@
 import React from "react";
 import { ContentState } from "..";
 import TermLink from "../../common/component/term/TermLink";
+import { TextQuoteSelector } from "../../common/model/TermOccurrence";
 import Vocabulary from "../../common/model/Vocabulary";
+import VocabularyUtils from "../../common/util/VocabularyUtils";
 import PageSummary from "./PageSummery";
 
 const SidebarApp = ({
@@ -11,7 +13,7 @@ const SidebarApp = ({
   state: ContentState;
   handleAnnotatePage: (vocabulary: Vocabulary) => void;
 }) => {
-  if (!state.vocabularies){
+  if (!state.vocabularies) {
     return;
   }
   return (
@@ -33,7 +35,13 @@ const SidebarApp = ({
             onClick={() => annotation.focusAnnotation()}
           >
             <div className="mb-0 text-lg font-semibold">
-              {annotation.termOccurrence?.originalTerm}
+              {
+                (
+                  annotation.termOccurrence?.target.selectors.find((selector) =>
+                    selector.types.includes(VocabularyUtils.TEXT_QUOTE_SELECTOR)
+                  ) as TextQuoteSelector
+                ).exactMatch
+              }
             </div>
             {annotation.term && (
               <div className="flex items-center mt-1.5">

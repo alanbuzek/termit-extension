@@ -83,7 +83,7 @@ export const globalActions = {
 
     contentState.vocabulary.document?.websites.push(contentState.website);
     // update cahce
-    await api.savePageAnnotationResults(termOccurrencesGrouped, contentState.website);
+    await api.savePageAnnotationResults(termOccurrencesGrouped.flatMap(occGroup => occGroup), contentState.website);
     await browserApi.storageSet("vocabularies", contentState.vocabularies);
     contentState.hasBeenAnnotated = true;
 

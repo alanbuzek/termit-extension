@@ -19,6 +19,8 @@ import TermOccurrence, {
   TermOccurrenceData,
   CONTEXT as OCCURRENCE_CONTEXT,
   CssSelector,
+  TextQuoteSelector,
+  TextPositionSelector,
 } from "../common/model/TermOccurrence";
 
 // TODO: remove all Promise.resolve() statements and uncomment real back-end calls when ready
@@ -94,11 +96,13 @@ export function runPageAnnotationAnalysis(
 }
 
 export async function savePageAnnotationResults(
-  pageAnnotationAnalysisResult: any,
+  termOccurrences: TermOccurrence[],
   website: Website
 ) {
   // TODO: persist this to a new endpoint
-  await createTermOccurrence(website);
+  if (termOccurrences.length > 0) {
+    await Promise.all(termOccurrences.map(termOccurrence => createTermOccurrence(termOccurrence, website)));
+  }
   return Promise.resolve();
 }
 
@@ -184,10 +188,15 @@ export async function getWebsiteTermOccurrences(
       const cssSelector = occurrence.target.selectors.find((selector) =>
         selector.types.includes(VocabularyUtils.CSS_SELECTOR)
       ) as CssSelector;
-      if (!cssSelector){
-        console.log('NO CSS selectors: ', occurrence.target.selectors, ', occurrence: ', occurrence);
+      if (!cssSelector) {
+        console.log(
+          "NO CSS selectors: ",
+          occurrence.target.selectors,
+          ", occurrence: ",
+          occurrence
+        );
       } else {
-        console.log('css selector found: ', cssSelector);
+        console.log("css selector found: ", cssSelector);
       }
 
       if (!selectorMap[cssSelector.value]) {
@@ -278,8 +287,21 @@ export function createTerm(term: Term, vocabularyIri: IRI) {
   );
 }
 
-export async function createTermOccurrence(website: Website, term?: Term) {
+export async function createTermOccurrence(
+  termOccurrence: TermOccurrence,
+  website: Website
+) {
   const websiteIRI: IRI = VocabularyUtils.create(website.iri);
+  const cssSelector = termOccurrence.target.selectors.find((selector) =>
+    selector.types.includes(VocabularyUtils.CSS_SELECTOR)
+  ) as CssSelector;
+  const textQuoteSelector = termOccurrence.target.selectors.find((selector) =>
+    selector.types.includes(VocabularyUtils.TEXT_QUOTE_SELECTOR)
+  ) as TextQuoteSelector;
+  const textPositionSelector = termOccurrence.target.selectors.find(
+    (selector) =>
+      selector.types.includes(VocabularyUtils.TEXT_POSITION_SELECTOR)
+  ) as TextPositionSelector;
 
   return termitApi.post(
     `/occurrence`,
@@ -288,7 +310,15 @@ export async function createTermOccurrence(website: Website, term?: Term) {
       websiteFragment: websiteIRI.fragment,
       // TODO:
       // termFragment: term ? VocabularyUtils.create(term.iri).fragment : null,
-    }).contentType(Constants.JSON_MIME_TYPE)
+    })
+      .content({
+        exactMatch: textQuoteSelector.exactMatch,
+        selector: cssSelector.value,
+        start: textPositionSelector.start,
+      })
+      // TODO: add back in
+      // .content(termOccurrence.toJsonLd())
+      .contentType(Constants.JSON_MIME_TYPE)
   );
   // TODO
   // const url = resolveTermCreationUrl(term, vocabularyIri);
