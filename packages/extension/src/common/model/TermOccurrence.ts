@@ -6,6 +6,18 @@ import TermAssignment, {
 } from "./TermAssignment";
 import Utils from "../util/Utils";
 import VocabularyUtils from "../util/VocabularyUtils";
+import { TermsMap } from "../../content";
+
+// TODO: move to there when possible
+// import { isAnnotationWithMinimumScore } from "../component/annotator/AnnotationDomHelper";
+export function isAnnotationWithMinimumScore(
+  score: number,
+  threshold: number
+): boolean {
+  return threshold <= score;
+}
+
+export const ANNOTATION_MINIMUM_SCORE_THRESHOLD = 0.65;
 
 const ctx = {
   selectors: VocabularyUtils.NS_TERMIT + "má-selektor",
@@ -62,7 +74,7 @@ export interface TextPositionSelector extends Selector {
 }
 
 export interface CssSelector extends Selector {
-  value: number;
+  value: string;
 }
 
 export interface OccurrenceTarget extends Target {
@@ -71,15 +83,136 @@ export interface OccurrenceTarget extends Target {
 
 export interface TermOccurrenceData extends TermAssignmentData {
   target: OccurrenceTarget;
+  score?: number;
 }
+
+export const createTermOccurrences = (
+  results: any[],
+  resourceIri: string,
+  terms: TermsMap
+): TermOccurrence[][] => {
+  return results.map(({ cssSelectors, termOccurrences }) => {
+    return termOccurrences
+      .filter((termOccurrence) =>
+        isAnnotationWithMinimumScore(
+          termOccurrence.score,
+          ANNOTATION_MINIMUM_SCORE_THRESHOLD
+        )
+      )
+      .map((termOccurrence) => {
+        const {
+          about,
+          property,
+          resource,
+          content,
+          typeof: typeOf,
+          score,
+          startOffset,
+          originalTerm,
+        } = termOccurrence;
+
+        const termOccurrenceData = {
+          iri: VocabularyUtils.WEBSITE_TERM_OCCURRENCE + `/${about}`,
+          types: [
+            VocabularyUtils.TERM_OCCURRENCE,
+            VocabularyUtils.WEBSITE_TERM_OCCURRENCE,
+          ],
+          score,
+          term: resource ? terms[resource] : undefined,
+          target: {
+            // iri: VocabularyUtils.WEBSITE_OCCURRENCE_TARGET + "/instance1749321978",
+            types: [
+              VocabularyUtils.TERM_OCCURRENCE_TARGET,
+              VocabularyUtils.WEBSITE_OCCURRENCE_TARGET,
+            ],
+            selectors: [
+              {
+                // iri: VocabularyUtils.TEXT_QUOTE_SELECTOR + "/instance-1673666643",
+                types: [
+                  VocabularyUtils.TEXT_QUOTE_SELECTOR,
+                  VocabularyUtils.SELECTOR,
+                ],
+                exactMatch: originalTerm,
+              },
+              {
+                // iri: VocabularyUtils.TEXT_POSITION_SELECTOR + "/instance1202492151",
+                types: [
+                  VocabularyUtils.SELECTOR,
+                  VocabularyUtils.TEXT_POSITION_SELECTOR,
+                ],
+                // TODO; maybe remove this?
+                end: -1,
+                // TODO: adjust for just storing length, in annotace service
+                start: startOffset.replace(/\s/g, "").length,
+              },
+              {
+                // iri: VocabularyUtils.CSS_SELECTOR + "/instance455547086",
+                types: [VocabularyUtils.SELECTOR, VocabularyUtils.CSS_SELECTOR],
+                // TODO: this should be changed to an array later?
+                value: cssSelectors[0],
+              },
+            ],
+            source: {
+              iri: resourceIri,
+            },
+          },
+        };
+
+        return new TermOccurrence(termOccurrenceData);
+      });
+  });
+};
+
+const example = {
+  iri: VocabularyUtils.WEBSITE_TERM_OCCURRENCE + "/instance-205549560",
+  target: {
+    iri: VocabularyUtils.WEBSITE_OCCURRENCE_TARGET + "/instance1749321978",
+    types: [
+      VocabularyUtils.TERM_OCCURRENCE_TARGET,
+      VocabularyUtils.WEBSITE_OCCURRENCE_TARGET,
+    ],
+    selectors: [
+      {
+        iri: VocabularyUtils.TEXT_QUOTE_SELECTOR + "/instance-1673666643",
+        types: [VocabularyUtils.TEXT_QUOTE_SELECTOR, VocabularyUtils.SELECTOR],
+        exactMatch: "example match",
+      },
+      {
+        iri: VocabularyUtils.TEXT_POSITION_SELECTOR + "/instance1202492151",
+        types: [
+          VocabularyUtils.SELECTOR,
+          VocabularyUtils.TEXT_POSITION_SELECTOR,
+        ],
+        end: 10,
+        start: 5,
+      },
+      {
+        iri: VocabularyUtils.CSS_SELECTOR + "/instance455547086",
+        types: [VocabularyUtils.SELECTOR, VocabularyUtils.CSS_SELECTOR],
+        value: "div > .example",
+      },
+    ],
+    source: {
+      iri: "http://onto.fel.cvut.cz/ontologies/slovnik/http:--skauti.lubina.cz-subdom-skauti-2022-01-27-jarni-prazdniny-3-",
+    },
+  },
+  types: [
+    VocabularyUtils.TERM_OCCURRENCE,
+    VocabularyUtils.WEBSITE_TERM_OCCURRENCE,
+  ],
+};
 
 export default class TermOccurrence extends TermAssignment {
   public target: OccurrenceTarget;
+  public score?: number;
 
   constructor(data: TermOccurrenceData) {
     super(data);
     this.target = data.target;
     this.target.selectors = Utils.sanitizeArray(this.target.selectors);
+    if (typeof data.score === "number") {
+      this.score = data.score;
+    }
   }
 
   public isSuggested(): boolean {

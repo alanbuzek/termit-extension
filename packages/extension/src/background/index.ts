@@ -1,5 +1,6 @@
 import "regenerator-runtime/runtime.js";
 import api from '../api';
+import { SKIP_CACHE } from '../api/cache';
 import { MessageType } from "../types";
 // import { JSDOM } from 'jsdom';
 
@@ -47,4 +48,4 @@ chrome.action.onClicked.addListener((tab) => {
   );
 });
 
-api.loadVocabularies('SKIP_CACHE');
+api.loadVocabularies(SKIP_CACHE);

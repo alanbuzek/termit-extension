@@ -4,7 +4,7 @@ import AnnotationTerms from "./AnnotationTerms";
 import { Button } from "reactstrap";
 import { FaCheck } from "react-icons/fa";
 import { TiTimes, TiTrash } from "react-icons/ti";
-import { AnnotationOrigin } from "../../util/Annotation";
+import { AnnotationOriginClass } from "../../util/Annotation";
 import TermOccurrenceAnnotationView from "./TermOccurrenceAnnotationView";
 import { GoPencil } from "react-icons/go";
 import { useI18n } from '../hook/useI18n';
@@ -36,7 +36,7 @@ function createActionButtons(
 ) {
   const actions: any[] = [];
   const t = props.term ? props.term : null;
-  if (props.annotationOrigin === AnnotationOrigin.PROPOSED && t !== null) {
+  if (props.annotationOrigin === AnnotationOriginClass.PROPOSED && t !== null) {
     actions.push(
       // <IfUserAuthorized
       //   renderUnauthorizedAlert={false}

@@ -143,8 +143,6 @@ export function paramsSerializer(paramData: {} | undefined) {
   let options = "";
 
   keys.forEach((key) => {
-    console.log('key:, ', key);
-    console.log('paramData: ', paramData);
     const isParamTypeObject = typeof paramData[key] === "object";
     const isParamTypeArray = isParamTypeObject && paramData[key].length >= 0;
     if (!paramData[key]) {
@@ -168,7 +166,10 @@ export function paramsSerializer(paramData: {} | undefined) {
 const callFetch = (baseURL: string, path: string, config) => {
   // pre-request interceptor
   config.headers[Constants.Headers.AUTHORIZATION] = SecurityUtils.loadToken();
-
+  if (['GET', 'HEAD'].includes(config.method) && config.body){
+    console.warn('Fetch request includes body in a get/head requested, deleting:: ', config.body);
+    delete config.body
+  } 
   return fetch(`${baseURL}${path}`, config).then((response: Response) => {
     // TODO: add validate get status
     if (!response.ok) {
@@ -185,7 +186,7 @@ const callFetch = (baseURL: string, path: string, config) => {
       );
     }
 
-    if (response.status !== 201) {
+    if (response.status !== 201 && response.status !== 204) {
       return response.json();
     }
 
@@ -286,7 +287,7 @@ export class Ajax {
   /**
    * Gets response from the server and returns its content.
    */
-public get(
+  public get(
     path: string,
     config: RequestConfigBuilder = new RequestConfigBuilder()
   ) {

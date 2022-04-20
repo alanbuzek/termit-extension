@@ -25,7 +25,7 @@ export interface Target {
 
 export interface TermAssignmentData {
   iri?: string;
-  term: TermData;
+  term?: TermData;
   target: Target;
   description?: string;
   types: string[];
@@ -35,7 +35,7 @@ export default class TermAssignment
   implements TermAssignmentData, SupportsJsonLd<TermAssignmentData>
 {
   public iri?: string;
-  public term: TermData;
+  public term?: TermData;
   public target: Target;
   public description?: string;
   public types: string[];

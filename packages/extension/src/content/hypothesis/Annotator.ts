@@ -9,6 +9,7 @@ import backgroundApi from "../../shared/backgroundApi";
 import { Annotation } from "../../common/util/Annotation";
 import { ContentState } from "..";
 import Term from "../../common/model/Term";
+import TermOccurrence from '../../common/model/TermOccurrence';
 
 /**
  * `Annotator` is the central class of the annotator that handles anchoring (locating)
@@ -54,7 +55,7 @@ export default class Annotator {
     this.isPopupVisible = false;
     this.contentPopup = new ContentPopupContainer(
       this.rootElement,
-      this.contentState,
+      this.contentState
       // TODO: are these handlers needed?
       // {
       //   onAnnotate: () => console.log("this.createAnnotation()"),
@@ -143,9 +144,14 @@ export default class Annotator {
     this.contentPopup.hide();
   }
 
-  public async annotatePage(vocabulary: Vocabulary, termOccSelectors: any) {
+  public async annotatePage(
+    vocabulary: Vocabulary,
+    termOccurrencesGrouped: TermOccurrence[][]
+  ) {
     const annotationsData = await Promise.all(
-      termOccSelectors.map((termOccSelector) => markTerms(termOccSelector, this.contentState.terms))
+      termOccurrencesGrouped.map((termOccurrencesGroup) =>
+        markTerms(termOccurrencesGroup, this.contentState.terms)
+      )
     );
 
     // add all annotatations to the set for later reference

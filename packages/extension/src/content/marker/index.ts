@@ -1,12 +1,14 @@
 import { getCssSelector } from "css-selector-generator";
 import { globalActions } from "..";
 import { getPropertyForAnnotationType } from "../../common/component/annotator/AnnotationDomHelper";
+import TermOccurrence, { CssSelector, TextPositionSelector, TextQuoteSelector } from "../../common/model/TermOccurrence";
 import {
   Annotation,
   AnnotationStatus,
   AnnotationType,
 } from "../../common/util/Annotation";
 import JsonLdUtils from "../../common/util/JsonLdUtils";
+import VocabularyUtils from "../../common/util/VocabularyUtils";
 import Mark from "../../markjs";
 
 // TODO: this most likely will be able to be removed
@@ -39,42 +41,56 @@ export const unmarkTerm = (element: HTMLElement) => {
   return new Promise((resolve) => new Mark(element).unmark({ done: resolve }));
 };
 
-export const markTerms = ({
-  cssSelectors,
-  termOccurrences,
-}, termsMap): Promise<Annotation[]> => {
+export const markTerms = (
+  termOccurrencesGroup: TermOccurrence[],
+  termsMap
+): Promise<Annotation[]> => {
+  console.log('termOccurrencesGroup: ', termOccurrencesGroup);
+  const cssSelector = termOccurrencesGroup[0].target.selectors.find(
+    (selector) => selector.types.includes(VocabularyUtils.CSS_SELECTOR)
+  ) as CssSelector;
+  const textQuoteSelector = termOccurrencesGroup[0].target.selectors.find(
+    (selector) => selector.types.includes(VocabularyUtils.TEXT_QUOTE_SELECTOR)
+  ) as TextQuoteSelector;
+  const textPositionSelector = termOccurrencesGroup[0].target.selectors.find(
+    (selector) => selector.types.includes(VocabularyUtils.TEXT_POSITION_SELECTOR)
+  ) as TextPositionSelector;
+
   return new Promise((resolve, reject) => {
     const selectedElements = Array.from(
-      document.querySelectorAll(cssSelectors[0])
+      document.querySelectorAll(cssSelector.value)
     );
 
     if (selectedElements.length === 1) {
       results.selectors.successes += 1;
     } else if (selectedElements.length === 0) {
-      console.log("[Selector] Failure: ", cssSelectors, ", ", selectedElements);
+      console.log("[Selector] Failure: ", cssSelector, ", ", selectedElements);
       results.selectors.failures += 1;
     } else {
       results.selectors.overselectedFailures += 1;
       console.log(
         "[Selector] Overseledcted Failure: ",
-        cssSelectors,
+        cssSelector,
         ", ",
         selectedElements
       );
     }
 
     if (selectedElements.length !== 1) {
-      reject("Selector didn't select exactly one element");
+      console.warn("Selector didn't select exactly one element");
+      resolve([]);
       return;
     }
 
     let annotations: Annotation[] = [];
     const markInstance = new Mark(selectedElements[0]);
-    termOccurrences.forEach((termOccurrence) => {
-      termOccurrence.cssSelector = cssSelectors[0];
-      const annotation = new Annotation(termOccurrence, termsMap[termOccurrence.term]);
+    termOccurrencesGroup.forEach((termOccurrence) => {
+      const annotation = new Annotation(
+        termOccurrence,
+        termOccurrence.term?.iri && termsMap[termOccurrence.term.iri]
+      );
 
-      markInstance.mark(termOccurrence.originalTerm, {
+      markInstance.mark(textQuoteSelector.exactMatch, {
         accuracy: "partially",
         filter(node, term, offestInCurrentNode) {
           let calculatedOffset = node.textContent.slice(0, offestInCurrentNode);
@@ -86,8 +102,8 @@ export const markTerms = ({
             }
           }
 
-          const pureLeft = calculatedOffset.replace(/\s/g, "");
-          const pureRight = termOccurrence.startOffset.replace(/\s/g, "");
+          const pureLeft = calculatedOffset.replace(/\s/g, "").length;
+          const pureRight = textPositionSelector.start;
 
           return pureLeft === pureRight;
         },
@@ -123,7 +139,7 @@ export const markTerms = ({
           }
 
           annotations.push(annotation);
-          if (annotations.length === termOccurrences.length) {
+          if (annotations.length === termOccurrencesGroup.length) {
             resolve(annotations);
           }
         },
@@ -133,10 +149,7 @@ export const markTerms = ({
 };
 
 // TODO: move this to some sort of a Utils file?
-export const occurrenceFromRange = (
-  range,
-  annotationType
-) => {
+export const occurrenceFromRange = (range, annotationType) => {
   let parentElement = range.startContainer;
   if (!parentElement) {
     throw new Error("No parent element to create annotation!");

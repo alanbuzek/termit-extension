@@ -5,7 +5,7 @@ import { preloadContentStyles } from "./hypothesis/helpers";
 import { overlay } from "./helper/overlay";
 import {
   Annotation,
-  AnnotationClass,
+  AnnotationTypeClass,
   AnnotationType,
 } from "../common/util/Annotation";
 import api from "../api";
@@ -15,6 +15,9 @@ import { occurrenceFromRange, markTerms } from "./marker";
 import backgroundApi from "../shared/backgroundApi";
 import Website from "../common/model/Website";
 import browserApi from "../shared/browserApi";
+import TermOccurrence, {
+  createTermOccurrences,
+} from "../common/model/TermOccurrence";
 
 // global important classes
 let sidebar: Sidebar | null = null;
@@ -52,33 +55,40 @@ export const globalActions = {
     annotator!.showPopup(annotation);
   },
   async annotateNewWebsite(vocabulary: Vocabulary) {
-    const result = await backgroundApi.getPageAnnotations(
-      vocabulary.iri,
-      document.body.outerHTML
-    );
-    const vocabularyTerms = await api.loadAllTerms(
-      VocabularyUtils.create(vocabulary.iri)
-    );
-    contentState.terms = vocabularyTerms;
-    contentState.vocabulary = vocabulary;
-    // TODO: make this call only once (not from inside of sidebar)
-
-    await annotator!.annotatePage(vocabulary, result);
-  
-    contentState.annotations = annotator!.getAnnotations();
     contentState.website = await api.createWebsiteInDocument(
       document.URL,
       VocabularyUtils.create(vocabulary.document!.iri)
     );
+    const textAnalysisResult = await backgroundApi.getPageAnnotations(
+      vocabulary.iri,
+      document.body.outerHTML
+    );
+    console.log('finished getPageANnotaitons: ', textAnalysisResult);
+    const vocabularyTerms = await api.loadAllTerms(
+      VocabularyUtils.create(vocabulary.iri)
+    );
+    console.log('finished loading terms');
+    contentState.terms = vocabularyTerms;
+    contentState.vocabulary = vocabulary;
+    // TODO: make this call only once (not from inside of sidebar)
+
+    const termOccurrencesGrouped: TermOccurrence[][] = createTermOccurrences(
+      textAnalysisResult,
+      contentState.website.iri,
+      contentState.terms!
+    );
+    await annotator!.annotatePage(vocabulary, termOccurrencesGrouped);
+
+    contentState.annotations = annotator!.getAnnotations();
+
     contentState.vocabulary.document?.websites.push(contentState.website);
     // update cahce
-    await api.savePageAnnotationResults(result, contentState.website);
+    await api.savePageAnnotationResults(termOccurrencesGrouped, contentState.website);
     await browserApi.storageSet("vocabularies", contentState.vocabularies);
     contentState.hasBeenAnnotated = true;
 
     // this makes sure to re-render sidebar on data update
     sidebar!.render();
-    console.log('finished annotate new website')
   },
   async attemptAnnotatingExistingWebsite() {
     const foundExistingWebsite = await api.getExistingWebsite(
@@ -93,12 +103,13 @@ export const globalActions = {
 
     const { website, vocabulary } = foundExistingWebsite;
     // TODO: how to handle multiple vocabularies? schema adjustments, state adjustments
-   
+
     contentState.terms = await api.loadAllTerms(
       VocabularyUtils.create(vocabulary.iri)
     );
-    const result = await api.getWebsiteTermOccurrences(website);
-    await annotator!.annotatePage(vocabulary, result);
+    const termOccurrencesGroups: TermOccurrence[][] =
+      await api.getWebsiteTermOccurrences(website);
+    await annotator!.annotatePage(vocabulary, termOccurrencesGroups);
     contentState.annotations = annotator!.getAnnotations();
     contentState.vocabulary = vocabulary;
     contentState.hasBeenAnnotated = true;
@@ -120,10 +131,7 @@ export const globalActions = {
     annotator!.hidePopup();
     // await api.updateTermOccurrence(annotation);
     // TODO: maybe the annotace service needs to be run again to help out with that?
-    await api.createTermOccurrence(
-      term,
-      contentState.website!
-    );
+    await api.createTermOccurrence(contentState.website!, term);
 
     sidebar?.render();
   },
@@ -200,7 +208,6 @@ window.addEventListener("load", async () => {
   preloadContentStyles();
   initSidebar();
   annotator = new Annotator(document.body, contentState);
-
 
   await globalActions.attemptAnnotatingExistingWebsite();
 });

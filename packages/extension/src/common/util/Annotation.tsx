@@ -1,8 +1,9 @@
 import { markTerms, unmarkTerm } from "../../content/marker";
 import Term from "../model/Term";
+import TermOccurrence from "../model/TermOccurrence";
 import VocabularyUtils from "./VocabularyUtils";
 
-export const AnnotationClass = {
+export const AnnotationTypeClass = {
   INVALID: "invalid-term-occurrence",
   ASSIGNED_OCCURRENCE: "assigned-term-occurrence",
   SUGGESTED_OCCURRENCE: "suggested-term-occurrence",
@@ -11,14 +12,14 @@ export const AnnotationClass = {
   DEFINITION: "term-definition",
 };
 
-export const AnnotationOrigin = {
+export const AnnotationOriginClass = {
   PROPOSED: "proposed-occurrence",
   SELECTED: "selected-occurrence",
 };
 
 export const AnnotationType = {
   OCCURRENCE: VocabularyUtils.TERM_OCCURRENCE,
-  DEFINITION: VocabularyUtils.DEFINITION,
+  DEFINITION: VocabularyUtils.DEFINITIONAL_OCCURRENCE,
 };
 
 export enum AnnotationStatus {
@@ -27,23 +28,23 @@ export enum AnnotationStatus {
   PENDING,
 }
 
-export type TermOccurrence = {
-  about: string;
-  content: string;
-  originalTerm: string;
-  property: string;
-  resource: string;
-  score?: number;
-  // TODO: change startOffset to a number
-  startOffset: string;
-  typeof: string;
-  cssSelector: string;
-};
+// TODO: remove when no longer needed as a reference
+// export type TermOccurrence = {
+//   about: string;
+//   content: string;
+//   originalTerm: string;
+//   property: string;
+//   resource: string;
+//   score?: number;
+//   // TODO: change startOffset to a number
+//   startOffset: string;
+//   typeof: string;
+//   cssSelector: string;
+// };
 
 // TODO: we'll have to make sure that the mapping works ok here (e.g. ddo:definice vs full url)
-export function isDefinitionAnnotation(type: string) {
-  console.log("type: ", type, ", definintion: ", AnnotationType.DEFINITION);
-  return type === AnnotationType.DEFINITION;
+export function isDefinitionAnnotation(types: string[]) {
+  return types.includes(AnnotationType.DEFINITION);
 }
 export class Annotation {
   public termOccurrence: TermOccurrence;
@@ -77,24 +78,24 @@ export class Annotation {
 
     if (this.term === null) {
       // this.termOccurrence.typeof maybe be subject to change
-      return isDefinitionAnnotation(this.termOccurrence.typeof)
-        ? AnnotationClass.PENDING_DEFINITION
-        : AnnotationClass.SUGGESTED_OCCURRENCE;
+      return isDefinitionAnnotation(this.termOccurrence.types)
+        ? AnnotationTypeClass.PENDING_DEFINITION
+        : AnnotationTypeClass.SUGGESTED_OCCURRENCE;
     }
     if (this.termOccurrence) {
-      return isDefinitionAnnotation(this.termOccurrence.typeof)
-        ? AnnotationClass.DEFINITION
-        : AnnotationClass.ASSIGNED_OCCURRENCE;
+      return isDefinitionAnnotation(this.termOccurrence.types)
+        ? AnnotationTypeClass.DEFINITION
+        : AnnotationTypeClass.ASSIGNED_OCCURRENCE;
     }
-    return AnnotationClass.INVALID;
+    return AnnotationTypeClass.INVALID;
   }
 
   public getTermCreatorState() {
     // TODO: this check may later not work with existing terms
-    if (this.termOccurrence.score) {
-      return AnnotationOrigin.PROPOSED;
+    if (typeof this.termOccurrence.score === 'number') {
+      return AnnotationOriginClass.PROPOSED;
     }
-    return AnnotationOrigin.SELECTED;
+    return AnnotationOriginClass.SELECTED;
   }
 
   public getClassName() {
@@ -105,7 +106,7 @@ export class Annotation {
   }
 
   public focusAnnotation() {
-    this.element?.scrollIntoView({block: "center", inline: "nearest"});
+    this.element?.scrollIntoView({ block: "center", inline: "nearest" });
     this.element?.classList.add("annotation-focused");
     this.element?.click();
     setTimeout(() => {
@@ -140,7 +141,6 @@ export class Annotation {
       ? AnnotationType.OCCURRENCE
       : AnnotationType.DEFINITION;
     delete this.termOccurrence.score;
-    console.log('assigning term: ', term);
     this.updateAppearance();
   }
 

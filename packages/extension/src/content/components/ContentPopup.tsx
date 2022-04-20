@@ -8,8 +8,8 @@ import { useState } from "react";
 import { markTerms } from "../marker";
 import {
   Annotation,
-  AnnotationClass,
-  AnnotationOrigin,
+  AnnotationTypeClass,
+  AnnotationOriginClass,
 } from "../../common/util/Annotation";
 import { overlay } from "../helper/overlay";
 import { ContentState, globalActions } from "..";
@@ -136,10 +136,10 @@ function ContentPopup({
             }
             // TODO: tweak these defaults
             annotationClass={
-              annotation?.getTermState() || AnnotationClass.SUGGESTED_OCCURRENCE
+              annotation?.getTermState() || AnnotationTypeClass.SUGGESTED_OCCURRENCE
             }
             annotationOrigin={
-              annotation?.getTermCreatorState() || AnnotationOrigin.PROPOSED
+              annotation?.getTermCreatorState() || AnnotationOriginClass.PROPOSED
             }
             // TODO: do we need is open? or will that be fully managed by the above layer (more likely)
             isOpen={true}

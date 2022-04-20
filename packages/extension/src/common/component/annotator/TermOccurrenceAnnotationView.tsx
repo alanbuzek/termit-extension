@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useI18n } from '../hook/useI18n';
-import { AnnotationClass } from '../../util/Annotation';
+import { AnnotationTypeClass } from '../../util/Annotation';
 import TermLink from '../term/TermLink';
 
 interface TermOccurrenceAnnotationViewProps {
@@ -14,7 +14,7 @@ const TermOccurrenceAnnotationView: React.FC<TermOccurrenceAnnotationViewProps> 
   (props) => {
     const { i18n, formatMessage } = useI18n();
     switch (props.annotationClass) {
-      case AnnotationClass.ASSIGNED_OCCURRENCE:
+      case AnnotationTypeClass.ASSIGNED_OCCURRENCE:
         return (
           <table>
             <tbody>
@@ -30,13 +30,13 @@ const TermOccurrenceAnnotationView: React.FC<TermOccurrenceAnnotationViewProps> 
             </tbody>
           </table>
         );
-      case AnnotationClass.SUGGESTED_OCCURRENCE:
+      case AnnotationTypeClass.SUGGESTED_OCCURRENCE:
         return (
           <span className="an-warning">
             {i18n("annotation.form.suggested-occurrence.message")}
           </span>
         );
-      case AnnotationClass.INVALID:
+      case AnnotationTypeClass.INVALID:
         return (
           <span className="an-error">
             {formatMessage("annotation.form.invalid-occurrence.message", {

@@ -18,6 +18,7 @@ import { cachedCall } from "./cache";
 import TermOccurrence, {
   TermOccurrenceData,
   CONTEXT as OCCURRENCE_CONTEXT,
+  CssSelector,
 } from "../common/model/TermOccurrence";
 
 // TODO: remove all Promise.resolve() statements and uncomment real back-end calls when ready
@@ -48,12 +49,10 @@ export function loadAllTerms(
   vocabularyIri: IRI,
   includeImported: boolean = false
 ) {
-  const parameters = params(
-    Object.assign({
-      includeImported,
-      namespace: vocabularyIri.namespace,
-    })
-  );
+  const parameters = params({
+    includeImported,
+    namespace: vocabularyIri.namespace,
+  });
 
   return (
     termitApi
@@ -151,11 +150,13 @@ export async function getExistingWebsite(
   });
 }
 
-export async function getWebsiteTermOccurrences(website: Website) {
+export async function getWebsiteTermOccurrences(
+  website: Website
+): Promise<TermOccurrence[][]> {
   // TODO: add endpoint
   const map = {};
   const websiteIRI: IRI = VocabularyUtils.create(website.iri);
-  const existingOccurrences = await termitApi
+  const existingOccurrences: TermOccurrence[] = await termitApi
     .get(
       `/occurrence/resources/${websiteIRI.fragment}?namespace=${websiteIRI.namespace}`,
       params({ namespace: websiteIRI.namespace })
@@ -172,23 +173,30 @@ export async function getWebsiteTermOccurrences(website: Website) {
       data.map((d) => new TermOccurrence(d))
     );
 
-  mockExistingOccurrences.forEach(({ termOccurrence, term }) => {
-    termOccurrence.term = term;
-    if (!map[termOccurrence.cssSelector]) {
-      map[termOccurrence.cssSelector] = [];
-    }
-    map[termOccurrence.cssSelector].push(termOccurrence);
-  });
+  // group to optimize for mark.js, maybe later removed
+  const selectorMap = {};
+  existingOccurrences
+    // TODO: this filtering to be later done on the back-end in SPARQL
+    .filter((occurrence) => {
+      return occurrence.target.source.iri === website.iri;
+    })
+    .forEach((occurrence) => {
+      const cssSelector = occurrence.target.selectors.find((selector) =>
+        selector.types.includes(VocabularyUtils.CSS_SELECTOR)
+      ) as CssSelector;
+      if (!cssSelector){
+        console.log('NO CSS selectors: ', occurrence.target.selectors, ', occurrence: ', occurrence);
+      } else {
+        console.log('css selector found: ', cssSelector);
+      }
 
-  const result: any[] = [];
-  Object.entries(map).forEach(([key, value]) => {
-    result.push({
-      cssSelectors: [key],
-      termOccurrences: value,
+      if (!selectorMap[cssSelector.value]) {
+        selectorMap[cssSelector.value] = [];
+      }
+      selectorMap[cssSelector.value].push(occurrence);
     });
-  });
 
-  return Promise.resolve(result);
+  return Object.values(selectorMap);
 }
 
 /**

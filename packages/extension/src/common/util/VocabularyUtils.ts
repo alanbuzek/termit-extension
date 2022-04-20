@@ -2,7 +2,7 @@
  * Vocabulary used by the application ontological model.
  */
 
-export interface IRI {
+ export interface IRI {
   namespace?: string;
   fragment: string;
 }
@@ -82,15 +82,23 @@ const VocabularyUtils = {
   RESOURCE: _NS_POPIS_DAT + "zdroj",
   TERM_ASSIGNMENT: _NS_TERMIT + "přiřazení-termu",
   TERM_OCCURRENCE: _NS_TERMIT + "výskyt-termu",
+  WEBSITE_TERM_OCCURRENCE: _NS_TERMIT + "webový-výskyt-termu",
   TERM_DEFINITION_SOURCE: _NS_TERMIT + "zdroj-definice-termu",
+  DEFINITIONAL_OCCURRENCE: _NS_TERMIT + "definiční-výskyt-termu",
   JE_TEMATEM: _NS_TERMIT + "je-tématem",
   MA_MUJ_POSLEDNI_KOMENTAR: _NS_TERMIT + "má-můj-poslední-komentář",
   SUGGESTED_TERM_OCCURRENCE: _NS_TERMIT + "navržený-výskyt-termu",
   ASSIGNMENT_TARGET: _NS_TERMIT + "c\u00edl",
+  TERM_OCCURRENCE_TARGET: _NS_TERMIT + "cíl-výskytu",
   FILE_OCCURRENCE_TARGET: _NS_TERMIT + "c\u00edl-souborov\u00e9ho-v\u00fdskytu",
   DEFINITION_OCCURRENCE_TARGET:
     _NS_TERMIT + "c\u00edl-defini\u010dn\u00edho-v\u00fdskytu",
+  WEBSITE_OCCURRENCE_TARGET: _NS_TERMIT + "cíl-webového-výskytu",
+  HAS_WEBSITE_OCCURRENCE_TARGET: _NS_TERMIT + "má-cíl-webového-výskytu",
+  SELECTOR: _NS_TERMIT + "selektor",
   TEXT_QUOTE_SELECTOR: _NS_TERMIT + "selektor-text-quote",
+  TEXT_POSITION_SELECTOR: _NS_TERMIT + "selektor-pozici-v-textu",
+  CSS_SELECTOR: _NS_TERMIT + "selektor-css",
   HAS_DEFINITION_SOURCE: _NS_TERMIT + "m\u00e1-zdroj-definice-termu",
   HAS_FILE: _NS_POPIS_DAT + "má-soubor",
   HAS_WEBSITE: _NS_POPIS_DAT + "má-webovou-stránku",
