@@ -47,3 +47,4 @@ chrome.action.onClicked.addListener((tab) => {
   );
 });
 
+api.loadVocabularies('SKIP_CACHE');

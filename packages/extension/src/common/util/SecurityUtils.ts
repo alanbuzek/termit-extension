@@ -12,7 +12,7 @@ export default class SecurityUtils {
   public static loadToken(): string {
     // return BrowserStorage.get(Constants.STORAGE_JWT_KEY, "")!;
     // TODO
-    return 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXJtaXQtYWRtaW5Aa2Jzcy5mZWxrLmN2dXQuY3oiLCJqdGkiOiJodHRwOi8vb250by5mZWwuY3Z1dC5jei9vbnRvbG9naWVzL2FwcGxpY2F0aW9uL3Rlcm1pdC9zeXN0ZW0tYWRtaW4tdXNlciIsImlhdCI6MTY1MDA5NDk1MSwiZXhwIjoxNjUwMTgxMzUxLCJyb2xlIjoiUk9MRV9GVUxMX1VTRVItUk9MRV9BRE1JTi1ST0xFX1JFU1RSSUNURURfVVNFUiJ9.CCSimexVOn9vTNCtSynSwc_yImlD9PBzX_WwijuEwzU';
+    return 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXJtaXQtYWRtaW5Aa2Jzcy5mZWxrLmN2dXQuY3oiLCJqdGkiOiJodHRwOi8vb250by5mZWwuY3Z1dC5jei9vbnRvbG9naWVzL2FwcGxpY2F0aW9uL3Rlcm1pdC9zeXN0ZW0tYWRtaW4tdXNlciIsImlhdCI6MTY1MDM2MDcwMywiZXhwIjoxNjUwNDQ3MTAzLCJyb2xlIjoiUk9MRV9GVUxMX1VTRVItUk9MRV9BRE1JTi1ST0xFX1JFU1RSSUNURURfVVNFUiJ9.H5_0_37LjKb4FrTHUYktQSv3g2Qq4O-KI1IcKCZ43Yk';
   }
 
   public static clearToken(): void {

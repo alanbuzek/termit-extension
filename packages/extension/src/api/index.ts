@@ -4,7 +4,7 @@ import Vocabulary, {
   CONTEXT as VOCABULARY_CONTEXT,
   VocabularyData,
 } from "../common/model/Vocabulary";
-import Ajax, { content, param, params } from "../common/util/Ajax";
+import Ajax, { content, contentType, param, params } from "../common/util/Ajax";
 import { Annotation } from "../common/util/Annotation";
 import JsonLdUtils from "../common/util/JsonLdUtils";
 import Utils from "../common/util/Utils";
@@ -15,6 +15,10 @@ import mockExistingOccurrences from "./mockData/mockExistingOccurrences";
 import Website from "../common/model/Website";
 import browserApi from "../shared/browserApi";
 import { cachedCall } from "./cache";
+import TermOccurrence, {
+  TermOccurrenceData,
+  CONTEXT as OCCURRENCE_CONTEXT,
+} from "../common/model/TermOccurrence";
 
 // TODO: remove all Promise.resolve() statements and uncomment real back-end calls when ready
 // TODO (optional): use fetch-mock or similar library to mock api server responses, will likely be needed to testing
@@ -34,7 +38,6 @@ export const loadVocabularies = cachedCall("vocabularies", async () => {
         : [];
     })
     .then((data: VocabularyData[]) => {
-
       return data.map((v) => new Vocabulary(v));
     });
 
@@ -91,8 +94,12 @@ export function runPageAnnotationAnalysis(
   );
 }
 
-export function savePageAnnotationResults(pageAnnotationAnalysisResult: any) {
+export async function savePageAnnotationResults(
+  pageAnnotationAnalysisResult: any,
+  website: Website
+) {
   // TODO: persist this to a new endpoint
+  await createTermOccurrence(website);
   return Promise.resolve();
 }
 
@@ -123,24 +130,47 @@ export async function createWebsiteInDocument(url: string, documentIri: IRI) {
   return website;
 }
 
-export async function getExistingWebsite(url: string) {
-  // TODO: create endpoint
-  // const website =  await termitApi.get(`/resources/websites`, { url });
-  // TODO: add caching
-  let website: Website | null = null;
-
-  if (url === "http://www.lubina.cz/historie/14/geologie-flora") {
-    website = {
-      url,
-      document: "http://onto.fel.cvut.cz/ontologies/slovnik/023/document",
-    };
+export async function getExistingWebsite(
+  url: string,
+  vocabularies: Vocabulary[]
+): Promise<{ website: Website; vocabulary: Vocabulary } | null> {
+  // TODO: this doesn't do any back-end work as of now, check if this is ok?
+  const foundVocabulary = vocabularies.find((vocab) => {
+    return vocab.document?.websites.find((website) => website.url === url);
+  });
+  if (!foundVocabulary) {
+    return null;
   }
-  return website;
+  const foundWebsite = foundVocabulary.document?.websites.find(
+    (website) => website.url === url
+  );
+
+  return Promise.resolve({
+    website: foundWebsite!,
+    vocabulary: foundVocabulary,
+  });
 }
 
-export async function getWebsitesTermOccurrences(website: Website) {
+export async function getWebsiteTermOccurrences(website: Website) {
   // TODO: add endpoint
   const map = {};
+  const websiteIRI: IRI = VocabularyUtils.create(website.iri);
+  const existingOccurrences = await termitApi
+    .get(
+      `/occurrence/resources/${websiteIRI.fragment}?namespace=${websiteIRI.namespace}`,
+      params({ namespace: websiteIRI.namespace })
+    )
+    .then((data: object[]) =>
+      data.length !== 0
+        ? JsonLdUtils.compactAndResolveReferencesAsArray<TermOccurrenceData>(
+            data,
+            OCCURRENCE_CONTEXT
+          )
+        : []
+    )
+    .then((data: TermOccurrenceData[]) =>
+      data.map((d) => new TermOccurrence(d))
+    );
 
   mockExistingOccurrences.forEach(({ termOccurrence, term }) => {
     termOccurrence.term = term;
@@ -158,7 +188,6 @@ export async function getWebsitesTermOccurrences(website: Website) {
     });
   });
 
-  console.log("transformed result: ", result);
   return Promise.resolve(result);
 }
 
@@ -241,7 +270,18 @@ export function createTerm(term: Term, vocabularyIri: IRI) {
   );
 }
 
-export async function createTermOccurrence(term: Term, vocabularyIri: IRI) {
+export async function createTermOccurrence(website: Website, term?: Term) {
+  const websiteIRI: IRI = VocabularyUtils.create(website.iri);
+
+  return termitApi.post(
+    `/occurrence`,
+    params({
+      namespace: websiteIRI.namespace,
+      websiteFragment: websiteIRI.fragment,
+      // TODO:
+      // termFragment: term ? VocabularyUtils.create(term.iri).fragment : null,
+    }).contentType(Constants.JSON_MIME_TYPE)
+  );
   // TODO
   // const url = resolveTermCreationUrl(term, vocabularyIri);
   // const data = Object.assign(term.toJsonLd(), {
@@ -288,6 +328,6 @@ export default {
   savePageAnnotationResults,
   createWebsiteInDocument,
   getExistingWebsite,
-  getWebsitesTermOccurrences,
+  getWebsiteTermOccurrences,
   loadIdentifier,
 };

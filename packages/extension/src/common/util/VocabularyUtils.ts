@@ -109,6 +109,7 @@ const VocabularyUtils = {
   HAS_COUNT: _NS_TERMIT + "has-count",
   PREFIX_RDFS: _NS_RDFS,
   RDF_TYPE: _NS_RDF + "type",
+  RDF_VALUE: _NS_RDF + "value",
   RDFS_LABEL: _NS_RDFS + "label",
   RDFS_COMMENT: _NS_RDFS + "comment",
   RDFS_RESOURCE: _NS_RDFS + "Resource",

@@ -143,6 +143,8 @@ export function paramsSerializer(paramData: {} | undefined) {
   let options = "";
 
   keys.forEach((key) => {
+    console.log('key:, ', key);
+    console.log('paramData: ', paramData);
     const isParamTypeObject = typeof paramData[key] === "object";
     const isParamTypeArray = isParamTypeObject && paramData[key].length >= 0;
     if (!paramData[key]) {
@@ -284,7 +286,7 @@ export class Ajax {
   /**
    * Gets response from the server and returns its content.
    */
-  public get(
+public get(
     path: string,
     config: RequestConfigBuilder = new RequestConfigBuilder()
   ) {

@@ -17,6 +17,15 @@ const textQuoteSelectorCtx = {
   suffix: VocabularyUtils.NS_TERMIT + "má-suffix-text-quote",
 };
 
+const textPositionSelectorCtx = {
+  start: VocabularyUtils.NS_TERMIT + "má-startovní-pozici",
+  end: VocabularyUtils.NS_TERMIT + "má-koncovou-pozici",
+};
+
+const cssSelectorCtx = {
+  value: VocabularyUtils.RDF_VALUE,
+};
+
 /**
  * Context of the assignment itself, without term or resource context.
  */
@@ -31,7 +40,9 @@ export const CONTEXT = Object.assign(
   {},
   ASSIGNMENT_CONTEXT,
   ctx,
-  textQuoteSelectorCtx
+  textQuoteSelectorCtx,
+  textPositionSelectorCtx,
+  cssSelectorCtx
 );
 
 export interface Selector {
@@ -45,8 +56,17 @@ export interface TextQuoteSelector extends Selector {
   suffix?: string;
 }
 
+export interface TextPositionSelector extends Selector {
+  start: number;
+  end: number;
+}
+
+export interface CssSelector extends Selector {
+  value: number;
+}
+
 export interface OccurrenceTarget extends Target {
-  selectors: TextQuoteSelector[] | TextQuoteSelector;
+  selectors: Selector[];
 }
 
 export interface TermOccurrenceData extends TermAssignmentData {
