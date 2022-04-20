@@ -64,6 +64,7 @@ export const globalActions = {
     // TODO: make this call only once (not from inside of sidebar)
 
     await annotator!.annotatePage(vocabulary, result);
+  
     contentState.annotations = annotator!.getAnnotations();
     contentState.website = await api.createWebsiteInDocument(
       document.URL,
@@ -71,38 +72,37 @@ export const globalActions = {
     );
     contentState.vocabulary.document?.websites.push(contentState.website);
     // update cahce
+    await api.savePageAnnotationResults(result, contentState.website);
     await browserApi.storageSet("vocabularies", contentState.vocabularies);
-    await api.savePageAnnotationResults(result);
     contentState.hasBeenAnnotated = true;
 
     // this makes sure to re-render sidebar on data update
     sidebar!.render();
+    console.log('finished annotate new website')
   },
   async attemptAnnotatingExistingWebsite() {
-    const website: Website | null = await api.getExistingWebsite(document.URL);
+    const foundExistingWebsite = await api.getExistingWebsite(
+      document.URL,
+      contentState.vocabularies
+    );
 
-    if (!website) {
+    if (!foundExistingWebsite) {
       // website hasn't been annotated yet, wait for explicit user action
       return;
     }
 
-    contentState.vocabularies = await api.loadVocabularies();
+    const { website, vocabulary } = foundExistingWebsite;
     // TODO: how to handle multiple vocabularies? schema adjustments, state adjustments
-    const foundVocabulary = contentState.vocabularies.find(
-      (vocab) => vocab.document?.iri === (website as Website).owner?.iri
-    );
-    if (!foundVocabulary) {
-      throw new Error("Matching vocabulary of an existing website not found!");
-    }
+   
     contentState.terms = await api.loadAllTerms(
-      VocabularyUtils.create(foundVocabulary.iri)
+      VocabularyUtils.create(vocabulary.iri)
     );
-    const result = await api.getWebsitesTermOccurrences(website);
-    await annotator!.annotatePage(foundVocabulary, result);
+    const result = await api.getWebsiteTermOccurrences(website);
+    await annotator!.annotatePage(vocabulary, result);
     contentState.annotations = annotator!.getAnnotations();
-    contentState.vocabulary = foundVocabulary;
+    contentState.vocabulary = vocabulary;
     contentState.hasBeenAnnotated = true;
-    contentState.annotations = annotator!.getAnnotations();
+    contentState.website = website;
 
     // TODO: fix bug where this opens on the wrong side
     setTimeout(() => {
@@ -122,7 +122,7 @@ export const globalActions = {
     // TODO: maybe the annotace service needs to be run again to help out with that?
     await api.createTermOccurrence(
       term,
-      VocabularyUtils.create(contentState.vocabulary!.iri)
+      contentState.website!
     );
 
     sidebar?.render();
@@ -199,11 +199,10 @@ window.addEventListener("load", async () => {
   overlay.init();
   preloadContentStyles();
   initSidebar();
-
-  // TODO:
-  // globalActions.attemptAnnotatingExistingWebsite();
-
   annotator = new Annotator(document.body, contentState);
+
+
+  await globalActions.attemptAnnotatingExistingWebsite();
 });
 
 function initSidebar() {
