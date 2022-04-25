@@ -1,4 +1,3 @@
-import { constants } from "buffer";
 import Term, { TermData, CONTEXT as TERM_CONTEXT } from "../common/model/Term";
 import Vocabulary, {
   CONTEXT as VOCABULARY_CONTEXT,
@@ -11,9 +10,7 @@ import Utils from "../common/util/Utils";
 import VocabularyUtils, { IRI } from "../common/util/VocabularyUtils";
 import mockTypes from "./mockData/mockTypes";
 import Constants from "../common/util/Constants";
-import mockExistingOccurrences from "./mockData/mockExistingOccurrences";
 import Website from "../common/model/Website";
-import browserApi from "../shared/browserApi";
 import { cachedCall } from "./cache";
 import TermOccurrence, {
   TermOccurrenceData,
@@ -22,6 +19,9 @@ import TermOccurrence, {
   TextQuoteSelector,
   TextPositionSelector,
 } from "../common/model/TermOccurrence";
+import SecurityUtils from "../common/util/SecurityUtils";
+import BrowserApi from "../shared/BrowserApi";
+import User, { UserData } from "../common/model/User";
 
 // TODO: remove all Promise.resolve() statements and uncomment real back-end calls when ready
 // TODO (optional): use fetch-mock or similar library to mock api server responses, will likely be needed to testing
@@ -56,24 +56,21 @@ export function loadAllTerms(
     namespace: vocabularyIri.namespace,
   });
 
-  return (
-    termitApi
-      .get(`/vocabularies/${vocabularyIri.fragment}/terms`, parameters)
-      // return Promise.resolve(mockTerms2)
-      .then((data: object[]) =>
-        data.length !== 0
-          ? JsonLdUtils.compactAndResolveReferencesAsArray<TermData>(
-              data,
-              TERM_CONTEXT
-            )
-          : []
-      )
-      .then((data: TermData[]) => {
-        const terms: { [key: string]: Term } = {};
-        data.forEach((d) => (terms[d.iri!] = new Term(d)));
-        return terms;
-      })
-  );
+  return termitApi
+    .get(`/vocabularies/${vocabularyIri.fragment}/terms`, parameters)
+    .then((data: object[]) =>
+      data.length !== 0
+        ? JsonLdUtils.compactAndResolveReferencesAsArray<TermData>(
+            data,
+            TERM_CONTEXT
+          )
+        : []
+    )
+    .then((data: TermData[]) => {
+      const terms: { [key: string]: Term } = {};
+      data.forEach((d) => (terms[d.iri!] = new Term(d)));
+      return terms;
+    });
 }
 
 export function runPageAnnotationAnalysis(
@@ -97,11 +94,27 @@ export function runPageAnnotationAnalysis(
 
 export async function savePageAnnotationResults(
   termOccurrences: TermOccurrence[],
-  website: Website
+  website: Website,
+  vocabularyIri: string
 ) {
   // TODO: persist this to a new endpoint
   if (termOccurrences.length > 0) {
-    await Promise.all(termOccurrences.map(termOccurrence => createTermOccurrence(termOccurrence, website)));
+    const results = await Promise.all(
+      termOccurrences.map((termOccurrence) =>
+        createTermOccurrence(
+          termOccurrence,
+          website,
+          VocabularyUtils.SUGGESTED_TERM_OCCURRENCE,
+          vocabularyIri
+        )
+      )
+    );
+
+    // make sure termOccurrences have iris
+    termOccurrences.forEach((termOccurrence, i) => {
+      console.log("@id: ", results[i]["@id"]);
+      termOccurrence.iri = results[i]["@id"];
+    });
   }
   return Promise.resolve();
 }
@@ -287,9 +300,26 @@ export function createTerm(term: Term, vocabularyIri: IRI) {
   );
 }
 
+export async function approveTermOccurrence(termOccurrence: TermOccurrence) {
+  const termIRI = VocabularyUtils.create(termOccurrence.term!.iri!);
+  const termOccurrenceIRI = VocabularyUtils.create(termOccurrence.iri!);
+
+  return termitApi.put(
+    `/occurrence/${termOccurrenceIRI.fragment}`,
+    params({
+      namespace: termIRI.namespace,
+      termFragment: termIRI.fragment,
+      // TODO:
+      // termFragment: term ? VocabularyUtils.create(term.iri).fragment : null,
+    })
+  );
+}
+
 export async function createTermOccurrence(
   termOccurrence: TermOccurrence,
-  website: Website
+  website: Website,
+  occurrenceType: string,
+  vocabularyIri: string
 ) {
   const websiteIRI: IRI = VocabularyUtils.create(website.iri);
   const cssSelector = termOccurrence.target.selectors.find((selector) =>
@@ -308,13 +338,16 @@ export async function createTermOccurrence(
     params({
       namespace: websiteIRI.namespace,
       websiteFragment: websiteIRI.fragment,
+      contextIri: vocabularyIri,
       // TODO:
-      // termFragment: term ? VocabularyUtils.create(term.iri).fragment : null,
+      // termIdFragment: term ? VocabularyUtils.create(term.iri).fragment : null,
     })
       .content({
         exactMatch: textQuoteSelector.exactMatch,
         selector: cssSelector.value,
         start: textPositionSelector.start,
+        extraTypes: [occurrenceType],
+        id: termOccurrence.id,
       })
       // TODO: add back in
       // .content(termOccurrence.toJsonLd())
@@ -352,6 +385,16 @@ export function loadIdentifier<T extends { name: string; assetType: string }>(
   return termitApi.post(`/identifiers`, params(parameters));
 }
 
+export async function getUser() {
+  const userData: UserData = await BrowserApi.storage.get(Constants.STORAGE.USER);
+  console.log('got user data: ', userData);
+  if (!userData) {
+    return null;
+  }
+
+  return new User(userData);
+}
+
 export default {
   loadVocabularies,
   runPageAnnotationAnalysis,
@@ -368,4 +411,6 @@ export default {
   getExistingWebsite,
   getWebsiteTermOccurrences,
   loadIdentifier,
+  approveTermOccurrence,
+  getUser,
 };

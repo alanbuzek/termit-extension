@@ -84,6 +84,7 @@ export interface OccurrenceTarget extends Target {
 export interface TermOccurrenceData extends TermAssignmentData {
   target: OccurrenceTarget;
   score?: number;
+  id?: string;
 }
 
 export const createTermOccurrences = (
@@ -112,10 +113,12 @@ export const createTermOccurrences = (
         } = termOccurrence;
 
         const termOccurrenceData = {
-          iri: VocabularyUtils.WEBSITE_TERM_OCCURRENCE + `/${about}`,
+          id: about,
+          // iri: VocabularyUtils.WEBSITE_TERM_OCCURRENCE + `/${about}`,
           types: [
             VocabularyUtils.TERM_OCCURRENCE,
             VocabularyUtils.WEBSITE_TERM_OCCURRENCE,
+            VocabularyUtils.SUGGESTED_TERM_OCCURRENCE,
           ],
           score,
           term: resource ? terms[resource] : undefined,
@@ -171,6 +174,7 @@ const example = {
     types: [
       VocabularyUtils.TERM_OCCURRENCE_TARGET,
       VocabularyUtils.WEBSITE_OCCURRENCE_TARGET,
+      VocabularyUtils.SUGGESTED_TERM_OCCURRENCE,
     ],
     selectors: [
       {
@@ -205,14 +209,15 @@ const example = {
 
 export default class TermOccurrence extends TermAssignment {
   public target: OccurrenceTarget;
-  public score?: number;
+  public id?: string;
+  // public score?: number;
 
   constructor(data: TermOccurrenceData) {
     super(data);
     this.target = data.target;
     this.target.selectors = Utils.sanitizeArray(this.target.selectors);
-    if (typeof data.score === "number") {
-      this.score = data.score;
+    if (data.id){
+      this.id = data.description;
     }
   }
 

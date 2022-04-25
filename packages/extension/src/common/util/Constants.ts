@@ -81,7 +81,7 @@ const constants = {
     LOCATION: "location",
     X_TOTAL_COUNT: "x-total-count",
   },
-  STORAGE_JWT_KEY: "",
+  STORAGE_JWT_KEY: "STORAGE_JWT_KEY",
   STORAGE_LANG_KEY: "",
   STORAGE_TABLE_PAGE_SIZE_KEY: "",
   STORAGE_ANNOTATOR_LEGEND_OPEN_KEY: "",
@@ -104,6 +104,9 @@ const constants = {
   EMPTY_ASSET_IRI: "http://empty",
   LAST_COMMENTED_ASSET_LIMIT: 5,
   ANNOTATOR_TUTORIAL: {},
+  STORAGE: {
+    USER: "USER"
+  }
 };
 
 constants.ANNOTATOR_TUTORIAL[constants.LANG.CS.locale] =

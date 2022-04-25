@@ -92,7 +92,7 @@ export class Annotation {
 
   public getTermCreatorState() {
     // TODO: this check may later not work with existing terms
-    if (typeof this.termOccurrence.score === 'number') {
+    if (this.termOccurrence.isSuggested()) {
       return AnnotationOriginClass.PROPOSED;
     }
     return AnnotationOriginClass.SELECTED;
@@ -108,7 +108,7 @@ export class Annotation {
   public focusAnnotation() {
     this.element?.scrollIntoView({ block: "center", inline: "nearest" });
     this.element?.classList.add("annotation-focused");
-    this.element?.click();
+    // this.element?.click();
     setTimeout(() => {
       this.element?.classList.remove("annotation-focused");
     }, 4000);
@@ -137,10 +137,11 @@ export class Annotation {
 
   public assignTerm(term: Term, isTermOccurrence: boolean) {
     this.term = term;
-    this.termOccurrence.typeof = isTermOccurrence
-      ? AnnotationType.OCCURRENCE
-      : AnnotationType.DEFINITION;
-    delete this.termOccurrence.score;
+    this.termOccurrence.term = term;
+    if (!isTermOccurrence){
+      this.termOccurrence.types.push(VocabularyUtils.DEFINITIONAL_OCCURRENCE);
+    }
+    // delete this.termOccurrence.score;
     this.updateAppearance();
   }
 

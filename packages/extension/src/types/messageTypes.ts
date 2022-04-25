@@ -1,9 +1,12 @@
 export enum MessageType {
   GetPageAnnotationsAnalysis,
   SaveAnnotaionResult,
-  OpenToolbar
+  OpenToolbar,
+  LoginEvent,
 }
 
 export default {
   MessageType,
 };
+
+

@@ -1,6 +1,7 @@
 import Constants, { getEnv } from "./Constants";
 import SecurityUtils from "./SecurityUtils";
 import _ from "lodash";
+import BrowserApi from "../../shared/BrowserApi";
 
 class RequestConfigBuilder {
   private mContent?: any;
@@ -163,18 +164,22 @@ export function paramsSerializer(paramData: {} | undefined) {
   return options ? `?${options.slice(0, -1)}` : options;
 }
 
-const callFetch = (baseURL: string, path: string, config) => {
+const callFetch = async (baseURL: string, path: string, config) => {
   // pre-request interceptor
-  config.headers[Constants.Headers.AUTHORIZATION] = SecurityUtils.loadToken();
-  if (['GET', 'HEAD'].includes(config.method) && config.body){
-    console.warn('Fetch request includes body in a get/head requested, deleting:: ', config.body);
-    delete config.body
-  } 
+  config.headers[Constants.Headers.AUTHORIZATION] = await SecurityUtils.loadToken();
+  if (["GET", "HEAD"].includes(config.method) && config.body) {
+    console.warn(
+      "Fetch request includes body in a get/head requested, deleting:: ",
+      config.body
+    );
+    delete config.body;
+  }
   return fetch(`${baseURL}${path}`, config).then((response: Response) => {
     // TODO: add validate get status
     if (!response.ok) {
       if (response.status === Constants.STATUS_UNAUTHORIZED) {
         SecurityUtils.clearToken();
+        BrowserApi.storage.remove(Constants.STORAGE.USER);
         // TODO: how to handle unauthorized?
         console.log("user unauthorized!");
       }

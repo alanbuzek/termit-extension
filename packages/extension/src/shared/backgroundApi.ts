@@ -1,5 +1,5 @@
-import { MessageType } from "../types";
-import browserApi from "./browserApi";
+import { MessageType } from "../types/messageTypes";
+import browserApi from "./BrowserApi";
 
 // TODO: probably no longer needed
 const getPageAnnotations = async (vocabulary: string, pageHtml: string) => {

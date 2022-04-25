@@ -1,45 +1,55 @@
-// promisified browser api calls
-const sendMessage = (payload) => {
-  return new Promise((resolve, reject) => {
-    chrome.runtime.sendMessage(payload, async (response) => {
-      const { data, error } = response;
-
-      if (error) {
-        reject("There was an error sending this message: " + error);
+const promisify = (functionCall) => (payload) =>
+  new Promise((resolve, reject) => {
+    functionCall(payload, (response) => {
+      if (response?.error || chrome.runtime.lastError) {
+        reject(response?.error || chrome.runtime.lastError);
         return;
       }
-
-      resolve(data);
+      resolve(response);
     });
   });
-};
 
-const storageSet = (key: string, value: any) => {
-  return new Promise((resolve) => {
-    chrome.storage.local.remove(key, () => {
-      chrome.storage.local.set({ [key]: value }, function () {
-        console.log(
-          "runtime.lastError (local.set): ",
-          chrome.runtime.lastError
-        );
-        resolve(null);
+// promisified and contained browser api
+const BrowserApi = {
+  // promisified browser api calls
+  sendMessage(payload) {
+    // TODO: abstract promisify
+    return new Promise((resolve, reject) => {
+      chrome.runtime.sendMessage(payload, async (response) => {
+        const { data, error } = response;
+
+        if (error) {
+          reject("There was an error sending this message: " + error);
+          return;
+        }
+
+        resolve(data);
       });
     });
-  });
+  },
+  storage: {
+    set(key: string, value: any) {
+      return new Promise((resolve) => {
+        console.log('setting: ', { [key]: value })
+        chrome.storage.local.set({ [key]: value }, function () {
+          resolve(null);
+        });
+      });
+    },
+    get(key: string, defaultValue?: any): Promise<any> {
+      return new Promise((resolve) => {
+        console.log('getting: ', [key])
+        chrome.storage.local.get([key], (result) => {
+          console.log("OUTSIDE got name: ", result[key]);
+          resolve(result[key]);
+        });
+
+      });
+    },
+    remove(key: string) {
+      return chrome.storage.local.remove(key);
+    },
+  },
 };
 
-const storageGet = (key: string) => {
-  return new Promise((resolve) => {
-    chrome.storage.local.get([key], function (result) {
-      console.log("runtime.lastError (local.get): ", chrome.runtime.lastError);
-      console.log("got result: ", result);
-      resolve(result[key]);
-    });
-  });
-};
-
-export default {
-  sendMessage,
-  storageSet,
-  storageGet,
-};
+export default BrowserApi;

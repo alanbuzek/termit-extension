@@ -59,6 +59,7 @@ const getTypesForSelector = _.memoize(
 export class TermTypesEdit extends React.Component<TermTypesEditProps> {
   state = { availableTypes: null };
   public async componentDidMount() {
+    // TODO: move this api load?
     const types = await api.loadTypes();
     this.setState({ availableTypes: types });
   }

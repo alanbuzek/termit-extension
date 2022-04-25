@@ -14,10 +14,12 @@ import Term from "../common/model/Term";
 import { occurrenceFromRange, markTerms } from "./marker";
 import backgroundApi from "../shared/backgroundApi";
 import Website from "../common/model/Website";
-import browserApi from "../shared/browserApi";
+import browserApi from "../shared/BrowserApi";
 import TermOccurrence, {
   createTermOccurrences,
 } from "../common/model/TermOccurrence";
+import BrowserApi from "../shared/BrowserApi";
+import User from "../common/model/User";
 
 // global important classes
 let sidebar: Sidebar | null = null;
@@ -34,6 +36,7 @@ export type ContentState = {
   // local state data
   hasBeenAnnotated: boolean;
   vocabularies: Vocabulary[];
+  user: User | null;
 };
 
 const contentState: ContentState = {
@@ -43,6 +46,7 @@ const contentState: ContentState = {
   website: null,
   hasBeenAnnotated: false,
   vocabularies: [],
+  user: null,
 };
 
 // TODO: on some of these actions, sidebar (or event annotator) will need to be updated to show the most up to date data (e.g., rerender the whole tree through reactDOM, roll out redux, or solve in another way, to be determined)
@@ -63,11 +67,11 @@ export const globalActions = {
       vocabulary.iri,
       document.body.outerHTML
     );
-    console.log('finished getPageANnotaitons: ', textAnalysisResult);
+    console.log("finished getPageANnotaitons: ", textAnalysisResult);
     const vocabularyTerms = await api.loadAllTerms(
       VocabularyUtils.create(vocabulary.iri)
     );
-    console.log('finished loading terms');
+    console.log("finished loading terms");
     contentState.terms = vocabularyTerms;
     contentState.vocabulary = vocabulary;
     // TODO: make this call only once (not from inside of sidebar)
@@ -83,8 +87,12 @@ export const globalActions = {
 
     contentState.vocabulary.document?.websites.push(contentState.website);
     // update cahce
-    await api.savePageAnnotationResults(termOccurrencesGrouped.flatMap(occGroup => occGroup), contentState.website);
-    await browserApi.storageSet("vocabularies", contentState.vocabularies);
+    await api.savePageAnnotationResults(
+      termOccurrencesGrouped.flatMap((occGroup) => occGroup),
+      contentState.website,
+      vocabulary.iri
+    );
+    await BrowserApi.storage.set("vocabularies", contentState.vocabularies);
     contentState.hasBeenAnnotated = true;
 
     // this makes sure to re-render sidebar on data update
@@ -131,8 +139,9 @@ export const globalActions = {
     annotator!.hidePopup();
     // await api.updateTermOccurrence(annotation);
     // TODO: maybe the annotace service needs to be run again to help out with that?
-    await api.createTermOccurrence(contentState.website!, term);
+    // await api.createTermOccurrence(contentState.website!, term);
 
+    api.approveTermOccurrence(annotation.termOccurrence);
     sidebar?.render();
   },
   async assignTermToSuggestedDefinitionOccurrence(
@@ -202,6 +211,11 @@ export const globalActions = {
 };
 
 window.addEventListener("load", async () => {
+  contentState.user = await api.getUser();
+
+  if (!contentState.user){
+    return;
+  }
   contentState.vocabularies = await api.loadVocabularies();
 
   overlay.init();

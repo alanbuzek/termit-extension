@@ -2,7 +2,7 @@ import Vocabulary from '../../common/model/Vocabulary';
 
 import { sendErrorsTo } from "../../shared/frame-error-capture";
 import { ListenerCollection } from "../../shared/listener-collection";
-import { MessageType } from "../../types";
+import { MessageType } from "../../types/messageTypes";
 import { createShadowRoot } from "./ContentPopupContainer";
 import SidebarContainer from "../components/SidebarContainer";
 import { ToolbarController } from "./toolbar";
