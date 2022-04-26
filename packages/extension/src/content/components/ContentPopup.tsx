@@ -10,9 +10,10 @@ import {
   Annotation,
   AnnotationTypeClass,
   AnnotationOriginClass,
+  AnnotationType,
 } from "../../common/util/Annotation";
 import { overlay } from "../helper/overlay";
-import { ContentState, globalActions } from "..";
+import { ContentState, ContentActions } from "..";
 import Term from "../../common/model/Term";
 import VocabularyUtils, { IRI } from "../../common/util/VocabularyUtils";
 
@@ -102,7 +103,7 @@ function ContentPopup({
             // TODO: handle fallback when no vocabulary is selected
             vocabularyIri={vocabularyIri}
             createTerm={(term: Term) => {
-              return globalActions.createTerm(term, vocabularyIri, annotation);
+              return ContentActions.createTerm(term, vocabularyIri, annotation);
             }}
             i18n={() => ""}
             formatMessag={() => Promise.resolve()}
@@ -117,11 +118,11 @@ function ContentPopup({
         return (
           <HighlightedTextAdder
             onMarkOccurrence={() => {
-              globalActions.createUnknownTermOccurrence(selectionRange);
+              ContentActions.createUnknownOccurrenceFromRange(selectionRange, AnnotationType.OCCURRENCE);
               setCurrPopup(PopupType.TermOccurrence);
             }}
             onMarkDefinition={() => {
-              globalActions.createUnknownDefinitionOccurrence(selectionRange);
+              ContentActions.createUnknownOccurrenceFromRange(selectionRange, AnnotationType.DEFINITION);
               setCurrPopup(PopupType.TermDefinition);
             }}
           />
@@ -130,10 +131,10 @@ function ContentPopup({
         return (
           <TermOccurrenceAnnotation
             term={annotation?.term}
-            score={`${annotation?.termOccurrence.score}`}
-            text={
-              annotation?.termOccurrence.content || selectionRange?.toString()
-            }
+            // TODO: is this needed?
+            // text={
+            //   annotation?.termOccurrence.content || selectionRange?.toString()
+            // }
             // TODO: tweak these defaults
             annotationClass={
               annotation?.getTermState() || AnnotationTypeClass.SUGGESTED_OCCURRENCE
@@ -144,11 +145,11 @@ function ContentPopup({
             // TODO: do we need is open? or will that be fully managed by the above layer (more likely)
             isOpen={true}
             onRemove={() => {
-              globalActions.removeOccurrence(annotation);
               closePopup();
+              return ContentActions.removeOccurrence(annotation);
             }}
             onSelectTerm={(term: Term) =>
-              globalActions.assignTermToSuggestedTermOccurrence(term, annotation)
+              ContentActions.assignTermToSuggestedOccurrence(term, annotation, AnnotationType.OCCURRENCE)
             }
             onCreateTerm={() => {
               showAt(0, 0, true);
@@ -164,15 +165,15 @@ function ContentPopup({
           <TermDefinitionAnnotation
             term={annotation?.term}
             text={
-              annotation?.termOccurrence.content || selectionRange.toString()
+              annotation.termOccurrence.getTextContent() || selectionRange.toString()
             }
             isOpen={true}
             onRemove={() => {
               closePopup();
-              return globalActions.removeOccurrence(annotation);
+              return ContentActions.removeOccurrence(annotation);
             }}
             onSelectTerm={(term: Term) => {
-              return globalActions.assignTermToSuggestedDefinitionOccurrence(term, annotation)
+              return ContentActions.assignTermToSuggestedOccurrence(term, annotation, AnnotationType.DEFINITION)
             }}
             onToggleDetailOpen={() => 0}
             onClose={closePopup}

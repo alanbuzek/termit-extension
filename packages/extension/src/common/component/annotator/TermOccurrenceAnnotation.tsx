@@ -21,7 +21,7 @@ interface TermOccurrenceAnnotationProps {
   annotationOrigin: string;
   isOpen: boolean;
   onRemove: () => void;
-  onSelectTerm: (term: Term | null) => void;
+  onSelectTerm: (term: Term) => void;
   onCreateTerm: () => void;
   onToggleDetailOpen: () => void;
   onClose: () => void;
@@ -114,14 +114,13 @@ export const TermOccurrenceAnnotation: React.FC<TermOccurrenceAnnotationProps> =
         onCreateTerm={props.onCreateTerm}
         i18n={i18n}
         vocabulary={props.contentState.vocabulary!}
-        terms={props.contentState.terms}
+        terms={props.contentState.terms!}
         canCreateTerm
         selectVocabularyTerm={(v) => console.log('vocabulary term selected: ', v)}
       />
     ) : (
       <TermOccurrenceAnnotationView
         term={term}
-        score={props.score}
         resource={props.resource}
         annotationClass={props.annotationClass}
       />

@@ -1,7 +1,12 @@
 import { getCssSelector } from "css-selector-generator";
-import { globalActions } from "..";
+import { ContentActions } from '..';
 import { getPropertyForAnnotationType } from "../../common/component/annotator/AnnotationDomHelper";
-import TermOccurrence, { CssSelector, TextPositionSelector, TextQuoteSelector } from "../../common/model/TermOccurrence";
+import TermOccurrence, {
+  createTermOccurrences,
+  CssSelector,
+  TextPositionSelector,
+  TextQuoteSelector,
+} from "../../common/model/TermOccurrence";
 import {
   Annotation,
   AnnotationStatus,
@@ -21,7 +26,7 @@ const classesMap = {
 };
 
 const handleElementClick = (annotation) => () => {
-  globalActions.showPopup(annotation);
+  ContentActions.showPopup(annotation);
 };
 
 const results = {
@@ -45,16 +50,8 @@ export const markTerms = (
   termOccurrencesGroup: TermOccurrence[],
   termsMap
 ): Promise<Annotation[]> => {
-  console.log('termOccurrencesGroup: ', termOccurrencesGroup);
-  const cssSelector = termOccurrencesGroup[0].target.selectors.find(
-    (selector) => selector.types.includes(VocabularyUtils.CSS_SELECTOR)
-  ) as CssSelector;
-  const textQuoteSelector = termOccurrencesGroup[0].target.selectors.find(
-    (selector) => selector.types.includes(VocabularyUtils.TEXT_QUOTE_SELECTOR)
-  ) as TextQuoteSelector;
-  const textPositionSelector = termOccurrencesGroup[0].target.selectors.find(
-    (selector) => selector.types.includes(VocabularyUtils.TEXT_POSITION_SELECTOR)
-  ) as TextPositionSelector;
+  console.log("termOccurrencesGroup: ", termOccurrencesGroup);
+  const cssSelector = termOccurrencesGroup[0].getCssSelector()
 
   return new Promise((resolve, reject) => {
     const selectedElements = Array.from(
@@ -89,9 +86,30 @@ export const markTerms = (
         termOccurrence,
         termOccurrence.term?.iri && termsMap[termOccurrence.term.iri]
       );
+      const textPositionSelector = termOccurrence.getTextPositionSelector()
+      const textQuoteSelector = termOccurrence.getTextQuoteSelector()
 
+      
       markInstance.mark(textQuoteSelector.exactMatch, {
+        // NOTE: partially is safer, as we may not have an exhaustive list of limiters, and since we know the exact position
+        // of the word, there's no reason not to use it (even though it might not be used very often)
         accuracy: "partially",
+        // accuracy: {
+        //   value: 'exactly',
+        //   limiters: [
+        //     ',',
+        //     '.',
+        //     ':',
+        //     ';',
+        //     "'",
+        //     '"',
+        //     '?',
+        //     '!',
+        //     ')',
+        //     '(',
+        //     '-',
+        //   ],
+        // },
         filter(node, term, offestInCurrentNode) {
           let calculatedOffset = node.textContent.slice(0, offestInCurrentNode);
           let currNode = node;
@@ -149,7 +167,12 @@ export const markTerms = (
 };
 
 // TODO: move this to some sort of a Utils file?
-export const occurrenceFromRange = (range, annotationType) => {
+export const occurrenceFromRange = (
+  range,
+  annotationType,
+  websiteIri,
+  termsMap
+) => {
   let parentElement = range.startContainer;
   if (!parentElement) {
     throw new Error("No parent element to create annotation!");
@@ -188,8 +211,16 @@ export const occurrenceFromRange = (range, annotationType) => {
     startOffset: parentElement.textContent.slice(0, startOffsetIdx),
     // typeof: "ddo:výskyt-termu",
     typeof: annotationType,
+    score: 1
   };
   newTerm.cssSelectors.push(generatedCssSelector);
   newTerm.termOccurrences.push(termOccurrence);
-  return newTerm;
+  const [termOccurrenceResult] = createTermOccurrences(
+    [newTerm],
+    websiteIri,
+    termsMap,
+  );
+  console.log('inner termOccurrenceResult: ', termOccurrenceResult)
+
+  return termOccurrenceResult[0];
 };

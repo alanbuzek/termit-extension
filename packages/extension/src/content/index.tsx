@@ -3,18 +3,13 @@ import { Sidebar } from "./hypothesis/Sidebar";
 import Vocabulary from "../common/model/Vocabulary";
 import { preloadContentStyles } from "./hypothesis/helpers";
 import { overlay } from "./helper/overlay";
-import {
-  Annotation,
-  AnnotationTypeClass,
-  AnnotationType,
-} from "../common/util/Annotation";
+import { Annotation, AnnotationType } from "../common/util/Annotation";
 import api from "../api";
 import VocabularyUtils, { IRI } from "../common/util/VocabularyUtils";
 import Term from "../common/model/Term";
 import { occurrenceFromRange, markTerms } from "./marker";
 import backgroundApi from "../shared/backgroundApi";
 import Website from "../common/model/Website";
-import browserApi from "../shared/BrowserApi";
 import TermOccurrence, {
   createTermOccurrences,
 } from "../common/model/TermOccurrence";
@@ -34,7 +29,7 @@ export type ContentState = {
   terms: TermsMap | null;
   website: Website | null;
   // local state data
-  hasBeenAnnotated: boolean;
+  // hasBeenAnnotated: boolean;
   vocabularies: Vocabulary[];
   user: User | null;
 };
@@ -44,21 +39,24 @@ const contentState: ContentState = {
   vocabulary: null,
   terms: null,
   website: null,
-  hasBeenAnnotated: false,
   vocabularies: [],
   user: null,
 };
+
+// helper functions also operating on global data if needed
+const internalActions = {};
 
 // TODO: on some of these actions, sidebar (or event annotator) will need to be updated to show the most up to date data (e.g., rerender the whole tree through reactDOM, roll out redux, or solve in another way, to be determined)
 // TODO: re-evaluate how things are done with respect to annotator, maybe can move all things there instead?
 /**
  * all important global content script calls should be done here
  */
-export const globalActions = {
+export const ContentActions = {
   showPopup(annotation: Annotation) {
     annotator!.showPopup(annotation);
   },
   async annotateNewWebsite(vocabulary: Vocabulary) {
+    // TODO: dry up the 2 annotation actions code, extract into a helper, e.g. load page data...
     contentState.website = await api.createWebsiteInDocument(
       document.URL,
       VocabularyUtils.create(vocabulary.document!.iri)
@@ -67,11 +65,11 @@ export const globalActions = {
       vocabulary.iri,
       document.body.outerHTML
     );
-    console.log("finished getPageANnotaitons: ", textAnalysisResult);
+
     const vocabularyTerms = await api.loadAllTerms(
       VocabularyUtils.create(vocabulary.iri)
     );
-    console.log("finished loading terms");
+
     contentState.terms = vocabularyTerms;
     contentState.vocabulary = vocabulary;
     // TODO: make this call only once (not from inside of sidebar)
@@ -79,7 +77,8 @@ export const globalActions = {
     const termOccurrencesGrouped: TermOccurrence[][] = createTermOccurrences(
       textAnalysisResult,
       contentState.website.iri,
-      contentState.terms!
+      contentState.terms!,
+      [VocabularyUtils.SUGGESTED_TERM_OCCURRENCE],
     );
     await annotator!.annotatePage(vocabulary, termOccurrencesGrouped);
 
@@ -93,7 +92,6 @@ export const globalActions = {
       vocabulary.iri
     );
     await BrowserApi.storage.set("vocabularies", contentState.vocabularies);
-    contentState.hasBeenAnnotated = true;
 
     // this makes sure to re-render sidebar on data update
     sidebar!.render();
@@ -120,88 +118,68 @@ export const globalActions = {
     await annotator!.annotatePage(vocabulary, termOccurrencesGroups);
     contentState.annotations = annotator!.getAnnotations();
     contentState.vocabulary = vocabulary;
-    contentState.hasBeenAnnotated = true;
     contentState.website = website;
 
+    sidebar!.render();
     // TODO: fix bug where this opens on the wrong side
     setTimeout(() => {
       sidebar!.open();
     }, 200);
-
-    sidebar!.render();
   },
-  async assignTermToSuggestedTermOccurrence(
+  async assignTermToSuggestedOccurrence(
     term: Term,
-    annotation: Annotation
+    annotation: Annotation,
+    annotationType: string
   ) {
-    annotation.assignTerm(term, true);
-    // TODO: is hiding popup needed?
+    annotation.assignTerm(term, annotationType);
+    if (!annotation.termOccurrence.iri) {
+      // term occurrence doesn't exist in the back-end yet
+      await api.createTermOccurrence(
+        annotation.termOccurrence,
+        contentState.website!,
+        annotationType,
+        contentState.vocabulary!.iri
+      );
+    } else {
+      await api.updateTermOccurrence(annotation.termOccurrence);
+    }
     annotator!.hidePopup();
-    // await api.updateTermOccurrence(annotation);
-    // TODO: maybe the annotace service needs to be run again to help out with that?
-    // await api.createTermOccurrence(contentState.website!, term);
-
-    api.approveTermOccurrence(annotation.termOccurrence);
-    sidebar?.render();
-  },
-  async assignTermToSuggestedDefinitionOccurrence(
-    term: Term,
-    annotation: Annotation
-  ) {
-    console.log("term in global actions: ", term);
-    annotation.assignTerm(term, false);
-    annotator!.hidePopup();
-    await api.updateTermOccurrence(annotation);
 
     sidebar?.render();
   },
-  async createUnknownTermOccurrence(selectionRange: Range) {
-    console.log("contentState.annotations: ", contentState.annotations);
+  async createUnknownOccurrenceFromRange(
+    selectionRange: Range,
+    annotationType: string
+  ) {
     const newTermOccurrence = occurrenceFromRange(
       selectionRange,
-      AnnotationType.OCCURRENCE
-    );
-    const [newAnnotation] = await markTerms(
-      newTermOccurrence,
+      annotationType,
+      contentState.website?.iri,
       contentState.terms
     );
-    contentState.annotations!.push(newAnnotation);
-    this.showPopup(newAnnotation);
-
-    // TODO: this maybe not need to be persisted, as the user will likely create a term or assign occurrence to existing term from this unknown occurrence, but double check this to be sure
-    // TODO: if we don't persist it initially, it will make things a bit more complicated in figuring out if we need to create the term occurrence or just update it instead
-    // await api.createTermOccurrence(newAnnotation.term);
-
-    sidebar?.render();
-  },
-  async createUnknownDefinitionOccurrence(selectionRange: Range) {
-    const newDefinitionOccurrence = occurrenceFromRange(
-      selectionRange,
-      AnnotationType.DEFINITION
-    );
+    
+    console.log("new term Occurrence: ", newTermOccurrence);
     const [newAnnotation] = await markTerms(
-      newDefinitionOccurrence,
+      [newTermOccurrence],
       contentState.terms
     );
+
     contentState.annotations!.push(newAnnotation);
     this.showPopup(newAnnotation);
-
-    // TODO: this maybe not need to be persisted, as per the comment in createUnknownTermOccurrence()
-    await api.createDefinitionOccurrence(newAnnotation);
 
     sidebar?.render();
   },
   async createTerm(term: Term, vocabularyIri: IRI, annotation: Annotation) {
     await api.createTerm(term, vocabularyIri);
     contentState.terms![term.iri] = term;
-    annotation.assignTerm(term, true);
+    annotation.assignTerm(term, AnnotationType.OCCURRENCE);
     overlay.off();
     annotator?.hidePopup();
 
     sidebar?.render();
   },
   async removeOccurrence(annotation: Annotation) {
-    await api.removeOccurrence(annotation);
+    await api.removeOccurrence(annotation.termOccurrence);
     await annotation.removeOccurrence();
     const annotationIdx = contentState.annotations!.indexOf(annotation);
     contentState.annotations?.splice(annotationIdx, 1);
@@ -213,7 +191,7 @@ export const globalActions = {
 window.addEventListener("load", async () => {
   contentState.user = await api.getUser();
 
-  if (!contentState.user){
+  if (!contentState.user) {
     return;
   }
   contentState.vocabularies = await api.loadVocabularies();
@@ -223,7 +201,7 @@ window.addEventListener("load", async () => {
   initSidebar();
   annotator = new Annotator(document.body, contentState);
 
-  await globalActions.attemptAnnotatingExistingWebsite();
+  await ContentActions.attemptAnnotatingExistingWebsite();
 });
 
 function initSidebar() {
@@ -231,6 +209,6 @@ function initSidebar() {
     document.body,
     // TODO: maybe not pass the whole state inside, or restructure state such that it doesn't contain whole classes instances of Annotator and Sidebar
     contentState,
-    globalActions.annotateNewWebsite
+    ContentActions.annotateNewWebsite
   );
 }

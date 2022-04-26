@@ -35,13 +35,7 @@ const SidebarApp = ({
             onClick={() => annotation.focusAnnotation()}
           >
             <div className="mb-0 text-lg font-semibold">
-              {
-                (
-                  annotation.termOccurrence?.target.selectors.find((selector) =>
-                    selector.types.includes(VocabularyUtils.TEXT_QUOTE_SELECTOR)
-                  ) as TextQuoteSelector
-                ).exactMatch
-              }
+              {annotation.termOccurrence.getTextContent()}
             </div>
             {annotation.term && (
               <div className="flex items-center mt-1.5">

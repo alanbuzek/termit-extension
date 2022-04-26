@@ -44,5 +44,8 @@
   "permissions": ["tabs", "storage"],
   "host_permissions": [
     "*://*/*"
-  ]
+  ],
+  "externally_connectable": {
+    "matches": ["http://localhost:3000/*"]
+  }
 }

@@ -16,11 +16,12 @@ import {
 } from "../misc/treeselect/Renderers";
 import { HasI18n } from "../hoc/withI18n";
 import { useI18n } from '../hook/useI18n';
+import { TermsMap } from '../../../content';
 
 type Term = any;
 interface GlossaryTermsProps extends HasI18n {
   vocabulary?: Vocabulary;
-  terms: { [key: string]: Term };
+  terms: TermsMap;
   counter: number;
   selectVocabularyTerm: (selectedTerms: Term | null) => void;
 }
@@ -67,7 +68,7 @@ export class AnnotationTerms extends React.Component<AnnotationTermsProps> {
   }
 
   private handleChange = (term: TermData | null) => {
-    console.log('on change');
+    console.log('on change: ', term);
     if (term === null) {
       this.props.selectVocabularyTerm(term);
       this.props.onChange(null);

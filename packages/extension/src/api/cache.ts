@@ -4,7 +4,6 @@ import browserApi from "../shared/BrowserApi";
 export const SKIP_CACHE = 'SKIP_CACHE';
 
 export const cachedCall = (key, callback) => {
-  console.log("about to return from cached call", key, callback);
   return async (...args) => {
     const skipCache = args.length && args[args.length - 1] === SKIP_CACHE;
     if (!skipCache) {

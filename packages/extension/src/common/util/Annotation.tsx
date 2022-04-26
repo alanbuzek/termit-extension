@@ -1,4 +1,4 @@
-import { markTerms, unmarkTerm } from "../../content/marker";
+import { unmarkTerm } from "../../content/marker";
 import Term from "../model/Term";
 import TermOccurrence from "../model/TermOccurrence";
 import VocabularyUtils from "./VocabularyUtils";
@@ -114,11 +114,6 @@ export class Annotation {
     }, 4000);
   }
 
-  public markAnnotation() {
-    // TODO: if needed?
-    throw new Error("To be implemented");
-  }
-
   public set status(newStaus) {
     this.annotatationStatus = newStaus;
   }
@@ -135,13 +130,15 @@ export class Annotation {
     return this.element;
   }
 
-  public assignTerm(term: Term, isTermOccurrence: boolean) {
+  public assignTerm(term: Term, annotationType: string) {
     this.term = term;
     this.termOccurrence.term = term;
-    if (!isTermOccurrence){
+    if (annotationType === AnnotationType.DEFINITION){
       this.termOccurrence.types.push(VocabularyUtils.DEFINITIONAL_OCCURRENCE);
     }
     // delete this.termOccurrence.score;
+
+    this.termOccurrence.types = this.termOccurrence.types.filter(type => type !== VocabularyUtils.SUGGESTED_TERM_OCCURRENCE);
     this.updateAppearance();
   }
 

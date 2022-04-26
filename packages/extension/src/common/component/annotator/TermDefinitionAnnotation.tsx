@@ -18,7 +18,7 @@ interface TermDefinitionAnnotationProps {
   text: string;
   isOpen: boolean;
   onRemove: () => void;
-  onSelectTerm: (term: Term | null) => void;
+  onSelectTerm: (term: Term) => Promise<void>;
   onToggleDetailOpen: () => void;
   onClose: () => void;
   contentState: ContentState;

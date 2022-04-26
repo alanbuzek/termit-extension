@@ -5,7 +5,6 @@ import TermLink from '../term/TermLink';
 
 interface TermOccurrenceAnnotationViewProps {
   term?: any;
-  score?: string;
   resource?: string;
   annotationClass: string;
 }

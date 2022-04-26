@@ -97,9 +97,8 @@ export async function savePageAnnotationResults(
   website: Website,
   vocabularyIri: string
 ) {
-  // TODO: persist this to a new endpoint
   if (termOccurrences.length > 0) {
-    const results = await Promise.all(
+    await Promise.all(
       termOccurrences.map((termOccurrence) =>
         createTermOccurrence(
           termOccurrence,
@@ -110,13 +109,12 @@ export async function savePageAnnotationResults(
       )
     );
 
+    // TODO: not very elegent, maybe we can simply generate iris on the front-end
     // make sure termOccurrences have iris
-    termOccurrences.forEach((termOccurrence, i) => {
-      console.log("@id: ", results[i]["@id"]);
-      termOccurrence.iri = results[i]["@id"];
-    });
+    // termOccurrences.forEach((termOccurrence, i) => {
+    //   termOccurrence.iri = results[i]["@id"];
+    // });
   }
-  return Promise.resolve();
 }
 
 // TODO: move interface elsewhere
@@ -198,19 +196,7 @@ export async function getWebsiteTermOccurrences(
       return occurrence.target.source.iri === website.iri;
     })
     .forEach((occurrence) => {
-      const cssSelector = occurrence.target.selectors.find((selector) =>
-        selector.types.includes(VocabularyUtils.CSS_SELECTOR)
-      ) as CssSelector;
-      if (!cssSelector) {
-        console.log(
-          "NO CSS selectors: ",
-          occurrence.target.selectors,
-          ", occurrence: ",
-          occurrence
-        );
-      } else {
-        console.log("css selector found: ", cssSelector);
-      }
+      const cssSelector = occurrence.getCssSelector()
 
       if (!selectorMap[cssSelector.value]) {
         selectorMap[cssSelector.value] = [];
@@ -242,17 +228,12 @@ export async function createDefinitionOccurrence(annotation: Annotation) {
   return Promise.resolve();
 }
 
-export async function updateTermOccurrence(annotation: Annotation) {
-  // TODO: update term occurrence to the backend
-  return Promise.resolve();
-}
-
 export function loadTypes() {
   // TODO: add caching layer, at least within one browser session
-  // return termitApi
-  //   .get("/language/types")
+  // return
 
-  return Promise.resolve(mockTypes)
+  return termitApi
+    .get("/language/types")
     .then((data: object[]) =>
       data.length !== 0
         ? JsonLdUtils.compactAndResolveReferencesAsArray<TermData>(
@@ -300,7 +281,8 @@ export function createTerm(term: Term, vocabularyIri: IRI) {
   );
 }
 
-export async function approveTermOccurrence(termOccurrence: TermOccurrence) {
+// NOTE: this currently only assigns term to occurrence, but could do other updates later
+export async function updateTermOccurrence(termOccurrence: TermOccurrence) {
   const termIRI = VocabularyUtils.create(termOccurrence.term!.iri!);
   const termOccurrenceIRI = VocabularyUtils.create(termOccurrence.iri!);
 
@@ -322,61 +304,62 @@ export async function createTermOccurrence(
   vocabularyIri: string
 ) {
   const websiteIRI: IRI = VocabularyUtils.create(website.iri);
-  const cssSelector = termOccurrence.target.selectors.find((selector) =>
-    selector.types.includes(VocabularyUtils.CSS_SELECTOR)
-  ) as CssSelector;
-  const textQuoteSelector = termOccurrence.target.selectors.find((selector) =>
-    selector.types.includes(VocabularyUtils.TEXT_QUOTE_SELECTOR)
-  ) as TextQuoteSelector;
-  const textPositionSelector = termOccurrence.target.selectors.find(
-    (selector) =>
-      selector.types.includes(VocabularyUtils.TEXT_POSITION_SELECTOR)
-  ) as TextPositionSelector;
+
+  const paramsPayload: {
+    namespace?: string;
+    websiteFragment: string;
+    contextIri: string;
+    termFragment?: string;
+  } = {
+    namespace: websiteIRI.namespace,
+    websiteFragment: websiteIRI.fragment,
+    contextIri: vocabularyIri,
+  };
+
+  if (termOccurrence.term && termOccurrence.term.iri){
+    const termIRI = VocabularyUtils.create(termOccurrence.term.iri);
+    paramsPayload.termFragment = termIRI.fragment;
+  }
 
   return termitApi.post(
     `/occurrence`,
-    params({
-      namespace: websiteIRI.namespace,
-      websiteFragment: websiteIRI.fragment,
-      contextIri: vocabularyIri,
-      // TODO:
-      // termIdFragment: term ? VocabularyUtils.create(term.iri).fragment : null,
-    })
+    params(paramsPayload)
       .content({
-        exactMatch: textQuoteSelector.exactMatch,
-        selector: cssSelector.value,
-        start: textPositionSelector.start,
+        exactMatch: termOccurrence.getTextQuoteSelector().exactMatch,
+        selector: termOccurrence.getCssSelector().value,
+        start: termOccurrence.getTextPositionSelector().start,
         extraTypes: [occurrenceType],
         id: termOccurrence.id,
       })
-      // TODO: add back in
+      // TODO: add back in, maybe not?
       // .content(termOccurrence.toJsonLd())
       .contentType(Constants.JSON_MIME_TYPE)
-  );
-  // TODO
-  // const url = resolveTermCreationUrl(term, vocabularyIri);
-  // const data = Object.assign(term.toJsonLd(), {
-  //   vocabulary: {
-  //     iri: vocabularyIri.namespace + vocabularyIri.fragment,
-  //   },
-  // });
-  // const resourceIRI = VocabularyUtils.create(
-  //   "http://onto.fel.cvut.cz/ontologies/slovnik/my-new-slovnik/document/soubor/rozvrh.png"
-  // );
-  // return termitApi.post(
-  //   `/vocabularies/${vocabularyIri.fragment}/occurrences?namespace=${vocabularyIri.namespace}&resourceNormalizedName=${resourceIRI.fragment}`,
-  //   null,
-  //   {
-  //     headers: new Headers({
-  //       ...defaultTermitHeaders,
-  //       // "Content-Type": Constants.JSON_LD_MIME_TYPE,
-  //     }),
-  //   }
-  // );
+  ).then(result => {
+    // make sure termOccurrences have iris
+    termOccurrence.iri = result["@id"];
+    return termOccurrence;
+  })
 }
-export function removeOccurrence(annotation: Annotation) {
+export function removeOccurrence(termOccurrence: TermOccurrence) {
+  const termOccurrenceIRI = VocabularyUtils.create(termOccurrence.iri!);
+  const termIRI = termOccurrence.term
+    ? VocabularyUtils.create(termOccurrence.term!.iri!)
+    : null;
+
+  const paramsPayload: { namespace: string; termFragment?: string } = {
+    namespace: termOccurrenceIRI.namespace!,
+    // TODO:
+    // termFragment: term ? VocabularyUtils.create(term.iri).fragment : null,
+  };
+
+  if (termIRI) {
+    paramsPayload.termFragment = termIRI.fragment;
+  }
   // TODO
-  return Promise.resolve();
+  return termitApi.delete(
+    `/occurrence/${termOccurrenceIRI.fragment}`,
+    params(paramsPayload)
+  );
 }
 
 export function loadIdentifier<T extends { name: string; assetType: string }>(
@@ -386,8 +369,10 @@ export function loadIdentifier<T extends { name: string; assetType: string }>(
 }
 
 export async function getUser() {
-  const userData: UserData = await BrowserApi.storage.get(Constants.STORAGE.USER);
-  console.log('got user data: ', userData);
+  const userData: UserData = await BrowserApi.storage.get(
+    Constants.STORAGE.USER
+  );
+  console.log("got user data: ", userData);
   if (!userData) {
     return null;
   }
@@ -403,7 +388,6 @@ export default {
   createTermOccurrence,
   loadTypes,
   createTerm,
-  updateTermOccurrence,
   removeOccurrence,
   createDefinitionOccurrence,
   savePageAnnotationResults,
@@ -411,6 +395,6 @@ export default {
   getExistingWebsite,
   getWebsiteTermOccurrences,
   loadIdentifier,
-  approveTermOccurrence,
+  updateTermOccurrence,
   getUser,
 };
