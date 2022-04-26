@@ -22,6 +22,8 @@ import TermOccurrence, {
 import SecurityUtils from "../common/util/SecurityUtils";
 import BrowserApi from "../shared/BrowserApi";
 import User, { UserData } from "../common/model/User";
+import { TermsMap } from "../content";
+import Document from "../common/model/Document";
 
 // TODO: remove all Promise.resolve() statements and uncomment real back-end calls when ready
 // TODO (optional): use fetch-mock or similar library to mock api server responses, will likely be needed to testing
@@ -122,13 +124,13 @@ export async function savePageAnnotationResults(
 /**
  * Creates a website file within a resource (vocabulary)
  */
-export async function createWebsiteInDocument(url: string, documentIri: IRI) {
+export async function createWebsiteInDocument(url: string, documentIRI: IRI) {
   const website = new Website({ url });
 
   // TODO: maybe don't need to load the identifier again?
   const websiteIri = await loadIdentifier({
     name: url,
-    contextIri: documentIri,
+    contextIri: documentIRI.toString(),
     assetType: "WEBSITE",
   });
 
@@ -137,8 +139,24 @@ export async function createWebsiteInDocument(url: string, documentIri: IRI) {
 
   // TODO: transform website into a format that we need
   await termitApi.post(
-    `/resources/${documentIri.fragment}/websites`,
-    content(website.toJsonLd()).param("namespace", documentIri.namespace)
+    `/resources/${documentIRI.fragment}/websites`,
+    content(website.toJsonLd()).param("namespace", documentIRI.namespace)
+  );
+
+  return website;
+}
+
+export async function removeWebsiteFromDocument(
+  document: Document,
+  website: Website
+) {
+  const websiteIRI = VocabularyUtils.create(website.iri);
+  const documentIRI = VocabularyUtils.create(document.iri);
+
+  // TODO: transform website into a format that we need
+  await termitApi.delete(
+    `/resources/${documentIRI.fragment}/websites/${websiteIRI.fragment}`,
+    param("namespace", websiteIRI.namespace)
   );
 
   return website;
@@ -166,7 +184,8 @@ export async function getExistingWebsite(
 }
 
 export async function getWebsiteTermOccurrences(
-  website: Website
+  website: Website,
+  terms: TermsMap
 ): Promise<TermOccurrence[][]> {
   // TODO: add endpoint
   const map = {};
@@ -190,19 +209,20 @@ export async function getWebsiteTermOccurrences(
 
   // group to optimize for mark.js, maybe later removed
   const selectorMap = {};
-  existingOccurrences
-    // TODO: this filtering to be later done on the back-end in SPARQL
-    .filter((occurrence) => {
-      return occurrence.target.source.iri === website.iri;
-    })
-    .forEach((occurrence) => {
-      const cssSelector = occurrence.getCssSelector()
+  existingOccurrences.forEach((occurrence) => {
+    if (occurrence?.term?.iri) {
+      occurrence.term = terms[occurrence.term.iri];
+    }
+  });
 
-      if (!selectorMap[cssSelector.value]) {
-        selectorMap[cssSelector.value] = [];
-      }
-      selectorMap[cssSelector.value].push(occurrence);
-    });
+  existingOccurrences.forEach((occurrence) => {
+    const cssSelector = occurrence.getCssSelector();
+
+    if (!selectorMap[cssSelector.value]) {
+      selectorMap[cssSelector.value] = [];
+    }
+    selectorMap[cssSelector.value].push(occurrence);
+  });
 
   return Object.values(selectorMap);
 }
@@ -306,39 +326,43 @@ export async function createTermOccurrence(
   const websiteIRI: IRI = VocabularyUtils.create(website.iri);
 
   const paramsPayload: {
-    namespace?: string;
+    websiteNamespace: string;
+    termNamespace?: string;
     websiteFragment: string;
     contextIri: string;
     termFragment?: string;
   } = {
-    namespace: websiteIRI.namespace,
+    websiteNamespace: websiteIRI.namespace!,
     websiteFragment: websiteIRI.fragment,
     contextIri: vocabularyIri,
   };
 
-  if (termOccurrence.term && termOccurrence.term.iri){
+  if (termOccurrence.term && termOccurrence.term.iri) {
     const termIRI = VocabularyUtils.create(termOccurrence.term.iri);
     paramsPayload.termFragment = termIRI.fragment;
+    paramsPayload.termNamespace = termIRI.namespace;
   }
 
-  return termitApi.post(
-    `/occurrence`,
-    params(paramsPayload)
-      .content({
-        exactMatch: termOccurrence.getTextQuoteSelector().exactMatch,
-        selector: termOccurrence.getCssSelector().value,
-        start: termOccurrence.getTextPositionSelector().start,
-        extraTypes: [occurrenceType],
-        id: termOccurrence.id,
-      })
-      // TODO: add back in, maybe not?
-      // .content(termOccurrence.toJsonLd())
-      .contentType(Constants.JSON_MIME_TYPE)
-  ).then(result => {
-    // make sure termOccurrences have iris
-    termOccurrence.iri = result["@id"];
-    return termOccurrence;
-  })
+  return termitApi
+    .post(
+      `/occurrence`,
+      params(paramsPayload)
+        .content({
+          exactMatch: termOccurrence.getTextQuoteSelector().exactMatch,
+          selector: termOccurrence.getCssSelector().value,
+          start: termOccurrence.getTextPositionSelector().start,
+          extraTypes: [occurrenceType],
+          id: termOccurrence.id,
+        })
+        // TODO: add back in, maybe not?
+        // .content(termOccurrence.toJsonLd())
+        .contentType(Constants.JSON_MIME_TYPE)
+    )
+    .then((result) => {
+      // make sure termOccurrences have iris
+      termOccurrence.iri = result["@id"];
+      return termOccurrence;
+    });
 }
 export function removeOccurrence(termOccurrence: TermOccurrence) {
   const termOccurrenceIRI = VocabularyUtils.create(termOccurrence.iri!);
@@ -397,4 +421,5 @@ export default {
   loadIdentifier,
   updateTermOccurrence,
   getUser,
+  removeWebsiteFromDocument,
 };

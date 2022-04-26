@@ -34,14 +34,16 @@ export type ContentState = {
   user: User | null;
 };
 
-const contentState: ContentState = {
+const getEmptyContentState = (): ContentState => ({
   annotations: null,
   vocabulary: null,
   terms: null,
   website: null,
   vocabularies: [],
   user: null,
-};
+});
+
+const contentState = getEmptyContentState();
 
 // helper functions also operating on global data if needed
 const internalActions = {};
@@ -56,7 +58,6 @@ export const ContentActions = {
     annotator!.showPopup(annotation);
   },
   async annotateNewWebsite(vocabulary: Vocabulary) {
-    // TODO: dry up the 2 annotation actions code, extract into a helper, e.g. load page data...
     contentState.website = await api.createWebsiteInDocument(
       document.URL,
       VocabularyUtils.create(vocabulary.document!.iri)
@@ -78,7 +79,7 @@ export const ContentActions = {
       textAnalysisResult,
       contentState.website.iri,
       contentState.terms!,
-      [VocabularyUtils.SUGGESTED_TERM_OCCURRENCE],
+      [VocabularyUtils.SUGGESTED_TERM_OCCURRENCE]
     );
     await annotator!.annotatePage(vocabulary, termOccurrencesGrouped);
 
@@ -114,7 +115,7 @@ export const ContentActions = {
       VocabularyUtils.create(vocabulary.iri)
     );
     const termOccurrencesGroups: TermOccurrence[][] =
-      await api.getWebsiteTermOccurrences(website);
+      await api.getWebsiteTermOccurrences(website, contentState.terms!);
     await annotator!.annotatePage(vocabulary, termOccurrencesGroups);
     contentState.annotations = annotator!.getAnnotations();
     contentState.vocabulary = vocabulary;
@@ -157,7 +158,7 @@ export const ContentActions = {
       contentState.website?.iri,
       contentState.terms
     );
-    
+
     console.log("new term Occurrence: ", newTermOccurrence);
     const [newAnnotation] = await markTerms(
       [newTermOccurrence],
