@@ -1,4 +1,5 @@
 import * as React from "react";
+import { ExternalLinkIcon } from "../../../content/components/Sidebar/TermOccurrencesList";
 import OutgoingLink from "./OutgoingLink";
 
 interface AssetType {
@@ -48,8 +49,10 @@ export default class AssetLink<T extends AssetType> extends React.Component<
               title={this.props.tooltip ? this.props.tooltip : undefined}
               href={props.path}
               target="_blank"
+              style={{ display: "inline-flex" }}
             >
               {props.asset.label}
+              <ExternalLinkIcon className="ml-2 h-5 w-5" />
             </a>
           }
           iri={props.asset.iri}

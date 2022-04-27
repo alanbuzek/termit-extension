@@ -7,6 +7,7 @@ import Vocabulary from "../../../common/model/Vocabulary";
 import { Annotation } from "../../../common/util/Annotation";
 import AssetLink from "../../../common/component/misc/AssetLink";
 import VocabularyUtils from "../../../common/util/VocabularyUtils";
+import { DropdownComponent } from "./FiltersPanel";
 
 export const getUrlInfo = (url) => {
   const urlObject = new URL(url);
@@ -31,9 +32,12 @@ const SidebarControlPanel = ({
   const loading = false;
   const disabled = false;
 
-  const [selectedVocabulary, setSelectedVocabulary] = useState();
-  const onVocabularyChange = (vIri: string) =>
-    setSelectedVocabulary(vocabularies![vIri]);
+  const [selectedVocabulary, setSelectedVocabulary] =
+    useState<Vocabulary | null>(null);
+  const onVocabularyChange = (vIri: string) => {
+    const vocabulary = vocabularies!.find((v) => v.iri === vIri);
+    setSelectedVocabulary(vocabulary);
+  };
 
   const [annotationLoading, setAnnotationLoading] = useState(false);
   const { checkedHostname } = getUrlInfo(window.location.href);
@@ -63,20 +67,25 @@ const SidebarControlPanel = ({
       <div className="p-3 mb-4 rounded-md bg-gray-100 border-gray-600 border">
         {/* {allowPanel} */}
         <p className="font-semibold">This page hasn't be annotated yet.</p>
-        <VocabularySelect
-          id={"vocabularySelect1"}
-          vocabularies={vocabularies}
-          selectVocabulary={selectedVocabulary}
-          onVocabularyChange={onVocabularyChange}
-        />
+        <DropdownComponent
+          options={vocabularies!.map((vocab) => ({
+            name: vocab.label,
+            value: vocab.iri,
+          }))}
+          id="vocabulary-select"
+          label={"Vocabulary to annotate with"}
+          value={selectedVocabulary?.iri}
+          setValue={(newValue) => onVocabularyChange(newValue)}
+        ></DropdownComponent>
         <Button
+          disabled={!selectedVocabulary}
           onClick={() => {
             setAnnotationLoading(true);
 
             // TODO: remove timeout
             setTimeout(() => {
               // TODO: remove this fallback, adjust it to a different, proper default (To be specified)
-              handleAnnotatePage(selectedVocabulary || vocabularies[0]);
+              handleAnnotatePage(selectedVocabulary!);
             }, 200);
           }}
           loading={annotationLoading}

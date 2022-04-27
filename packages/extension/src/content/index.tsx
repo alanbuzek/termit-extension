@@ -141,6 +141,7 @@ export const ContentActions = {
     annotationType: string
   ) {
     annotation.assignTerm(term, annotationType);
+    annotator!.hidePopup();
     if (!annotation.termOccurrence.iri) {
       // term occurrence doesn't exist in the back-end yet
       await api.createTermOccurrence(
@@ -152,7 +153,6 @@ export const ContentActions = {
     } else {
       await api.updateTermOccurrence(annotation.termOccurrence);
     }
-    annotator!.hidePopup();
 
     sidebar?.render();
   },
@@ -179,11 +179,11 @@ export const ContentActions = {
     sidebar?.render();
   },
   async createTerm(term: Term, vocabularyIri: IRI, annotation: Annotation) {
+    annotator?.hidePopup();
     await api.createTerm(term, vocabularyIri);
     contentState.terms![term.iri] = term;
     await this.assignTermToSuggestedOccurrence(term, annotation, AnnotationType.OCCURRENCE);
     overlay.off();
-    annotator?.hidePopup();
 
     sidebar?.render();
   },

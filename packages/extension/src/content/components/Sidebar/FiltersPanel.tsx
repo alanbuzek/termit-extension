@@ -18,7 +18,7 @@ import { useState } from "react";
 const options = ["one", "two", "three"];
 const defaultOption = options[0];
 
-const DropdownComponent = ({ id, options, value, setValue, label }) => {
+export const DropdownComponent = ({ id, options, value, setValue, label }) => {
   return (
     <div className="text-base mb-3 mt-1.5">
       <label form={id} className="text-gray-700">
