@@ -60,6 +60,8 @@ export const ContentActions = {
     annotator!.showPopup(annotation);
   },
   async annotateNewWebsite(vocabulary: Vocabulary) {
+    annotator = new Annotator(document.body, contentState);
+
     contentState.website = await api.createWebsiteInDocument(
       document.URL,
       VocabularyUtils.create(vocabulary.document!.iri)
@@ -111,6 +113,8 @@ export const ContentActions = {
       // website hasn't been annotated yet, wait for explicit user action
       return;
     }
+
+    annotator = new Annotator(document.body, contentState);
 
     const { website, vocabulary } = foundExistingWebsite;
     // TODO: how to handle multiple vocabularies? schema adjustments, state adjustments
@@ -205,7 +209,10 @@ export const ContentActions = {
 
     // reset page
     // contentState = getEmptyContentState();
+    annotator!.turnOffAnnotations();
     resetContentState();
+    contentState.vocabularies = await api.loadVocabularies();
+
     sidebar!.render();
     initPage();
   },
@@ -222,7 +229,6 @@ const initPage = async () => {
   overlay.init();
   preloadContentStyles();
   initSidebar();
-  annotator = new Annotator(document.body, contentState);
 
   await ContentActions.attemptAnnotatingExistingWebsite();
 };

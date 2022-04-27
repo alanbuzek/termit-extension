@@ -95,7 +95,7 @@ export default class Annotator {
     this.listeners.add(window, "resize", () => this.repositionAdder());
   }
 
-  public destroy() {
+  private destroy() {
     this.listeners.removeAll();
 
     this.selectionObserver.disconnect();
@@ -209,4 +209,9 @@ export default class Annotator {
   //     metadata,
   //   };
   // }
+
+  public turnOffAnnotations(){
+    this.annotations.forEach(annotation => annotation.removeOccurrence())
+    this.destroy();
+  }
 }

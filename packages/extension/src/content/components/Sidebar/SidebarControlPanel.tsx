@@ -6,6 +6,7 @@ import VocabularySelect from "../../../common/component/vocabulary/VocabularySel
 import Vocabulary from "../../../common/model/Vocabulary";
 import { Annotation } from "../../../common/util/Annotation";
 import AssetLink from "../../../common/component/misc/AssetLink";
+import VocabularyUtils from "../../../common/util/VocabularyUtils";
 
 export const getUrlInfo = (url) => {
   const urlObject = new URL(url);
@@ -14,8 +15,7 @@ export const getUrlInfo = (url) => {
   return { checkedHostname, urlObject };
 };
 
-const SidebarControlPanel
- = ({
+const SidebarControlPanel = ({
   annotations,
   vocabulary,
   vocabularies,
@@ -31,7 +31,6 @@ const SidebarControlPanel
   const loading = false;
   const disabled = false;
 
- 
   const [selectedVocabulary, setSelectedVocabulary] = useState();
   const onVocabularyChange = (vIri: string) =>
     setSelectedVocabulary(vocabularies![vIri]);
@@ -93,17 +92,24 @@ const SidebarControlPanel
       {allowPanel}
       <div className="p-3 mb-4 rounded-md bg-gray-100 border-gray-600 border">
         <div className="text-base font-semibold text-gray-800 rounded-md mb-2">
-          Vocabulary: <AssetLink asset={vocabulary} path="/" />
+          Vocabulary:{" "}
+          <AssetLink
+            asset={vocabulary!}
+            path={`http://localhost:3000/#/vocabularies/${
+              VocabularyUtils.create(vocabulary!.iri!).fragment
+            }`}
+          />
         </div>
         <h3>
           There are <span className="text-blue-600">{annotations.length}</span>{" "}
           annotations on this page.
         </h3>
       </div>
-      <Button onClick={handlePageDelete} color='alert'>Delete page annotations</Button>
+      <Button onClick={handlePageDelete} color="alert">
+        Delete page annotations
+      </Button>
     </div>
   );
 };
 
-export default SidebarControlPanel
-;
+export default SidebarControlPanel;
