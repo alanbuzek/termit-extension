@@ -6,8 +6,8 @@ import React, {
 import Spinner from './Spinner';
 
 const sizeClassnames = {
-  big: 'py-3 px-6 text-base rounded-md',
-  standard: 'py-2 px-6 text-sm rounded-md',
+  big: 'py-3 px-5 text-base rounded-md',
+  standard: 'py-2 px-3 text-sm rounded-md',
   small: 'px-2 py-1 text-xs rounded-md',
 };
 
@@ -16,6 +16,7 @@ const colorClassnames = {
   neutral: 'text-button hover:bg-gray-200 text-gray-600',
   flat: 'text-gray-300 hover:text-gray-800',
   alert: 'bg-red-600 text-white font-semibold shadow-md hover:bg-red-400',
+  alertLight: 'text-red-500 text-red-500 border-2 border-red-500 hover:bg-red-500 hover:text-white',
   light: 'hover:text-gray-300 text-white',
   secondary:
     'text-blue-400 text-white border border-blue-400 hover:bg-blue-400 hover:text-white',

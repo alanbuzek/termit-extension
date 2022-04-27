@@ -1,3 +1,4 @@
+import { occurrenceTypes } from '../../content/components/Sidebar/FiltersPanel';
 import { unmarkTerm } from "../../content/marker";
 import Term from "../model/Term";
 import TermOccurrence from "../model/TermOccurrence";
@@ -103,6 +104,11 @@ export class Annotation {
     const termCreatorClassName = this.getTermCreatorState();
 
     return `${termClassName} ${termCreatorClassName}`;
+  }
+
+  public getTypeName() {
+    const className = this.getClassName();
+    return occurrenceTypes.find(type => type.value == className)?.name || 'Uknown annotation type';
   }
 
   public focusAnnotation() {

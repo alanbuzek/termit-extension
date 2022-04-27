@@ -1,14 +1,27 @@
 import FiltersPanel from "./FiltersPanel";
 import React from "react";
-import TermOccurrencesList from './TermOccurrencesList';
+import TermOccurrencesList from "./TermOccurrencesList";
+import { useState } from "react";
 
-const TermOccurrencesFeed = ({
-    annotations
-}) => {
+const TermOccurrencesFeed = ({ annotations }) => {
+  const [occurrenceTypeFilter, setOccurrenceTypeFilter] = useState("");
+
+  const filteredAnnotations = annotations.filter((annotation) => {
+    console.log("annotation.getClassName(): ", annotation.getClassName());
+    return (
+      !occurrenceTypeFilter ||
+      annotation.getClassName() === occurrenceTypeFilter
+    );
+  });
   return (
     <div>
-      <FiltersPanel />
-      <TermOccurrencesList annotations={annotations} />
+      <FiltersPanel
+        occurrenceTypeFilter={occurrenceTypeFilter}
+        setOccurrenceTypeFilter={setOccurrenceTypeFilter}
+        annotationsCount={filteredAnnotations.length}
+      />
+      <hr className="my-2" />
+      <TermOccurrencesList annotations={filteredAnnotations} />
     </div>
   );
 };

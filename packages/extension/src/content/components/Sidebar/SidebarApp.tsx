@@ -62,7 +62,7 @@ const SidebarApp = ({
           vocabularies={state.vocabularies}
           handlePageDelete={handleDeletePage}
         />
-        <hr className="my-2"></hr>
+        <hr className="my-4 bg-gray-400"></hr>
         {state.annotations && (
           <TermOccurrencesFeed annotations={state.annotations} />
         )}

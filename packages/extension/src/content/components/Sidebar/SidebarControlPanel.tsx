@@ -90,9 +90,9 @@ const SidebarControlPanel = ({
   return (
     <div>
       {allowPanel}
-      <div className="p-3 mb-4 rounded-md bg-gray-100 border-gray-600 border">
+      <div className="p-3 mb-3 rounded-md bg-gray-100 border-gray-600 border">
         <div className="text-base font-semibold text-gray-800 rounded-md mb-2">
-          Vocabulary:{" "}
+          Selected vocabulary:{" "}
           <AssetLink
             asset={vocabulary!}
             path={`http://localhost:3000/#/vocabularies/${
@@ -105,9 +105,14 @@ const SidebarControlPanel = ({
           annotations on this page.
         </h3>
       </div>
-      <Button onClick={handlePageDelete} color="alert">
-        Delete page annotations
-      </Button>
+      <div className="flex">
+        <Button onClick={handlePageDelete} color="alertLight" className="mr-2">
+          Delete all annotations
+        </Button>
+        {/* <Button onClick={handlePageDelete} color="alert">
+          Delete suggested annotations
+        </Button> */}
+      </div>
     </div>
   );
 };
