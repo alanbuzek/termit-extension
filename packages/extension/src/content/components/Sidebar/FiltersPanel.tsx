@@ -18,7 +18,14 @@ import { useState } from "react";
 const options = ["one", "two", "three"];
 const defaultOption = options[0];
 
-export const DropdownComponent = ({ id, options, value, setValue, label }) => {
+export const DropdownComponent = ({
+  id,
+  options,
+  value,
+  setValue,
+  label,
+  allowEmpyValue = true,
+}) => {
   return (
     <div className="text-base mb-3 mt-1.5">
       <label form={id} className="text-gray-700">
@@ -32,7 +39,7 @@ export const DropdownComponent = ({ id, options, value, setValue, label }) => {
         }}
         className="p-2"
       >
-        <option value="">All types</option>
+        {allowEmpyValue && <option value="">All</option>}
         {options.map((option) => (
           <option value={option.value} selected={option.value == value}>
             {option.name}

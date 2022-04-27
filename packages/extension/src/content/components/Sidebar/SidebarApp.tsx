@@ -1,6 +1,7 @@
 import React from "react";
 import { ContentState } from "../..";
 import Vocabulary from "../../../common/model/Vocabulary";
+import Button from "../Button";
 import SidebarControlPanel from "./SidebarControlPanel";
 import TermOccurrencesFeed from "./TermOccurrencesFeed";
 
@@ -13,9 +14,6 @@ const SidebarApp = ({
   handleAnnotatePage: (vocabulary: Vocabulary) => void;
   handleDeletePage: () => void;
 }) => {
-  if (!state.vocabularies) {
-    return;
-  }
   return (
     <div style={{ height: "100%" }}>
       <div
@@ -54,19 +52,43 @@ const SidebarApp = ({
             </a>
           )}
         </div>
-
-        <SidebarControlPanel
-          annotations={state.annotations}
-          handleAnnotatePage={handleAnnotatePage}
-          vocabulary={state.vocabulary}
-          vocabularies={state.vocabularies}
-          handlePageDelete={handleDeletePage}
-        />
-        <hr className="my-4 bg-gray-400"></hr>
-        {state.annotations && (
-          <TermOccurrencesFeed annotations={state.annotations} />
+        {!state.user && (
+          <div className="mt-2 p-3 mb-4 rounded-md bg-gray-100 border-gray-600 border flex flex-col items-center">
+            {/* {allowPanel} */}
+            <p className="font-semibold">
+              You need to login start using TermIt.
+            </p>
+            <a
+              href={`http://localhost:3000/#/login`}
+              target="_blank"
+              className="mx-auto block my-2"
+            >
+              <Button>Login</Button>
+            </a>
+            <p>After you do so, refresh this page to start annotating.</p>
+            <p>
+              Don't have an account?{" "}
+              <a href={`http://localhost:3000/#/register`}>Register here</a>.
+            </p>
+          </div>
         )}
-        {state.annotations && <hr className="my-2"></hr>}
+
+        {state.vocabularies.length && (
+          <>
+            <SidebarControlPanel
+              annotations={state.annotations}
+              handleAnnotatePage={handleAnnotatePage}
+              vocabulary={state.vocabulary}
+              vocabularies={state.vocabularies}
+              handlePageDelete={handleDeletePage}
+            />
+            <hr className="my-4 bg-gray-400"></hr>
+            {state.annotations && (
+              <TermOccurrencesFeed annotations={state.annotations} />
+            )}
+            {state.annotations && <hr className="my-2"></hr>}
+          </>
+        )}
         <footer
           className="footer-row mt-auto"
           style={{ background: "transparent" }}

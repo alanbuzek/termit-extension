@@ -116,7 +116,7 @@ export default class Term extends Asset implements TermData {
   public readonly parent?: string;
   public sources?: string[];
   public plainSubTerms?: string[];
-  public readonly vocabulary?: AssetData;
+  public vocabulary?: AssetData;
   public readonly definitionSource?: TermOccurrenceData;
   public draft: boolean;
 

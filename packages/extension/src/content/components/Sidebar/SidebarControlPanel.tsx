@@ -75,6 +75,7 @@ const SidebarControlPanel = ({
           id="vocabulary-select"
           label={"Vocabulary to annotate with"}
           value={selectedVocabulary?.iri}
+          allowEmpyValue={false}
           setValue={(newValue) => onVocabularyChange(newValue)}
         ></DropdownComponent>
         <Button

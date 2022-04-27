@@ -40,7 +40,7 @@ const resetContentState = () => {
   contentState.terms = null;
   contentState.website = null;
   contentState.vocabularies = [];
-  contentState.user = null;
+  // contentState.user = null;
 };
 
 let contentState: ContentState = {};
@@ -182,13 +182,23 @@ export const ContentActions = {
     annotator?.hidePopup();
     await api.createTerm(term, vocabularyIri);
     contentState.terms![term.iri] = term;
-    await this.assignTermToSuggestedOccurrence(term, annotation, AnnotationType.OCCURRENCE);
+    term.vocabulary = {
+      iri: contentState!.vocabulary!.iri,
+      types: contentState!.vocabulary!.types,
+    };
+    await this.assignTermToSuggestedOccurrence(
+      term,
+      annotation,
+      AnnotationType.OCCURRENCE
+    );
     overlay.off();
 
     sidebar?.render();
   },
   async removeOccurrence(annotation: Annotation) {
-    await api.removeOccurrence(annotation.termOccurrence);
+    if (annotation.termOccurrence.iri) {
+      await api.removeOccurrence(annotation.termOccurrence);
+    }
     await annotation.removeOccurrence();
     const annotationIdx = contentState.annotations!.indexOf(annotation);
     contentState.annotations?.splice(annotationIdx, 1);
@@ -220,14 +230,15 @@ export const ContentActions = {
 
 const initPage = async () => {
   contentState.user = await api.getUser();
+  preloadContentStyles();
+  overlay.init();
 
   if (!contentState.user) {
+    initSidebar();
     return;
   }
   contentState.vocabularies = await api.loadVocabularies();
 
-  overlay.init();
-  preloadContentStyles();
   initSidebar();
 
   await ContentActions.attemptAnnotatingExistingWebsite();
