@@ -181,7 +181,7 @@ export const ContentActions = {
   async createTerm(term: Term, vocabularyIri: IRI, annotation: Annotation) {
     await api.createTerm(term, vocabularyIri);
     contentState.terms![term.iri] = term;
-    annotation.assignTerm(term, AnnotationType.OCCURRENCE);
+    await this.assignTermToSuggestedOccurrence(term, annotation, AnnotationType.OCCURRENCE);
     overlay.off();
     annotator?.hidePopup();
 

@@ -46,6 +46,7 @@ export function isTermValid<T extends TermData>(
   data: T,
   labelExists: LabelExists
 ) {
+  console.log('data: ', data, ', labelExists: ', labelExists);
   return (
     data.iri !== undefined &&
     data.iri.trim().length > 0 &&
