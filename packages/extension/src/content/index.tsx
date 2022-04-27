@@ -43,7 +43,7 @@ const resetContentState = () => {
   // contentState.user = null;
 };
 
-let contentState: ContentState = {};
+let contentState = {} as ContentState;
 
 resetContentState();
 
@@ -144,8 +144,8 @@ export const ContentActions = {
     annotator!.hidePopup();
     if (!annotation.termOccurrence.iri) {
       // term occurrence doesn't exist in the back-end yet
-      await api.createTermOccurrence(
-        annotation.termOccurrence,
+      await api.createTermOccurrences(
+        [annotation.termOccurrence],
         contentState.website!,
         annotationType,
         contentState.vocabulary!.iri
@@ -196,10 +196,10 @@ export const ContentActions = {
     sidebar?.render();
   },
   async removeOccurrence(annotation: Annotation) {
+    await annotation.removeOccurrence();
     if (annotation.termOccurrence.iri) {
       await api.removeOccurrence(annotation.termOccurrence);
     }
-    await annotation.removeOccurrence();
     const annotationIdx = contentState.annotations!.indexOf(annotation);
     contentState.annotations?.splice(annotationIdx, 1);
 

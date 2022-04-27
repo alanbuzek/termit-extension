@@ -7,7 +7,7 @@ import Ajax, { content, contentType, param, params } from "../common/util/Ajax";
 import { Annotation } from "../common/util/Annotation";
 import JsonLdUtils from "../common/util/JsonLdUtils";
 import Utils from "../common/util/Utils";
-import VocabularyUtils, { IRI } from "../common/util/VocabularyUtils";
+import VocabularyUtils, { IRI, IRIImpl } from "../common/util/VocabularyUtils";
 import mockTypes from "./mockData/mockTypes";
 import Constants from "../common/util/Constants";
 import Website from "../common/model/Website";
@@ -101,15 +101,12 @@ export async function savePageAnnotationResults(
 ) {
   if (termOccurrences.length > 0) {
     console.log("termOccurrences: ", termOccurrences);
-    await Promise.all(
-      termOccurrences.map((termOccurrence) =>
-        createTermOccurrence(
-          termOccurrence,
-          website,
-          VocabularyUtils.SUGGESTED_TERM_OCCURRENCE,
-          vocabularyIri
-        )
-      )
+    await createTermOccurrences(
+      termOccurrences,
+      website,
+      // TODO: make this more versetile
+      VocabularyUtils.SUGGESTED_TERM_OCCURRENCE,
+      vocabularyIri
     );
 
     // TODO: not very elegent, maybe we can simply generate iris on the front-end
@@ -211,8 +208,13 @@ export async function getWebsiteTermOccurrences(
   // group to optimize for mark.js, maybe later removed
   const selectorMap = {};
   existingOccurrences.forEach((occurrence) => {
-    console.log('occurrence?.term?.iri: ', occurrence?.term?.iri)
-    console.log('terms: ', terms, ', terms[occurrence.term.iri]: ', occurrence?.term?.iri && terms[occurrence.term.iri])
+    console.log("occurrence?.term?.iri: ", occurrence?.term?.iri);
+    console.log(
+      "terms: ",
+      terms,
+      ", terms[occurrence.term.iri]: ",
+      occurrence?.term?.iri && terms[occurrence.term.iri]
+    );
     if (occurrence?.term?.iri) {
       occurrence.term = terms[occurrence.term.iri];
     }
@@ -314,15 +316,15 @@ export async function updateTermOccurrence(termOccurrence: TermOccurrence) {
     params({
       termNamespace: termIRI.namespace,
       termFragment: termIRI.fragment,
-      occurrenceNamespace: termOccurrenceIRI.namespace
+      occurrenceNamespace: termOccurrenceIRI.namespace,
       // TODO:
       // termFragment: term ? VocabularyUtils.create(term.iri).fragment : null,
     })
   );
 }
 
-export async function createTermOccurrence(
-  termOccurrence: TermOccurrence,
+export async function createTermOccurrences(
+  termOccurrences: TermOccurrence[],
   website: Website,
   occurrenceType: string,
   vocabularyIri: string
@@ -331,53 +333,51 @@ export async function createTermOccurrence(
 
   const paramsPayload: {
     websiteNamespace: string;
-    termNamespace?: string;
     websiteFragment: string;
     contextIri: string;
-    termFragment?: string;
   } = {
     websiteNamespace: websiteIRI.namespace!,
     websiteFragment: websiteIRI.fragment,
     contextIri: vocabularyIri,
   };
 
-  if (termOccurrence.term && termOccurrence.term.iri) {
-    const termIRI = VocabularyUtils.create(termOccurrence.term.iri);
-    paramsPayload.termFragment = termIRI.fragment;
-    paramsPayload.termNamespace = termIRI.namespace;
-  }
+  const contentBody = termOccurrences.map((termOccurrence) => {
+    const payload = {
+      exactMatch: termOccurrence.getTextQuoteSelector().exactMatch,
+      selector: termOccurrence.getCssSelector().value,
+      start: termOccurrence.getTextPositionSelector().start,
+      extraTypes: [occurrenceType],
+      id: termOccurrence.id,
+    };
 
-  console.log("TERM OCCURRENCE: ", termOccurrence);
+    if (termOccurrence.term && termOccurrence.term.iri) {
+      const termIRI = VocabularyUtils.create(termOccurrence.term.iri);
+      payload.termNamespace = termIRI.namespace;
+      payload.termFragment = termIRI.fragment;
+    }
 
-  console.log("payload: ", {
-    exactMatch: termOccurrence.getTextQuoteSelector().exactMatch,
-    selector: termOccurrence.getCssSelector().value,
-    start: termOccurrence.getTextPositionSelector().start,
-    extraTypes: [occurrenceType],
-    id: termOccurrence.id,
+    return payload;
   });
 
+  console.log('contentBody: ', contentBody);
   return termitApi
     .post(
       `/occurrence`,
-      content({
-        exactMatch: termOccurrence.getTextQuoteSelector().exactMatch,
-        selector: termOccurrence.getCssSelector().value,
-        start: termOccurrence.getTextPositionSelector().start,
-        extraTypes: [occurrenceType],
-        id: termOccurrence.id,
-      })
+      content(contentBody)
         .params(paramsPayload)
         // TODO: add back in, maybe not?
         // .content(termOccurrence.toJsonLd())
         .contentType(Constants.JSON_MIME_TYPE)
     )
-    .then((result) => {
+    .then((termOccurrencesResult) => {
       // make sure termOccurrences have iris
-      termOccurrence.iri = result["@id"];
-      return termOccurrence;
+      termOccurrencesResult.forEach((toResult, i) => {
+        termOccurrences[i].iri = toResult["@id"];
+      });
+      return termOccurrencesResult;
     });
 }
+
 export function removeOccurrence(termOccurrence: TermOccurrence) {
   const termOccurrenceIRI = VocabularyUtils.create(termOccurrence.iri!);
   const termIRI = termOccurrence.term
@@ -423,7 +423,7 @@ export default {
   runPageAnnotationAnalysis,
   loadAllTerms,
   getLabel,
-  createTermOccurrence,
+  createTermOccurrences,
   loadTypes,
   createTerm,
   removeOccurrence,
