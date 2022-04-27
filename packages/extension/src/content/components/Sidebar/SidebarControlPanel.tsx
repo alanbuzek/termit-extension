@@ -8,6 +8,7 @@ import { Annotation } from "../../../common/util/Annotation";
 import AssetLink from "../../../common/component/misc/AssetLink";
 import VocabularyUtils from "../../../common/util/VocabularyUtils";
 import { DropdownComponent } from "./FiltersPanel";
+import { overlay } from "../../helper/overlay";
 
 export const getUrlInfo = (url) => {
   const urlObject = new URL(url);
@@ -39,6 +40,14 @@ const SidebarControlPanel = ({
     setSelectedVocabulary(vocabulary);
   };
 
+  const [deleteLoading, setDeleteLoading] = useState(false);
+
+  const handlePageDeleteClick = () => {
+    setDeleteLoading(true);
+    overlay.on();
+    handlePageDelete();
+  };
+
   const [annotationLoading, setAnnotationLoading] = useState(false);
   const { checkedHostname } = getUrlInfo(window.location.href);
   const allowPanel = (
@@ -68,6 +77,7 @@ const SidebarControlPanel = ({
         {/* {allowPanel} */}
         <p className="font-semibold">This page hasn't be annotated yet.</p>
         <DropdownComponent
+          defaultOptionText={"Choose vocabulary"}
           options={vocabularies!.map((vocab) => ({
             name: vocab.label,
             value: vocab.iri,
@@ -75,7 +85,6 @@ const SidebarControlPanel = ({
           id="vocabulary-select"
           label={"Vocabulary to annotate with"}
           value={selectedVocabulary?.iri}
-          allowEmpyValue={false}
           setValue={(newValue) => onVocabularyChange(newValue)}
         ></DropdownComponent>
         <Button
@@ -116,7 +125,12 @@ const SidebarControlPanel = ({
         </h3>
       </div>
       <div className="flex">
-        <Button onClick={handlePageDelete} color="alertLight" className="mr-2">
+        <Button
+          disabled={deleteLoading}
+          onClick={handlePageDeleteClick}
+          color="alertLight"
+          className="mr-2"
+        >
           Delete all annotations
         </Button>
         {/* <Button onClick={handlePageDelete} color="alert">

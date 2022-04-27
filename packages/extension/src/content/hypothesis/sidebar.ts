@@ -139,6 +139,7 @@ export class Sidebar {
     if (this.hypothesisSidebar) {
       this.hypothesisSidebar.remove();
     } 
+    this.sidebarComponent.destroy();
 
     sendErrorsTo(null);
   }

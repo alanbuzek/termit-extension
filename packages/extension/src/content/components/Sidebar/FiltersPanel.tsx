@@ -24,7 +24,7 @@ export const DropdownComponent = ({
   value,
   setValue,
   label,
-  allowEmpyValue = true,
+  defaultOptionText,
 }) => {
   return (
     <div className="text-base mb-3 mt-1.5">
@@ -39,7 +39,7 @@ export const DropdownComponent = ({
         }}
         className="p-2"
       >
-        {allowEmpyValue && <option value="">All</option>}
+        <option value="">{defaultOptionText || 'All'}</option>
         {options.map((option) => (
           <option value={option.value} selected={option.value == value}>
             {option.name}

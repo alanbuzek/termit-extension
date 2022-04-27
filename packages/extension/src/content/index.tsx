@@ -60,6 +60,8 @@ export const ContentActions = {
     annotator!.showPopup(annotation);
   },
   async annotateNewWebsite(vocabulary: Vocabulary) {
+    // overlay.on();
+
     annotator = new Annotator(document.body, contentState);
 
     contentState.website = await api.createWebsiteInDocument(
@@ -85,14 +87,6 @@ export const ContentActions = {
       contentState.terms!,
       [VocabularyUtils.SUGGESTED_TERM_OCCURRENCE]
     );
-    await annotator!.annotatePage(vocabulary, termOccurrencesGrouped);
-
-    contentState.annotations = annotator!.getAnnotations();
-
-    contentState.vocabulary.document?.websites.push(contentState.website);
-
-    // update vocabulary cache
-    await BrowserApi.storage.set("vocabularies", contentState.vocabularies);
 
     await api.savePageAnnotationResults(
       termOccurrencesGrouped.flatMap((occGroup) => occGroup),
@@ -100,8 +94,21 @@ export const ContentActions = {
       vocabulary.iri
     );
 
+    await annotator!.annotatePage(vocabulary, termOccurrencesGrouped);
+    contentState.annotations = annotator!.getAnnotations();
+
+    contentState.vocabulary.document?.websites.push(contentState.website);
+
+    // update vocabulary cache
+    await BrowserApi.storage.set("vocabularies", contentState.vocabularies);
+    overlay.off();
+    console.log('got to render here:')
     // this makes sure to re-render sidebar on data update
     sidebar!.render();
+
+    setTimeout(() => {
+      sidebar?.render()
+    }, 200)
   },
   async attemptAnnotatingExistingWebsite() {
     const foundExistingWebsite = await api.getExistingWebsite(
@@ -224,6 +231,7 @@ export const ContentActions = {
     contentState.vocabularies = await api.loadVocabularies();
 
     sidebar!.render();
+    overlay.off();
     initPage();
   },
 };
@@ -247,6 +255,10 @@ const initPage = async () => {
 window.addEventListener("load", initPage);
 
 function initSidebar() {
+  if (sidebar){
+    sidebar.destroy();
+  }
+
   sidebar = new Sidebar(
     document.body,
     // TODO: maybe not pass the whole state inside, or restructure state such that it doesn't contain whole classes instances of Annotator and Sidebar

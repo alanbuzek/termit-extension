@@ -41,6 +41,10 @@ export default class SidebarContainer {
     return content.getBoundingClientRect().width;
   }
 
+  destroy() {
+    ReactDOM.unmountComponentAtNode(this._container);
+  }
+
   render() {
     ReactDOM.render(
       <IntlProvider locale="cs-CZ" defaultLocale="en" messages={cs}>
