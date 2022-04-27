@@ -97,7 +97,7 @@ const SidebarControlPanel = ({
             asset={vocabulary!}
             path={`http://localhost:3000/#/vocabularies/${
               VocabularyUtils.create(vocabulary!.iri!).fragment
-            }`}
+            }?namespace=http://onto.fel.cvut.cz/ontologies/slovnik/`}
           />
         </div>
         <h3>

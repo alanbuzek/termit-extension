@@ -17,13 +17,20 @@ const SidebarApp = ({
     return;
   }
   return (
-    <div>
+    <div style={{ height: "100%" }}>
       <div
-        className="h-full w-full p-3 overflow-x-auto"
+        className="h-full w-full p-3 overflow-x-auto flex flex-column"
         style={{ background: "#dddddd" }}
       >
-        {state.user && (
-          <div className="flex px-2 pb-2">
+        <div className="flex px-2 pb-2 justify-between items-center mb-3">
+          <a
+            href={`http://localhost:3000/#/`}
+            target="_blank"
+            className="ml-sm-3 ml-md-0 brand ml-2 p-0 navbar-brand"
+          >
+            TermIt
+          </a>
+          {state.user && (
             <a
               className="flex ml-auto items-center text-gray-800"
               href={`http://localhost:3000/#/profile`}
@@ -45,8 +52,9 @@ const SidebarApp = ({
                 {state.user.abbreviatedName}
               </span>
             </a>
-          </div>
-        )}
+          )}
+        </div>
+
         <SidebarControlPanel
           annotations={state.annotations}
           handleAnnotatePage={handleAnnotatePage}
@@ -58,6 +66,27 @@ const SidebarApp = ({
         {state.annotations && (
           <TermOccurrencesFeed annotations={state.annotations} />
         )}
+        {state.annotations && <hr className="my-2"></hr>}
+        <footer
+          className="footer-row mt-auto"
+          style={{ background: "transparent" }}
+        >
+          <div className="px-sm-3 px-2 col">
+            <a
+              href="https://kbss.felk.cvut.cz"
+              target="_blank"
+              rel="noopener noreferrer"
+              title="KBSS FEL ČVUT v Praze"
+            >
+              ©&nbsp;KBSS FEL ČVUT v Praze, 2022
+            </a>
+          </div>
+          <div className="news-viewer-toggle px-sm-2 px-sm-3 px-1 text-right">
+            <span id="news-toggler">
+              <span className="footer-version">Verze&nbsp;</span>0.0.1
+            </span>
+          </div>
+        </footer>
       </div>
     </div>
   );
