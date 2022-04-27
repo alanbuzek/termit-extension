@@ -4,7 +4,7 @@ import ReactDOM from "react-dom";
 import { IntlProvider } from "react-intl";
 import cs from "../../cs.locale";
 import { overlay } from "../helper/overlay";
-import { Annotation, AnnotationType } from "../../common/util/Annotation";
+import { Annotation, isDefinitionAnnotation } from "../../common/util/Annotation";
 import { ContentState } from '..';
 
 // TODO: probably don't need this for now
@@ -239,7 +239,7 @@ export class ContentPopupContainer {
   public destroy() {
     // TODO: maybe call unmount instead, this was using Preact before
     ReactDOM.render(<div />, this.shadowRoot); // First, unload the Preact component
-    this.outerContainer.remove();
+    // this.outerContainer.remove();
   }
 
   /**
@@ -404,19 +404,15 @@ export class ContentPopupContainer {
 
     let initialPopupType = PopupType.PurposeSelection;
     if (this.currentAnnotation) {
-      if (this.currentAnnotation.termOccurrence.typeof == AnnotationType.DEFINITION){
+      if (isDefinitionAnnotation(this.currentAnnotation.termOccurrence.types)){
         initialPopupType = PopupType.TermDefinition;
       } else {
         initialPopupType = PopupType.TermOccurrence;
       }
 
-      // TODO: figure out what is the best way to have track if an annotation is a definition
-      // if (this.currentAnnotation.term){
-      //   initialPopupType = PopupType.TermOccurrence;
-      // } else {
-      //   initialPopupType = PopupType.TermDefinition;
-      // }
     }
+
+    this.destroy();
     
     ReactDOM.render(
       <IntlProvider locale="cs-CZ" defaultLocale="en" messages={cs}>
