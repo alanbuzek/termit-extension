@@ -165,7 +165,7 @@ function ContentPopup({
           <TermDefinitionAnnotation
             term={annotation?.term}
             text={
-              annotation.termOccurrence.getTextContent() || selectionRange.toString()
+              annotation?.termOccurrence?.getTextContent() || selectionRange.toString()
             }
             isOpen={true}
             onRemove={() => {

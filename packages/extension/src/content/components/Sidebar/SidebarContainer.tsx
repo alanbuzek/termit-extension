@@ -1,9 +1,9 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import { IntlProvider } from "react-intl";
-import { ContentState } from "..";
-import cs from "../../cs.locale";
-import { loadStyles } from "../hypothesis/ContentPopupContainer";
+import { ContentActions, ContentState } from "../..";
+import cs from "../../../cs.locale";
+import { loadStyles } from "../../hypothesis/ContentPopupContainer";
 import SidebarApp from "./SidebarApp";
 
 /**
@@ -46,6 +46,7 @@ export default class SidebarContainer {
       <IntlProvider locale="cs-CZ" defaultLocale="en" messages={cs}>
         <SidebarApp
           handleAnnotatePage={this.handleAnnotatePage}
+          handleDeletePage={ContentActions.removeWebsiteAnnotations}
           state={this._state}
         />
       </IntlProvider>,

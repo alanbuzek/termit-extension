@@ -219,6 +219,7 @@ export const occurrenceFromRange = (
     [newTerm],
     websiteIri,
     termsMap,
+    [annotationType]
   );
   console.log('inner termOccurrenceResult: ', termOccurrenceResult)
 

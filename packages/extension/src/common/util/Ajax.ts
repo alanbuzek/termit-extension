@@ -166,7 +166,8 @@ export function paramsSerializer(paramData: {} | undefined) {
 
 const callFetch = async (baseURL: string, path: string, config) => {
   // pre-request interceptor
-  config.headers[Constants.Headers.AUTHORIZATION] = await SecurityUtils.loadToken();
+  config.headers[Constants.Headers.AUTHORIZATION] =
+    await SecurityUtils.loadToken();
   if (["GET", "HEAD"].includes(config.method) && config.body) {
     console.warn(
       "Fetch request includes body in a get/head requested, deleting:: ",
@@ -217,42 +218,37 @@ const createFetchInstance = ({ baseURL }: { baseURL: string }) => ({
     return callFetch(
       baseURL,
       path,
-      Object.assign(fetchConfig, config, { method: "HEAD" })
+      { ...fetchConfig, ...config, ...{ method: "HEAD" } }
+      // Object.assign(fetchConfig, config, { method: "HEAD" })
     );
   },
   get(path, config = {}) {
-    return callFetch(
-      baseURL,
-      path,
-      Object.assign(fetchConfig, config, { method: "GET" })
-    );
+    return callFetch(baseURL, path, {
+      ...fetchConfig,
+      ...config,
+      ...{ method: "GET" },
+    });
   },
   post(path, body, config = {}) {
-    return callFetch(
-      baseURL,
-      path,
-      Object.assign(fetchConfig, config, {
-        body: body ? JSON.stringify(body) : null,
-        method: "POST",
-      })
-    );
+    return callFetch(baseURL, path, {
+      ...fetchConfig,
+      ...config,
+      ...{ method: "POST", body: body ? JSON.stringify(body) : null },
+    });
   },
   put(path, body, config = {}) {
-    return callFetch(
-      baseURL,
-      path,
-      Object.assign(fetchConfig, config, {
-        body: body ? JSON.stringify(body) : null,
-        method: "PUT",
-      })
-    );
+    return callFetch(baseURL, path, {
+      ...fetchConfig,
+      ...config,
+      ...{ method: "PUT", body: body ? JSON.stringify(body) : null },
+    });
   },
   del(path, config = {}) {
-    return callFetch(
-      baseURL,
-      path,
-      Object.assign(fetchConfig, config, { method: "DELETE" })
-    );
+    return callFetch(baseURL, path, {
+      ...fetchConfig,
+      ...config,
+      ...{ method: "DELETE" },
+    });
   },
 });
 
@@ -316,6 +312,7 @@ export class Ajax {
   }
 
   public post(path: string, config: RequestConfigBuilder) {
+    console.log("config coming in: ", config);
     const conf = {
       headers: config.getHeaders(),
     };
@@ -336,6 +333,12 @@ export class Ajax {
       return this.fetchInstance.post(path, formData, conf);
     } else {
       const query: string = config.getParams() ? "?" + par.toString() : "";
+      console.log(
+        "config.getContent() over here: ",
+        config.getContent(),
+        ", config: ",
+        config
+      );
       return this.fetchInstance.post(
         path + paramsSerializer(config.getParams()),
         config.getContent(),

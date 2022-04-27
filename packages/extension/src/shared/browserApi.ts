@@ -30,7 +30,6 @@ const BrowserApi = {
   storage: {
     set(key: string, value: any) {
       return new Promise((resolve) => {
-        console.log('setting: ', { [key]: value })
         chrome.storage.local.set({ [key]: value }, function () {
           resolve(null);
         });
@@ -38,9 +37,7 @@ const BrowserApi = {
     },
     get(key: string, defaultValue?: any): Promise<any> {
       return new Promise((resolve) => {
-        console.log('getting: ', [key])
         chrome.storage.local.get([key], (result) => {
-          console.log("OUTSIDE got name: ", result[key]);
           resolve(result[key]);
         });
 

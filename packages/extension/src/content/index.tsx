@@ -34,16 +34,18 @@ export type ContentState = {
   user: User | null;
 };
 
-const getEmptyContentState = (): ContentState => ({
-  annotations: null,
-  vocabulary: null,
-  terms: null,
-  website: null,
-  vocabularies: [],
-  user: null,
-});
+const resetContentState = () => {
+  contentState.annotations = null;
+  contentState.vocabulary = null;
+  contentState.terms = null;
+  contentState.website = null;
+  contentState.vocabularies = [];
+  contentState.user = null;
+};
 
-const contentState = getEmptyContentState();
+let contentState: ContentState = {};
+
+resetContentState();
 
 // helper functions also operating on global data if needed
 const internalActions = {};
@@ -86,13 +88,15 @@ export const ContentActions = {
     contentState.annotations = annotator!.getAnnotations();
 
     contentState.vocabulary.document?.websites.push(contentState.website);
-    // update cahce
+
+    // update vocabulary cache
+    await BrowserApi.storage.set("vocabularies", contentState.vocabularies);
+
     await api.savePageAnnotationResults(
       termOccurrencesGrouped.flatMap((occGroup) => occGroup),
       contentState.website,
       vocabulary.iri
     );
-    await BrowserApi.storage.set("vocabularies", contentState.vocabularies);
 
     // this makes sure to re-render sidebar on data update
     sidebar!.render();
@@ -187,9 +191,27 @@ export const ContentActions = {
 
     sidebar?.render();
   },
+  async removeWebsiteAnnotations() {
+    await api.removeWebsiteFromDocument(
+      contentState.vocabulary!.document!,
+      contentState.website!
+    );
+    contentState.vocabulary!.document!.websites =
+      contentState.vocabulary!.document!.websites.filter(
+        (w) => w.iri !== contentState.website!.iri
+      );
+    // update vocabulary cache
+    await BrowserApi.storage.set("vocabularies", contentState.vocabularies);
+
+    // reset page
+    // contentState = getEmptyContentState();
+    resetContentState();
+    sidebar!.render();
+    initPage();
+  },
 };
 
-window.addEventListener("load", async () => {
+const initPage = async () => {
   contentState.user = await api.getUser();
 
   if (!contentState.user) {
@@ -203,7 +225,9 @@ window.addEventListener("load", async () => {
   annotator = new Annotator(document.body, contentState);
 
   await ContentActions.attemptAnnotatingExistingWebsite();
-});
+};
+
+window.addEventListener("load", initPage);
 
 function initSidebar() {
   sidebar = new Sidebar(

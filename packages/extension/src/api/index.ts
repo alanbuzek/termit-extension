@@ -23,7 +23,7 @@ import SecurityUtils from "../common/util/SecurityUtils";
 import BrowserApi from "../shared/BrowserApi";
 import User, { UserData } from "../common/model/User";
 import { TermsMap } from "../content";
-import Document from "../common/model/Document";
+import Document, { DocumentData } from "../common/model/Document";
 
 // TODO: remove all Promise.resolve() statements and uncomment real back-end calls when ready
 // TODO (optional): use fetch-mock or similar library to mock api server responses, will likely be needed to testing
@@ -100,6 +100,7 @@ export async function savePageAnnotationResults(
   vocabularyIri: string
 ) {
   if (termOccurrences.length > 0) {
+    console.log("termOccurrences: ", termOccurrences);
     await Promise.all(
       termOccurrences.map((termOccurrence) =>
         createTermOccurrence(
@@ -147,7 +148,7 @@ export async function createWebsiteInDocument(url: string, documentIRI: IRI) {
 }
 
 export async function removeWebsiteFromDocument(
-  document: Document,
+  document: DocumentData,
   website: Website
 ) {
   const websiteIRI = VocabularyUtils.create(website.iri);
@@ -210,6 +211,8 @@ export async function getWebsiteTermOccurrences(
   // group to optimize for mark.js, maybe later removed
   const selectorMap = {};
   existingOccurrences.forEach((occurrence) => {
+    console.log('occurrence?.term?.iri: ', occurrence?.term?.iri)
+    console.log('terms: ', terms, ', terms[occurrence.term.iri]: ', occurrence?.term?.iri && terms[occurrence.term.iri])
     if (occurrence?.term?.iri) {
       occurrence.term = terms[occurrence.term.iri];
     }
@@ -309,8 +312,9 @@ export async function updateTermOccurrence(termOccurrence: TermOccurrence) {
   return termitApi.put(
     `/occurrence/${termOccurrenceIRI.fragment}`,
     params({
-      namespace: termIRI.namespace,
+      termNamespace: termIRI.namespace,
       termFragment: termIRI.fragment,
+      occurrenceNamespace: termOccurrenceIRI.namespace
       // TODO:
       // termFragment: term ? VocabularyUtils.create(term.iri).fragment : null,
     })
@@ -343,17 +347,27 @@ export async function createTermOccurrence(
     paramsPayload.termNamespace = termIRI.namespace;
   }
 
+  console.log("TERM OCCURRENCE: ", termOccurrence);
+
+  console.log("payload: ", {
+    exactMatch: termOccurrence.getTextQuoteSelector().exactMatch,
+    selector: termOccurrence.getCssSelector().value,
+    start: termOccurrence.getTextPositionSelector().start,
+    extraTypes: [occurrenceType],
+    id: termOccurrence.id,
+  });
+
   return termitApi
     .post(
       `/occurrence`,
-      params(paramsPayload)
-        .content({
-          exactMatch: termOccurrence.getTextQuoteSelector().exactMatch,
-          selector: termOccurrence.getCssSelector().value,
-          start: termOccurrence.getTextPositionSelector().start,
-          extraTypes: [occurrenceType],
-          id: termOccurrence.id,
-        })
+      content({
+        exactMatch: termOccurrence.getTextQuoteSelector().exactMatch,
+        selector: termOccurrence.getCssSelector().value,
+        start: termOccurrence.getTextPositionSelector().start,
+        extraTypes: [occurrenceType],
+        id: termOccurrence.id,
+      })
+        .params(paramsPayload)
         // TODO: add back in, maybe not?
         // .content(termOccurrence.toJsonLd())
         .contentType(Constants.JSON_MIME_TYPE)

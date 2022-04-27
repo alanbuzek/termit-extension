@@ -1,14 +1,11 @@
 import React from "react";
-import { Spinner } from "reactstrap";
-import Button from "./Button";
+import Button from "../Button";
 import Toggle from "react-toggle";
 import { useState } from "react";
-import VocabularySelect from "../../common/component/vocabulary/VocabularySelect";
-import { useEffect } from "react";
-import { loadVocabularies } from "../../api";
-import Vocabulary from "../../common/model/Vocabulary";
-import { Annotation } from "../../common/util/Annotation";
-import AssetLink from "../../common/component/misc/AssetLink";
+import VocabularySelect from "../../../common/component/vocabulary/VocabularySelect";
+import Vocabulary from "../../../common/model/Vocabulary";
+import { Annotation } from "../../../common/util/Annotation";
+import AssetLink from "../../../common/component/misc/AssetLink";
 
 export const getUrlInfo = (url) => {
   const urlObject = new URL(url);
@@ -17,16 +14,19 @@ export const getUrlInfo = (url) => {
   return { checkedHostname, urlObject };
 };
 
-const PageSummary = ({
+const SidebarControlPanel
+ = ({
   annotations,
   vocabulary,
   vocabularies,
   handleAnnotatePage,
+  handlePageDelete,
 }: {
   vocabulary?: Vocabulary;
   vocabularies?: Vocabulary[];
   annotations?: Annotation[];
   handleAnnotatePage: (v: Vocabulary) => void;
+  handlePageDelete: () => void;
 }) => {
   const loading = false;
   const disabled = false;
@@ -100,8 +100,10 @@ const PageSummary = ({
           annotations on this page.
         </h3>
       </div>
+      <Button onClick={handlePageDelete} color='alert'>Delete page annotations</Button>
     </div>
   );
 };
 
-export default PageSummary;
+export default SidebarControlPanel
+;

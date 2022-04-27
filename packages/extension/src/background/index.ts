@@ -50,45 +50,6 @@ function handleMessages(message, sender, sendResponse) {
 
   return true;
 }
-
-// const BrowserStorage = {
-//   set(key: string, value: any) {
-//     return new Promise((resolve) => {
-//       chrome.storage.local.set({ [key]: value }, function () {
-//         chrome.storage.local.get([key], (result) => {
-//           console.log("Inside got key: ", result[key]);
-//           resolve(result[key]);
-//         });
-//       });
-//     });
-//   },
-//   get(key: string, defaultValue?: any): Promise<any> {
-//     return new Promise((resolve) => {
-//       console.log("getting: ", [key]);
-//       chrome.storage.local.get([key], (result) => {
-//         console.log("OUTSIDE got key2: ", result[key]);
-//         resolve(result[key]);
-//       });
-//     });
-//   },
-//   remove(key: string) {
-//     return chrome.storage.local.remove(key);
-//   },
-// };
-
-// const storageTest = async (name) => {
-//   console.log("starting storage test!");
-//   const value = { complex: "TEST-NAME-" + Math.random() };
-//   console.log("setting test: ", { [name]: value });
-//   console.log("getting test: ", [name]);
-
-//   await BrowserStorage.set(name, value);
-
-//   await BrowserStorage.get(name).then((result) => {
-//     console.log("OUTSIDE got name H-E-R-E: ", result);
-//   });
-// };
-
 async function handleExternalMessages(message, sender, sendResponse) {
   switch (message.type) {
     case ExtensionMessage.LoginEvent: {
