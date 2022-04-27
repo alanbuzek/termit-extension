@@ -31,7 +31,7 @@ const constants = {
   // Will be replaced with actual server url during build
   // TODO: add to env variable
   // SERVER_URL: getEnv("SERVER_URL"),
-  TERMIT_SERVER_URL: 'http://localhost:8082/termit/rest',
+  TERMIT_SERVER_URL: 'http://localhost:8080/termit/rest',
   ANNOTACE_SERVER_URL: 'http://localhost:8888',
   // Prefix of the server REST API
   API_PREFIX,
