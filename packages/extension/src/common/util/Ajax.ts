@@ -312,7 +312,6 @@ export class Ajax {
   }
 
   public post(path: string, config: RequestConfigBuilder) {
-    console.log("config coming in: ", config);
     const conf = {
       headers: config.getHeaders(),
     };

@@ -7,7 +7,6 @@ const TermOccurrencesFeed = ({ annotations }) => {
   const [occurrenceTypeFilter, setOccurrenceTypeFilter] = useState("");
 
   const filteredAnnotations = annotations.filter((annotation) => {
-    console.log("annotation.getClassName(): ", annotation.getClassName());
     return (
       !occurrenceTypeFilter ||
       annotation.getClassName() === occurrenceTypeFilter

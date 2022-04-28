@@ -9,7 +9,6 @@ export const cachedCall = (key, callback) => {
     // TODO: put cache back in
     if (!skipCache && false) {
       const cache = await BrowserApi.storage.get(key);
-      console.log('read cache: ', cache);
       if (cache) {
         return cache;
       }

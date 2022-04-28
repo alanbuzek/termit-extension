@@ -126,7 +126,6 @@ export class ToolbarController {
   }
 
   render() {
-    // console.log("rendering toolbar");
     ReactDOM.render(
       <Toolbar
         closeSidebar={this._closeSidebar}

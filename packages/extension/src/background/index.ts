@@ -55,7 +55,6 @@ async function handleExternalMessages(message, sender, sendResponse) {
     case ExtensionMessage.LoginEvent: {
       // await storageTest('Constants.STORAGE.USER');
       // return;
-      console.log("got to login event case");
       const name = "NO-NAME-" + Math.random();
       const { userData, authToken } = message.payload as LoginEventPayload;
 

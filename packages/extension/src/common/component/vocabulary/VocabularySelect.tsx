@@ -30,7 +30,6 @@ const VocabularySelect: React.FC<VocabularySelectProps> = ({
         className="m-vocabulary-select-item"
         key={vIri}
         onClick={() => {
-          console.log("on change cliked!");
           onVocabularyChange(vocabIdx);
         }}
       >

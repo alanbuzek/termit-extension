@@ -1,5 +1,5 @@
 import * as React from "react";
-import { UncontrolledTooltip } from "reactstrap";
+// import { UncontrolledTooltip } from "reactstrap";
 import Toggle from "react-bootstrap-toggle";
 import { useI18n } from "../hook/useI18n";
 

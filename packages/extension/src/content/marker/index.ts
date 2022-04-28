@@ -50,7 +50,6 @@ export const markTerms = (
   termOccurrencesGroup: TermOccurrence[],
   termsMap
 ): Promise<Annotation[]> => {
-  console.log("termOccurrencesGroup: ", termOccurrencesGroup);
   const cssSelector = termOccurrencesGroup[0].getCssSelector()
 
   return new Promise((resolve, reject) => {

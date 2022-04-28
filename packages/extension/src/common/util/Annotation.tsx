@@ -154,7 +154,5 @@ export class Annotation {
 
   private updateAppearance() {
     this.element!.className = this.getClassName();
-
-    console.log("updated now: ", this);
   }
 }

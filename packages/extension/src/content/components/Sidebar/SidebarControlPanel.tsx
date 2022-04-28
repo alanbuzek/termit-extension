@@ -65,7 +65,6 @@ const SidebarControlPanel = ({
         checked={!disabled}
         icons={false}
         onChange={() => {
-          console.log("TODO");
         }}
       />
     </label>

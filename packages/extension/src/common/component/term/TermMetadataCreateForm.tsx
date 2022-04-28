@@ -109,7 +109,6 @@ export class TermMetadataCreateForm extends React.Component<
   private resolveIdentifier = (label: string) => {
     if (this.state.generateUri && label.length > 0) {
       const vocabularyIri = VocabularyUtils.create(this.props.vocabularyIri);
-      console.log('vocabularyIri: ', vocabularyIri);
       loadIdentifier({
         name: label,
         contextIri: vocabularyIri.toString(),

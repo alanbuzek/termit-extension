@@ -68,7 +68,7 @@ export class AnnotationTerms extends React.Component<AnnotationTermsProps> {
   }
 
   private handleChange = (term: TermData | null) => {
-    console.log('on change: ', term);
+    console.log('term: ', term);
     if (term === null) {
       this.props.selectVocabularyTerm(term);
       this.props.onChange(null);

@@ -100,7 +100,6 @@ export async function savePageAnnotationResults(
   vocabularyIri: string
 ) {
   if (termOccurrences.length > 0) {
-    console.log("termOccurrences: ", termOccurrences);
     await createTermOccurrences(
       termOccurrences,
       website,
@@ -208,13 +207,7 @@ export async function getWebsiteTermOccurrences(
   // group to optimize for mark.js, maybe later removed
   const selectorMap = {};
   existingOccurrences.forEach((occurrence) => {
-    console.log("occurrence?.term?.iri: ", occurrence?.term?.iri);
-    console.log(
-      "terms: ",
-      terms,
-      ", terms[occurrence.term.iri]: ",
-      occurrence?.term?.iri && terms[occurrence.term.iri]
-    );
+   
     if (occurrence?.term?.iri) {
       occurrence.term = terms[occurrence.term.iri];
     }
@@ -359,7 +352,6 @@ export async function createTermOccurrences(
     return payload;
   });
 
-  console.log('contentBody: ', contentBody);
   return termitApi
     .post(
       `/occurrence`,
@@ -410,7 +402,6 @@ export async function getUser() {
   const userData: UserData = await BrowserApi.storage.get(
     Constants.STORAGE.USER
   );
-  console.log("got user data: ", userData);
   if (!userData) {
     return null;
   }

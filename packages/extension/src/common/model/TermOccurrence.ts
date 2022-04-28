@@ -113,7 +113,6 @@ export const createTermOccurrences = (
           originalTerm,
         } = termOccurrence;
 
-        console.log('about: ', about);
         const termOccurrenceData = {
           id: about,
           // iri: VocabularyUtils.WEBSITE_TERM_OCCURRENCE + `/${about}`,

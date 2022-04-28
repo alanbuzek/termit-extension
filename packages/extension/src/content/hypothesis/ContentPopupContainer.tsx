@@ -386,8 +386,6 @@ export class ContentPopupContainer {
         zIndex,
       });
     }
-
-    // console.log("style: ", this.outerContainer.style);
   }
 
   private render(selectionRange?) {

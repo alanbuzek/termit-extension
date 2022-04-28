@@ -81,7 +81,6 @@ function ContentPopup({
   const vocabularyIri = VocabularyUtils.create(contentState.vocabulary!.iri);
 
   const renderContentPopup = () => {
-    console.log("currPopup2: ", currPopup);
     switch (currPopup) {
       case PopupType.CreateTermModal:
         // 4. create term annotation
