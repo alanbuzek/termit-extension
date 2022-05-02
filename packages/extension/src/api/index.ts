@@ -207,7 +207,6 @@ export async function getWebsiteTermOccurrences(
   // group to optimize for mark.js, maybe later removed
   const selectorMap = {};
   existingOccurrences.forEach((occurrence) => {
-   
     if (occurrence?.term?.iri) {
       occurrence.term = terms[occurrence.term.iri];
     }
@@ -270,6 +269,11 @@ export function loadTypes() {
         }
         return new Term(term);
       });
+    })
+    .then((result) => {
+      const map = {};
+      result.forEach((v) => (map[v.iri] = v));
+      return map;
     });
 }
 

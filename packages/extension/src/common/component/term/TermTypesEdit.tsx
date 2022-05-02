@@ -5,22 +5,19 @@ import withI18n, { HasI18n } from "../hoc/withI18n";
 import { IntelligentTreeSelect } from "intelligent-tree-select";
 import "intelligent-tree-select/lib/styles.css";
 import Term, { TermData } from "../../model/Term";
-import { FormFeedback, FormGroup, Label } from "reactstrap";
+// import { FormFeedback, FormGroup, Label } from "reactstrap";
 import VocabularyUtils from "../../util/VocabularyUtils";
 import { getLocalized } from "../../model/MultilingualString";
 import { getShortLocale } from "../../util/IntlUtil";
 import IntlData from "../../model/IntlData";
 import _ from "lodash";
-import HelpIcon from "../misc/HelpIcon";
 import api from "../../../api";
 
 interface TermTypesEditProps extends HasI18n {
   termTypes: string[];
   onChange: (types: string[]) => void;
   validationMessage?: string | JSX.Element;
-  availableTypes: { [key: string]: Term };
   intl: IntlData;
-  loadTypes: () => void;
 }
 
 const getTypesForSelector = _.memoize(
@@ -33,21 +30,16 @@ const getTypesForSelector = _.memoize(
     Object.keys(availableTypes).forEach(
       (t) => (typesMap[t] = new Term(availableTypes[t]))
     );
+    console.log("availableTypes: ", availableTypes);
     const types = Object.keys(typesMap).map((k) => typesMap[k]);
-    
-    console.log('typesMap: ', typesMap);
-    console.log('availableTypes: ', availableTypes);
     types.forEach((t) => {
       if (t.subTerms) {
+        console.log("t.subTerms: ", t.subTerms, ", typesMap: ", typesMap);
+
         // The tree-select needs parent for proper function
         // @ts-ignore
         t.subTerms.forEach((st) => {
-          // TODO
-          if (!typesMap[st]){
-            console.log('typeMap: ', typesMap, ', st: ', st)
-          } else {
-            typesMap[st].parent = t.iri;
-          }
+          typesMap[st] && (typesMap[st].parent = t.iri);
         });
       }
     });
@@ -55,13 +47,12 @@ const getTypesForSelector = _.memoize(
   }
 );
 
-// TODO: deal with this crashing component later
 export class TermTypesEdit extends React.Component<TermTypesEditProps> {
   state = { availableTypes: null };
+
   public async componentDidMount() {
-    // TODO: move this api load?
-    const types = await api.loadTypes();
-    this.setState({ availableTypes: types });
+    const availableTypes = await api.loadTypes();
+    this.setState({ availableTypes });
   }
 
   public onChange = (val: Term | null) => {
@@ -80,22 +71,22 @@ export class TermTypesEdit extends React.Component<TermTypesEditProps> {
   }
 
   public render() {
-    if (!this.state.availableTypes){
+    const { availableTypes } = this.state;
+    if (!availableTypes) {
       return null;
     }
 
-    const types = getTypesForSelector(this.state.availableTypes);
+    const types = getTypesForSelector(availableTypes);
     const selected = this.resolveSelectedTypes(types);
-    const { i18n, intl } = this.props;
-
-  
-    console.log('types: ', types, ', this.props.termTypes: ', this.props.termTypes)
+    const { intl } = this.props;
     return (
-      <FormGroup>
-        <Label className="attribute-label">
+      <div>
+        {/*  <FormGroup> */}
+        {/* <Label className="attribute-label">
           {i18n("term.metadata.types")}
-          {/* <HelpIcon id={"test-types-edit"} text={i18n("term.types.help")} /> */}
-        </Label>
+          <HelpIcon id={"test-types-edit"} text={i18n("term.types.help")} />
+        </Label> */}
+
         <IntelligentTreeSelect
           onChange={this.onChange}
           value={selected}
@@ -113,15 +104,16 @@ export class TermTypesEdit extends React.Component<TermTypesEditProps> {
           renderAsTree={true}
           placeholder=""
         />
-        {this.props.validationMessage && (
+        {/* {this.props.validationMessage && (
           <FormFeedback
             className="validation-feedback"
             title={i18n("validation.message.tooltip")}
           >
             {this.props.validationMessage}
           </FormFeedback>
-        )}
-      </FormGroup>
+        )} */}
+        {/* </FormGroup> */}
+      </div>
     );
   }
 }
