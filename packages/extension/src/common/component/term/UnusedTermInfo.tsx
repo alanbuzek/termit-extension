@@ -3,7 +3,7 @@ import Term from "../../model/Term";
 import Utils from "../../util/Utils";
 import { AiOutlineDisconnect } from "react-icons/ai";
 import { useI18n } from '../hook/useI18n';
-import { UncontrolledTooltip } from 'reactstrap';
+// import { UncontrolledTooltip } from 'reactstrap';
 
 interface UnusedTermInfoProps {
   term: Term;

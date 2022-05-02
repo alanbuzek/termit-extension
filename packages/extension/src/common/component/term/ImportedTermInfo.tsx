@@ -1,7 +1,7 @@
 import * as React from "react";
 import Term from "../../model/Term";
 import { GoFileSymlinkDirectory } from "react-icons/go";
-import { UncontrolledTooltip } from "reactstrap";
+// import { UncontrolledTooltip } from "reactstrap";
 // import Utils from "../../util/Utils";
 // import AssetLabel from "../misc/AssetLabel";
 // import { useI18n } from "../hook/useI18n";
