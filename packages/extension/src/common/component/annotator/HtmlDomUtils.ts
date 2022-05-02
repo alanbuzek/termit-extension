@@ -86,6 +86,19 @@ const HtmlDomUtils = {
       }
     }
   },
+
+  /**
+   * Gets the selected range in the current window, if present and not empty.
+   *
+   * @return Range | null Selected range or null if there is none
+   */
+  getSelectionRange(): Range | null {
+    const sel = window.getSelection();
+    if (sel && !sel.isCollapsed) {
+      return sel.getRangeAt(0);
+    }
+    return null;
+  },
 };
 
 export default HtmlDomUtils;

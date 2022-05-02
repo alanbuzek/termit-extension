@@ -42,7 +42,8 @@ export const DropdownComponent = ({
         <option value="">{defaultOptionText || 'All'}</option>
         {options.map((option) => (
           <option value={option.value} selected={option.value == value}>
-            {option.name}
+            {/* TODO */}
+            {option.name.slice(0, 18)}
           </option>
         ))}
       </select>

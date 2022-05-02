@@ -2,13 +2,26 @@ import ListenerCollection from "./utils/listenerCollection";
 import { ContentPopupContainer } from "./ContentPopupContainer";
 import { createIntegration } from "./integrations";
 import * as rangeUtil from "./utils/rangeUtils";
-import SelectionObserver from "./utils/selectionObserver";
+import SelectionObserver from "./utils/SelectionObserver";
 import Vocabulary from "../../common/model/Vocabulary";
 import { markTerms } from "../marker";
 import { Annotation } from "../../common/util/Annotation";
 import { ContentState } from "..";
 import TermOccurrence from "../../common/model/TermOccurrence";
-import HtmlDomUtils from '../../common/component/annotator/HtmlDomUtils';
+import HtmlDomUtils from "../../common/component/annotator/HtmlDomUtils";
+
+
+
+const termitElements = [
+  "hypothesis-adder",
+  "hypothesis-sidebar",
+  "termit-h",
+];
+
+const isDescendantOfTermItElements = (element?: Element) => {
+  return !!element &&
+  termitElements.some((ancestor) => element.closest(ancestor))
+}
 
 /**
  * `Annotator` is the central class of the annotator that handles anchoring (locating)
@@ -35,7 +48,6 @@ import HtmlDomUtils from '../../common/component/annotator/HtmlDomUtils';
  */
 export default class Annotator {
   private rootElement: any;
-  private isPopupOpen: boolean;
   private contentPopup: ContentPopupContainer;
   private selectionObserver: SelectionObserver;
   private annotations: Annotation[] = [];
@@ -46,16 +58,35 @@ export default class Annotator {
   public constructor(rootElement: HTMLElement, contentState: ContentState) {
     this.contentState = contentState;
     this.rootElement = rootElement;
-    this.isPopupOpen = false;
     this.contentPopup = new ContentPopupContainer(
       this.rootElement,
       this.contentState
     );
 
+    // TODO: remove hypothesis from name, add more elements (e.g, message panel if needed);
+    
     // TODO: fix up selection observer handling
-    this.selectionObserver = new SelectionObserver((range) => {
+    this.selectionObserver = new SelectionObserver((range, event?: Event) => {
+      let shouldIgnore = false;
+
+      if (this.contentPopup.isOpen() && event) {
+        if (event.type === "selectionchange") {
+          const activeElement = event?.target?.activeElement as Element | undefined;
+          shouldIgnore = isDescendantOfTermItElements(activeElement);
+        } else if (event.type === "click") {
+          const targetElement = event?.target as Element | undefined;
+          shouldIgnore = isDescendantOfTermItElements(targetElement);
+        }
+
+        if (shouldIgnore) {
+          console.log("should ignore");
+          return;
+        }
+      }
+
+      this.onClearSelection();
+
       if (range) {
-        this.onClearSelection();
         this.onSelection(range);
       }
     });
@@ -92,7 +123,6 @@ export default class Annotator {
     }
     // HtmlDomUtils.extendSelectionToWords();
     const selectionRange = window.getSelection()?.getRangeAt(0);
-    this.isPopupOpen = true;
     this.contentPopup.show(focusRect, isBackwards, selectionRange);
   }
 
@@ -140,16 +170,11 @@ export default class Annotator {
   }
 
   private onClearSelection() {
-    this.isPopupOpen = false;
     this.contentPopup.hide();
   }
 
   public turnOffAnnotations() {
     this.annotations.forEach((annotation) => annotation.removeOccurrence());
     this.destroy();
-  }
-
-  public getIsPopupOpen() {
-    return this.isPopupOpen;
   }
 }

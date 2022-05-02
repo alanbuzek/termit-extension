@@ -1,4 +1,4 @@
-import ListenerCollection from './listenerCollection';
+import ListenerCollection from "./listenerCollection";
 
 /**
  * Return the current selection or `null` if there is no selection or it is empty.
@@ -22,15 +22,16 @@ function selectedRange(document) {
  * An observer that watches for and buffers changes to the document's current selection.
  */
 export default class SelectionObserver {
-  _pendingCallback: any;
-  _eventHandler: (event: any) => void;
-  _document: Document;
-  _listeners: ListenerCollection;
-  _events: string[];
+  private pendingCallback: any;
+  private eventHandler: (event: any) => void;
+  private document: Document;
+  private listeners: ListenerCollection;
+  private events: string[];
+
   /**
    * Start observing changes to the current selection in the document.
    *
-   * @param {(range: Range|null) => any} callback -
+   * @param {(range: Range|null, event: any) => any} callback -
    *   Callback invoked with the selected region of the document when it has
    *   changed.
    * @param {Document} document_ - Test seam
@@ -38,21 +39,18 @@ export default class SelectionObserver {
   constructor(callback, document_ = document) {
     let isMouseDown = false;
 
-    this._pendingCallback = null;
+    this.pendingCallback = null;
 
-    const scheduleCallback = (delay = 10) => {
-      this._pendingCallback = setTimeout(() => {
-        callback(selectedRange(document_));
+    const scheduleCallback = (delay = 10, event?) => {
+      this.pendingCallback = setTimeout(() => {
+        callback(selectedRange(document_), event);
       }, delay);
     };
 
-    /** @param {Event} event */
-    this._eventHandler = event => {
-      if (event.type === 'mousedown') {
-        isMouseDown = true;
-      }
-      if (event.type === 'mouseup') {
-        isMouseDown = false;
+    this.eventHandler = (event) => {
+      if (event.type === "mousedown" || event.type === "mouseup") {
+        isMouseDown = event.type === "mousedown";
+        return;
       }
 
       // If the user makes a selection with the mouse, wait until they release
@@ -63,27 +61,16 @@ export default class SelectionObserver {
 
       this._cancelPendingCallback();
 
-      // Schedule a notification after a short delay. The delay serves two
-      // purposes:
-      //
-      // - If this handler was called as a result of a 'mouseup' event then the
-      //   selection will not be updated until the next tick of the event loop.
-      //   In this case we only need a short delay.
-      //
-      // - If the user is changing the selection with a non-mouse input (eg.
-      //   keyboard or selection handles on mobile) this buffers updates and
-      //   makes sure that we only report one when the update has stopped
-      //   changing. In this case we want a longer delay.
-
-      const delay = event.type === 'mouseup' ? 10 : 100;
-      scheduleCallback(delay);
+      // Schedule a notification after a short delay.
+      const delay = 10;
+      scheduleCallback(delay, event);
     };
 
-    this._document = document_;
-    this._listeners = new ListenerCollection();
-    this._events = ['mousedown', 'mouseup', 'selectionchange'];
-    for (let event of this._events) {
-      this._listeners.add(document_, event, this._eventHandler);
+    this.document = document_;
+    this.listeners = new ListenerCollection();
+    this.events = ["mousedown", "mouseup", "selectionchange", "click"];
+    for (let event of this.events) {
+      this.listeners.add(document_, event, this.eventHandler, undefined);
     }
 
     // Report the initial selection.
@@ -91,14 +78,14 @@ export default class SelectionObserver {
   }
 
   disconnect() {
-    this._listeners.removeAll();
+    this.listeners.removeAll();
     this._cancelPendingCallback();
   }
 
   _cancelPendingCallback() {
-    if (this._pendingCallback) {
-      clearTimeout(this._pendingCallback);
-      this._pendingCallback = null;
+    if (this.pendingCallback) {
+      clearTimeout(this.pendingCallback);
+      this.pendingCallback = null;
     }
   }
 }

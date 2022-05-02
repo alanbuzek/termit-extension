@@ -388,6 +388,10 @@ export class ContentPopupContainer {
     }
   }
 
+  public isOpen(){
+    return this.isVisible
+  }
+
   private render(selectionRange?) {
     const handleCommand = (command) => {
       // TODO: figure out if something of this nature is needed?
