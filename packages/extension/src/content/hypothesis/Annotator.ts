@@ -5,11 +5,9 @@ import * as rangeUtil from "./utils/rangeUtils";
 import SelectionObserver from "./utils/selectionObserver";
 import Vocabulary from "../../common/model/Vocabulary";
 import { markTerms } from "../marker";
-import backgroundApi from "../../shared/backgroundApi";
 import { Annotation } from "../../common/util/Annotation";
 import { ContentState } from "..";
-import Term from "../../common/model/Term";
-import TermOccurrence from '../../common/model/TermOccurrence';
+import TermOccurrence from "../../common/model/TermOccurrence";
 
 /**
  * `Annotator` is the central class of the annotator that handles anchoring (locating)
@@ -36,33 +34,21 @@ import TermOccurrence from '../../common/model/TermOccurrence';
  */
 export default class Annotator {
   private rootElement: any;
-  private annotationsVisible: boolean;
-  private isPopupVisible: boolean;
+  private isPopupOpen: boolean;
   private contentPopup: ContentPopupContainer;
-  private selectionObserver: any;
-  // TODO: add annotation type
+  private selectionObserver: SelectionObserver;
   private annotations: Annotation[] = [];
   private integration: any;
-  private bucketBarClient: any;
-  private listeners: any;
   private currentAnnotation?: Annotation;
   private contentState: ContentState;
 
   public constructor(rootElement: HTMLElement, contentState: ContentState) {
     this.contentState = contentState;
     this.rootElement = rootElement;
-    this.annotationsVisible = false;
-    this.isPopupVisible = false;
+    this.isPopupOpen = false;
     this.contentPopup = new ContentPopupContainer(
       this.rootElement,
       this.contentState
-      // TODO: are these handlers needed?
-      // {
-      //   onAnnotate: () => console.log("this.createAnnotation()"),
-      //   onHighlight: () => console.log("({ highlight: true })"),
-      //   onShowAnnotations: (tags) =>
-      //     console.log("this.selectAnnotations(tags)"),
-      // }
     );
 
     // TODO: fix up selection observer handling
@@ -70,7 +56,6 @@ export default class Annotator {
       if (range) {
         this.onClearSelection();
         this.onSelection(range);
-      } else {
       }
     });
 
@@ -80,24 +65,10 @@ export default class Annotator {
      */
     this.integration = createIntegration(this);
 
-    // TODO: to be implemented soon
-    // this.bucketBarClient = new BucketBarClient({
-    //   contentContainer: this.integration.contentContainer(),
-    //   hostRPC: this._hostRPC,
-    // });
-
     // Setup event handlers on the root element
-    this.listeners = new ListenerCollection();
-    this.setupElementEvents();
-  }
-
-  private setupElementEvents() {
-    this.listeners.add(window, "resize", () => this.repositionAdder());
   }
 
   private destroy() {
-    this.listeners.removeAll();
-
     this.selectionObserver.disconnect();
     this.contentPopup.destroy();
     this.integration.destroy();
@@ -118,7 +89,7 @@ export default class Annotator {
       return;
     }
     const selectionRange = window.getSelection()?.getRangeAt(0);
-    this.isPopupVisible = true;
+    this.isPopupOpen = true;
     this.contentPopup.show(focusRect, isBackwards, selectionRange);
   }
 
@@ -165,53 +136,16 @@ export default class Annotator {
   }
 
   private onClearSelection() {
-    this.isPopupVisible = false;
+    this.isPopupOpen = false;
     this.contentPopup.hide();
   }
 
-  // TODO: anything past this is TODO
-  /**
-   * Set whether highlights are visible in the document or not.
-   *
-   * @param {boolean} visible
-   */
-  setHighlightsVisible(visible) {
-    // TODO:
-    // setHighlightsVisible(this.rootElement, visible);
-    this.annotationsVisible = visible;
-  }
-
-  // TODO: implement this later
-  /**
-   * Shift the position of the adder on window 'resize' events
-   */
-  private repositionAdder() {
-    // if (this.isPopupVisible === false) {
-    //   return;
-    // }
-    // const range = window.getSelection()?.getRangeAt(0);
-    // if (range) {
-    //   this.onSelection(range);
-    // }
-  }
-
-  /**
-   * Retrieve metadata for the current document.
-   */
-  // async getDocumentInfo() {
-  //   const [uri, metadata] = await Promise.all([
-  //     this.integration.uri(),
-  //     this.integration.getMetadata(),
-  //   ]);
-
-  //   return {
-  //     uri: normalizeURI(uri),
-  //     metadata,
-  //   };
-  // }
-
-  public turnOffAnnotations(){
-    this.annotations.forEach(annotation => annotation.removeOccurrence())
+  public turnOffAnnotations() {
+    this.annotations.forEach((annotation) => annotation.removeOccurrence());
     this.destroy();
+  }
+
+  public getIsPopupOpen() {
+    return this.isPopupOpen;
   }
 }

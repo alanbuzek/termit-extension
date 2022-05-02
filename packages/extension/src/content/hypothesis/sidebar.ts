@@ -1,4 +1,4 @@
-import Vocabulary from '../../common/model/Vocabulary';
+import Vocabulary from "../../common/model/Vocabulary";
 
 import { sendErrorsTo } from "../../shared/frame-error-capture";
 import { ListenerCollection } from "../../shared/listener-collection";
@@ -6,7 +6,8 @@ import { MessageType } from "../../types/messageTypes";
 import { createShadowRoot } from "./ContentPopupContainer";
 import SidebarContainer from "../components/sidebar/SidebarContainer";
 import { ToolbarController } from "./toolbar";
-import { ContentState } from '..';
+import { ContentState } from "..";
+import { BucketBar } from "./BucketBar";
 
 // Minimum width to which the iframeContainer can be resized.
 export const MIN_RESIZE = 280;
@@ -20,15 +21,12 @@ export const MIN_RESIZE = 280;
 export class Sidebar {
   private config: {};
   private sidebarComponent: SidebarContainer;
-  private bucketBar: null;
+  private bucketBar: BucketBar;
   private iframeContainer: HTMLDivElement;
   private hypothesisSidebar: HTMLElement;
   private listeners: any;
   private toolbar: any;
-  private toolbarWidth: any;
-  private onHelpRequest: any;
-  private onLayoutChange: any;
-  
+
   /**
    * @param {HTMLElement} element
    * @param {import('./util/emitter').EventBus} eventBus -
@@ -41,30 +39,19 @@ export class Sidebar {
     handleAnnotatePage: (vocabulary: Vocabulary) => void,
     config: Record<string, any> = {}
   ) {
-
     this.config = config;
-
-    /** @type {BucketBar|null} */
-    this.bucketBar = null;
 
     this.iframeContainer = document.createElement("div");
     this.iframeContainer.className = "annotator-frame";
 
-
-    // TODO: this will be needed
-    // this.bucketBar = new BucketBar(this.iframeContainer, {
-    //   onFocusAnnotations: (tags) =>
-    //     this._guestRPC.forEach((rpc) => rpc.call("focusAnnotations", tags)),
-    //   onScrollToClosestOffScreenAnchor: (tags, direction) =>
-    //     this._guestRPC.forEach((rpc) =>
-    //       rpc.call("scrollToClosestOffScreenAnchor", tags, direction)
-    //     ),
-    //   onSelectAnnotations: (tags, toggle) =>
-    //     this._guestRPC.forEach((rpc) =>
-    //       rpc.call("selectAnnotations", tags, toggle)
-    //     ),
-    // });
-
+    this.bucketBar = new BucketBar(this.iframeContainer, {
+      onFocusAnnotations: (tags) => {
+        console.log("BucketBar: onFocusAnnotations");
+      },
+      onScrollToClosestOffScreenAnchor: (tags, direction) =>
+        console.log("onScrollToClosestOffScreenAnchor"),
+      onSelectAnnotations: (tags, toggle) => console.log("onSelectAnnotations"),
+    });
 
     // Wrap up the 'iframeContainer' element into a shadow DOM so it is not affected by host CSS styles
     this.hypothesisSidebar = document.createElement("hypothesis-sidebar");
@@ -82,15 +69,11 @@ export class Sidebar {
     sidebarContainer.style["z-index"] = 3;
 
     this.iframeContainer.appendChild(sidebarContainer);
-
-    this.sidebarComponent = new SidebarContainer(sidebarContainer, state, handleAnnotatePage);
-
-    // TODO: is this needed?
-    // Register the sidebar as a handler for Hypothesis errors in this frame.
-    // if (this.iframe.contentWindow) {
-    //   sendErrorsTo(this.iframe.contentWindow);
-    // }
-
+    this.sidebarComponent = new SidebarContainer(
+      sidebarContainer,
+      state,
+      handleAnnotatePage
+    );
     this.listeners = new ListenerCollection();
 
     // Set up the toolbar on the left edge of the sidebar.
@@ -138,7 +121,7 @@ export class Sidebar {
     this.listeners.removeAll();
     if (this.hypothesisSidebar) {
       this.hypothesisSidebar.remove();
-    } 
+    }
     this.sidebarComponent.destroy();
 
     sendErrorsTo(null);
@@ -171,7 +154,6 @@ export class Sidebar {
     if (this.config.showHighlights === "whenSidebarOpen") {
       this.setHighlightsVisible(true);
     }
-
   }
 
   close() {

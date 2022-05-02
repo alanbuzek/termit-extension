@@ -1,8 +1,6 @@
-import scrollIntoView from 'scroll-into-view';
+import scrollIntoView from "scroll-into-view";
 
-import { anchor, describe } from '../anchoring/html';
-
-import { HTMLMetadata } from './html-metadata';
+import { HTMLMetadata } from "./html-metadata";
 
 /**
  * @typedef {import('../../types/annotator').Anchor} Anchor
@@ -18,45 +16,24 @@ import { HTMLMetadata } from './html-metadata';
  * @implements {Integration}
  */
 export class HTMLIntegration {
+  private container: HTMLElement;
+
   constructor(container = document.body) {
     this.container = container;
-    this.anchor = anchor;
-    this.describe = describe;
 
-    this._htmlMeta = new HTMLMetadata();
   }
 
-  canAnnotate() {
-    return true;
-  }
-
-  destroy() {
-    // There is nothing to do here yet.
-  }
 
   contentContainer() {
     return this.container;
-  }
-
-  fitSideBySide() {
-    // Not yet implemented.
-    return false;
-  }
-
-  async getMetadata() {
-    return this._htmlMeta.getDocumentMetadata();
-  }
-
-  async uri() {
-    return this._htmlMeta.uri();
   }
 
   /**
    * @param {Anchor} anchor
    */
   scrollToAnchor(anchor) {
-    const highlights = /** @type {Element[]} */ (anchor.highlights);
-    return new Promise(resolve => {
+    const highlights = /** @type {Element[]} */ anchor.highlights;
+    return new Promise((resolve) => {
       scrollIntoView(highlights[0], resolve);
     });
   }

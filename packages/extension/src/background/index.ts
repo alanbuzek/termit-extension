@@ -86,7 +86,6 @@ chrome.action.onClicked.addListener((tab) => {
   chrome.tabs.sendMessage(
     tab.id,
     { type: MessageType.OpenToolbar },
-    function (response) {}
   );
 });
 

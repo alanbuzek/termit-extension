@@ -102,7 +102,6 @@ export const ContentActions = {
     // update vocabulary cache
     await BrowserApi.storage.set("vocabularies", contentState.vocabularies);
     overlay.off();
-    console.log('got to render here:')
     // this makes sure to re-render sidebar on data update
     sidebar!.render();
 
@@ -174,7 +173,6 @@ export const ContentActions = {
       contentState.terms
     );
 
-    console.log("new term Occurrence: ", newTermOccurrence);
     const [newAnnotation] = await markTerms(
       [newTermOccurrence],
       contentState.terms
