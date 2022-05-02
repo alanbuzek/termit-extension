@@ -1,11 +1,8 @@
 import { getCssSelector } from "css-selector-generator";
-import { ContentActions } from '..';
+import { ContentActions, TermsMap } from "..";
 import { getPropertyForAnnotationType } from "../../common/component/annotator/AnnotationDomHelper";
 import TermOccurrence, {
   createTermOccurrences,
-  CssSelector,
-  TextPositionSelector,
-  TextQuoteSelector,
 } from "../../common/model/TermOccurrence";
 import {
   Annotation,
@@ -13,7 +10,6 @@ import {
   AnnotationType,
 } from "../../common/util/Annotation";
 import JsonLdUtils from "../../common/util/JsonLdUtils";
-import VocabularyUtils from "../../common/util/VocabularyUtils";
 import Mark from "../../markjs";
 
 // TODO: this most likely will be able to be removed
@@ -24,6 +20,22 @@ const classesMap = {
   newTermProposal: "proposed-occurrence suggested-term-occurrence",
   existingTermProposal: "proposed-occurrence assigned-term-occurrence",
 };
+
+/**
+ * Returns true if the start point of a selection occurs after the end point,
+ * in document order.
+ *
+ * @param {Selection} selection
+ */
+export function isSelectionBackwards(selection) {
+  if (selection.focusNode === selection.anchorNode) {
+    return selection.focusOffset < selection.anchorOffset;
+  }
+
+  const range = selection.getRangeAt(0);
+
+  return range.startContainer === selection.focusNode;
+}
 
 const handleElementClick = (annotation) => () => {
   ContentActions.showPopup(annotation);
@@ -50,7 +62,7 @@ export const markTerms = (
   termOccurrencesGroup: TermOccurrence[],
   termsMap
 ): Promise<Annotation[]> => {
-  const cssSelector = termOccurrencesGroup[0].getCssSelector()
+  const cssSelector = termOccurrencesGroup[0].getCssSelector();
 
   return new Promise((resolve, reject) => {
     const selectedElements = Array.from(
@@ -85,30 +97,13 @@ export const markTerms = (
         termOccurrence,
         termOccurrence.term?.iri && termsMap[termOccurrence.term.iri]
       );
-      const textPositionSelector = termOccurrence.getTextPositionSelector()
-      const textQuoteSelector = termOccurrence.getTextQuoteSelector()
+      const textPositionSelector = termOccurrence.getTextPositionSelector();
+      const textQuoteSelector = termOccurrence.getTextQuoteSelector();
 
-      
       markInstance.mark(textQuoteSelector.exactMatch, {
         // NOTE: partially is safer, as we may not have an exhaustive list of limiters, and since we know the exact position
         // of the word, there's no reason not to use it (even though it might not be used very often)
         accuracy: "partially",
-        // accuracy: {
-        //   value: 'exactly',
-        //   limiters: [
-        //     ',',
-        //     '.',
-        //     ':',
-        //     ';',
-        //     "'",
-        //     '"',
-        //     '?',
-        //     '!',
-        //     ')',
-        //     '(',
-        //     '-',
-        //   ],
-        // },
         filter(node, term, offestInCurrentNode) {
           let calculatedOffset = node.textContent.slice(0, offestInCurrentNode);
           let currNode = node;
@@ -122,13 +117,16 @@ export const markTerms = (
           const pureLeft = calculatedOffset.replace(/\s/g, "").length;
           const pureRight = textPositionSelector.start;
 
+          console.log("got to filter: ", pureLeft, pureRight);
+
           return pureLeft === pureRight;
         },
-        element: "termit-h",
+        element: "termit-h", // termit-highlight element
         diacritcs: false,
-        exclude: ["termit-h"],
+        exclude: ["termit-h"], // don't allow matches within matches
         caseSensitive: true,
         separateWordSearch: false,
+        // acrossElements: true,
         // TODO: determine term types and corresponding classes dynamically
         className: annotation.getClassName(),
         each(element) {
@@ -165,29 +163,75 @@ export const markTerms = (
   });
 };
 
-// TODO: move this to some sort of a Utils file?
-export const occurrenceFromRange = (
-  range,
-  annotationType,
-  websiteIri,
-  termsMap
-) => {
+const calculateRangeOffset = (range: Range) => {
+  // TODO: isSelectionBackwards?
+
+  // ------ NEW ------
+
   let parentElement = range.startContainer;
-  if (!parentElement) {
-    throw new Error("No parent element to create annotation!");
-  }
+
   const isTextNode = parentElement.nodeType === Node.TEXT_NODE;
   const selectedString = range.toString();
+
   let startOffsetIdx;
   if (isTextNode) {
-    const nodeText = parentElement.wholeText;
-    parentElement = parentElement.parentNode;
+    const nodeText = (parentElement as Text).wholeText;
+    // map parent element to one level above if it's a text node
+    parentElement = parentElement.parentNode as Node;
     startOffsetIdx =
-      parentElement.textContent.indexOf(nodeText) + range.startOffset;
+      parentElement.textContent!.indexOf(nodeText) + range.startOffset;
   } else {
     startOffsetIdx = range.startOffset;
   }
+
+  let offsetString = parentElement.textContent!.slice(0, startOffsetIdx);
+
+  const isAcrossMultipleElements = range.startContainer !== range.endContainer;
+
+  let commonAncestor = range.commonAncestorContainer;
+
+  if (!commonAncestor) {
+    // TODO: handle better? this should probably never happen?
+    throw new Error("No parent element to create annotation!");
+  }
+
+  if (isAcrossMultipleElements) {
+    let currentElement = parentElement;
+    while (currentElement !== commonAncestor) {
+      let currentPreviousSibling = currentElement.previousSibling;
+      while (currentPreviousSibling) {
+        offsetString += currentPreviousSibling.textContent || "";
+        currentPreviousSibling = currentPreviousSibling.previousSibling;
+      }
+      currentElement = currentElement.parentNode!;
+    }
+  }
+  // -------------
+
+  console.log("returned object: ", {
+    offset: offsetString.replace(/\s/g, "").length,
+    parentElement: isAcrossMultipleElements ? commonAncestor : parentElement,
+    isAcrossMultipleElements,
+  });
+
+  return {
+    offset: offsetString.replace(/\s/g, "").length,
+    parentElement: isAcrossMultipleElements ? commonAncestor : parentElement,
+    isAcrossMultipleElements,
+  };
+};
+
+// TODO: move this to some sort of a Utils file?
+export const occurrenceFromRange = (
+  range: Range,
+  annotationType: string,
+  websiteIri: string | undefined,
+  termsMap: TermsMap | null
+) => {
+  const { offset, parentElement } = calculateRangeOffset(range);
   const generatedCssSelector = getCssSelector(parentElement);
+  const selectionContent = range.toString();
+  // TODO: change this ugly object schema
   const newTerm: {
     cssSelectors: string[];
     termOccurrences: {
@@ -203,14 +247,15 @@ export const occurrenceFromRange = (
   // TODO: annotation type should not be hard-coded
   const termOccurrence = {
     about: JsonLdUtils.generateBlankNodeId(),
-    content: selectedString,
-    originalTerm: selectedString,
+    content: selectionContent,
+    originalTerm: selectionContent,
     // property: "ddo:je-výskytem-termu",
     property: getPropertyForAnnotationType(annotationType),
-    startOffset: parentElement.textContent.slice(0, startOffsetIdx),
+    startOffset: offset,
+    // startOffset: offset,
     // typeof: "ddo:výskyt-termu",
     typeof: annotationType,
-    score: 1
+    score: 1,
   };
   newTerm.cssSelectors.push(generatedCssSelector);
   newTerm.termOccurrences.push(termOccurrence);
@@ -220,7 +265,13 @@ export const occurrenceFromRange = (
     termsMap,
     [annotationType]
   );
-  console.log('inner termOccurrenceResult: ', termOccurrenceResult)
+
+  console.log(
+    "startOffset: ",
+    termOccurrence.startOffset,
+    ", parentElement: ",
+    parentElement
+  );
 
   return termOccurrenceResult[0];
 };

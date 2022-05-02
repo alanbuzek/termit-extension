@@ -146,7 +146,7 @@ export const createTermOccurrences = (
                 // TODO; maybe remove this?
                 end: -1,
                 // TODO: adjust for just storing length, in annotace service
-                start: startOffset.replace(/\s/g, "").length,
+                start: startOffset,
               },
               {
                 // iri: VocabularyUtils.CSS_SELECTOR + "/instance455547086",

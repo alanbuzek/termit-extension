@@ -79,6 +79,7 @@ export default class Annotator {
    *
    * @param {Range} range
    */
+  // TODO: we get rid of this? unused now...
   private onSelection(range: Range) {
     const selection = /** @type {Selection} */ document.getSelection();
     const isBackwards = rangeUtil.isSelectionBackwards(selection);

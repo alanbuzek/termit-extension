@@ -606,8 +606,8 @@ class Mark {
         // note that dict will be updated automatically, as it'll change
         // in the wrapping process, due to the fact that text
         // nodes will be splitted
-        this.wrapRangeInMappedTextNode(dict, start, end, node => {
-          return filterCb(match[matchIdx], node);
+        this.wrapRangeInMappedTextNode(dict, start, end, (node, offset) => {
+          return filterCb(match[matchIdx], node, offset);
         }, (node, lastIndex) => {
           regex.lastIndex = lastIndex;
           eachCb(node);
@@ -845,7 +845,7 @@ class Mark {
         let matches = 0;
         this.log(`Searching with expression "${regex}"`);
         this[fn](regex, 1, (term, node, offset) => {
-          return this.opt.filter(node, kw, offset,  totalMatches, matches);
+          return this.opt.filter(node, kw, offset, totalMatches, matches);
         }, element => {
           matches++;
           totalMatches++;
