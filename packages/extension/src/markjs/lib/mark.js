@@ -989,6 +989,9 @@ class Mark {
     this.opt = opt;
     let sel = this.opt.element ? this.opt.element : "*";
     sel += "[data-markjs]";
+    if (this.opt.attribute){
+      sel += `[${this.opt.attribute.key}="${this.opt.attribute.value}"]`
+    }
     if (this.opt.className) {
       sel += `.${this.opt.className}`;
     }

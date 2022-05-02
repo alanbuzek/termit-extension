@@ -106,7 +106,8 @@ const constants = {
   ANNOTATOR_TUTORIAL: {},
   STORAGE: {
     USER: "USER"
-  }
+  },
+  MAX_HIGHLIGHT_DEPTH: 1,
 };
 
 constants.ANNOTATOR_TUTORIAL[constants.LANG.CS.locale] =

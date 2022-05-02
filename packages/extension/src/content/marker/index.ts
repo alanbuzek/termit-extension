@@ -37,7 +37,9 @@ export function isSelectionBackwards(selection) {
   return range.startContainer === selection.focusNode;
 }
 
-const handleElementClick = (annotation) => () => {
+const handleElementClick = (annotation) => (event) => {
+  event.stopPropagation();
+  event.preventDefault();
   ContentActions.showPopup(annotation);
 };
 
@@ -55,7 +57,15 @@ const results = {
 };
 
 export const unmarkTerm = (element: HTMLElement) => {
-  return new Promise((resolve) => new Mark(element).unmark({ done: resolve }));
+  return new Promise((resolve) =>
+    new Mark(element).unmark({
+      done: resolve,
+      attribute: {
+        key: "data-term-occurrence-iri",
+        value: element.dataset.termOccurrenceIri,
+      },
+    })
+  );
 };
 
 export const markTerms = (
@@ -95,6 +105,7 @@ export const markTerms = (
     termOccurrencesGroup.forEach((termOccurrence) => {
       const annotation = new Annotation(
         termOccurrence,
+        selectedElements[0],
         termOccurrence.term?.iri && termsMap[termOccurrence.term.iri]
       );
       const textPositionSelector = termOccurrence.getTextPositionSelector();
@@ -123,7 +134,8 @@ export const markTerms = (
           while (currentElement !== commonAncestor) {
             let currentPreviousSibling = currentElement.previousSibling;
             while (currentPreviousSibling) {
-              calculatedOffset = (currentPreviousSibling.textContent || "") + calculatedOffset;
+              calculatedOffset =
+                (currentPreviousSibling.textContent || "") + calculatedOffset;
               currentPreviousSibling = currentPreviousSibling.previousSibling;
             }
             currentElement = currentElement.parentNode!;
@@ -147,7 +159,8 @@ export const markTerms = (
         },
         element: "termit-h", // termit-highlight element
         diacritcs: false,
-        exclude: ["termit-h"], // don't allow matches within matches
+        exclude: [],
+        // exclude: ["termit-h"], // don't allow matches within matches
         caseSensitive: true,
         separateWordSearch: false,
         acrossElements: true,
@@ -156,6 +169,7 @@ export const markTerms = (
         each(element) {
           // console.log("registering listener: ", element);
           element.addEventListener("click", handleElementClick(annotation));
+          element.dataset.termOccurrenceIri = annotation.termOccurrence.id;
           annotation.addElement(element);
         },
         done(numberOfMatches) {

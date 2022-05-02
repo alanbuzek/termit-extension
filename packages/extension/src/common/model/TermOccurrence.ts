@@ -14,7 +14,7 @@ export function isAnnotationWithMinimumScore(
   score: number,
   threshold: number
 ): boolean {
-  return typeof score !== 'number' || threshold <= score;
+  return typeof score !== "number" || threshold <= score;
 }
 
 export const ANNOTATION_MINIMUM_SCORE_THRESHOLD = 0.65;
@@ -118,7 +118,7 @@ export const createTermOccurrences = (
           // iri: VocabularyUtils.WEBSITE_TERM_OCCURRENCE + `/${about}`,
           types: [
             VocabularyUtils.TERM_OCCURRENCE,
-            VocabularyUtils.WEBSITE_TERM_OCCURRENCE
+            VocabularyUtils.WEBSITE_TERM_OCCURRENCE,
           ],
           score,
           term: resource ? terms[resource] : undefined,
@@ -161,7 +161,7 @@ export const createTermOccurrences = (
           },
         };
 
-        if (extraTypes){
+        if (extraTypes) {
           termOccurrenceData.types.push(...extraTypes);
         }
 
@@ -213,18 +213,22 @@ export const createTermOccurrences = (
 
 export default class TermOccurrence extends TermAssignment {
   public target: OccurrenceTarget;
-  public id?: string;
+  public id: string;
   public score?: number;
 
   constructor(data: TermOccurrenceData) {
     super(data);
     this.target = data.target;
     this.target.selectors = Utils.sanitizeArray(this.target.selectors);
-    if (data.id){
+    if (data.id) {
       this.id = data.id;
+    } else if (data.iri) {
+      this.id = VocabularyUtils.create(data.iri).fragment;
+    } else {
+      throw new Error(`This term occurrence doesn't have an identifier!`);
     }
-    if (typeof data.score === 'number'){
-      this.score = data.score
+    if (typeof data.score === "number") {
+      this.score = data.score;
     }
   }
 
@@ -242,26 +246,26 @@ export default class TermOccurrence extends TermAssignment {
     (result as any).term = { iri: this.term?.iri };
     return result;
   }
-  
-  public getTextQuoteSelector(){
-    return this.target.selectors.find(
-      (selector) => selector.types.includes(VocabularyUtils.TEXT_QUOTE_SELECTOR)
+
+  public getTextQuoteSelector() {
+    return this.target.selectors.find((selector) =>
+      selector.types.includes(VocabularyUtils.TEXT_QUOTE_SELECTOR)
     ) as TextQuoteSelector;
   }
 
-  public getCssSelector(){
-    return this.target.selectors.find(
-      (selector) => selector.types.includes(VocabularyUtils.CSS_SELECTOR)
+  public getCssSelector() {
+    return this.target.selectors.find((selector) =>
+      selector.types.includes(VocabularyUtils.CSS_SELECTOR)
     ) as CssSelector;
   }
 
-  public getTextPositionSelector(){
-    return this.target.selectors.find(
-      (selector) => selector.types.includes(VocabularyUtils.TEXT_POSITION_SELECTOR)
+  public getTextPositionSelector() {
+    return this.target.selectors.find((selector) =>
+      selector.types.includes(VocabularyUtils.TEXT_POSITION_SELECTOR)
     ) as TextPositionSelector;
   }
 
-  public getTextContent(){
+  public getTextContent() {
     return this.getTextQuoteSelector().exactMatch;
   }
 }

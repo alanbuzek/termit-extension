@@ -52,6 +52,8 @@ export class Annotation {
   public term: Term | null = null;
   private annotatationStatus: AnnotationStatus = AnnotationStatus.PENDING;
   private elements: HTMLElement[] = [];
+  private hoveredElements = new Set<HTMLElement>();
+  private containerElement: HTMLElement;
   // methods:
   // markAnnotation(); (called by contructor)
   // remove(); (will hide the annotation)
@@ -66,9 +68,10 @@ export class Annotation {
   // - reference to the node where it has been rendered
   // - term itself (if application)
 
-  constructor(termOccurrence, term = null) {
+  constructor(termOccurrence, containerElement, term = null) {
     this.termOccurrence = termOccurrence;
     this.term = term;
+    this.containerElement = containerElement;
   }
 
   public getTermState() {
@@ -137,6 +140,16 @@ export class Annotation {
   }
 
   public addElement(newElement: HTMLElement) {
+    newElement.addEventListener("mouseover", (e) => {
+      e.stopPropagation();
+      this.hoveredElements.add(newElement);
+      this.updateAppearance();
+    });
+    newElement.addEventListener("mouseout", (e) => {
+      e.stopPropagation();
+      this.hoveredElements.delete(newElement);
+      this.updateAppearance();
+    });
     this.elements.push(newElement);
   }
 
@@ -158,13 +171,48 @@ export class Annotation {
     this.updateAppearance();
   }
 
-  public removeOccurrence() {
-    return Promise.all(this.elements.map((element) => unmarkTerm(element)));
+  public async removeOccurrence() {
+    await Promise.all(this.elements.map((element) => unmarkTerm(element)));
+    this.updateRelatedAnnotationElements();
   }
 
-  private updateAppearance() {
+  public updateAppearance() {
+    // TODO: debounce
+    const standardClassName = this.getClassName();
+    const hoveredClassName = this.isHovered() ? " termit-h-hovered" : "";
     this.elements.forEach((element) => {
-      element!.className = this.getClassName();
+      element!.className = standardClassName + hoveredClassName;
+      Annotation.updateElementDepthPadding(element);
     });
+  }
+
+  public static updateElementDepthPadding(element) {
+    const depth = Annotation.getElementDepth(element);
+    element.style.padding = `${8 * depth}px`;
+  }
+
+  private isHovered() {
+    return this.hoveredElements.size > 0;
+  }
+
+  public static getElementDepth(element: HTMLElement) {
+    let depth = 0;
+    let curreElement = element;
+    while (curreElement.children.length) {
+      depth += 1;
+      curreElement = curreElement.children[0] as HTMLElement;
+    }
+
+    console.log("depth: ", depth);
+
+    return depth;
+  }
+
+  public updateRelatedAnnotationElements() {
+    Array.from(this.containerElement.querySelectorAll("termit-h")).forEach(
+      (element) => {
+        Annotation.updateElementDepthPadding(element);
+      }
+    );
   }
 }

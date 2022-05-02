@@ -106,8 +106,8 @@ export const ContentActions = {
     sidebar!.render();
 
     setTimeout(() => {
-      sidebar?.render()
-    }, 200)
+      sidebar?.render();
+    }, 200);
   },
   async attemptAnnotatingExistingWebsite() {
     const foundExistingWebsite = await api.getExistingWebsite(
@@ -170,13 +170,15 @@ export const ContentActions = {
       selectionRange,
       annotationType,
       contentState.website?.iri,
-      contentState.terms
+      contentState.terms,
     );
 
     const [newAnnotation] = await markTerms(
       [newTermOccurrence],
       contentState.terms
     );
+
+    newAnnotation.updateRelatedAnnotationElements();
 
     contentState.annotations!.push(newAnnotation);
     this.showPopup(newAnnotation);
@@ -253,7 +255,7 @@ const initPage = async () => {
 window.addEventListener("load", initPage);
 
 function initSidebar() {
-  if (sidebar){
+  if (sidebar) {
     sidebar.destroy();
   }
 

@@ -9,6 +9,7 @@ import { Annotation } from "../../common/util/Annotation";
 import { ContentState } from "..";
 import TermOccurrence from "../../common/model/TermOccurrence";
 import HtmlDomUtils from "../../common/component/annotator/HtmlDomUtils";
+import Constants from "../../common/util/Constants";
 
 const termitElements = ["hypothesis-adder", "hypothesis-sidebar", "termit-h"];
 
@@ -120,7 +121,7 @@ export default class Annotator {
    */
   // TODO: we get rid of this? unused now...
   private onSelection(range: Range) {
-    const selection = /** @type {Selection} */ document.getSelection();
+    const selection: Selection = document.getSelection()!;
     const isBackwards = rangeUtil.isSelectionBackwards(selection);
     const focusRect = rangeUtil.selectionFocusRect(selection);
     if (!focusRect) {
@@ -129,8 +130,41 @@ export default class Annotator {
       return;
     }
     HtmlDomUtils.extendSelectionToWords();
-    const selectionRange = window.getSelection()?.getRangeAt(0);
-    this.contentPopup.show(focusRect, isBackwards, selectionRange);
+
+    let updatedSelection = window.getSelection()!;
+    let updateRange = updatedSelection!.getRangeAt(0);
+    if (!this.isSelectionAllowed(updateRange, updatedSelection)) {
+      this.onClearSelection();
+      console.log("is not allowed");
+      return;
+    }
+
+    this.contentPopup.show(focusRect, isBackwards, updateRange);
+  }
+
+  private isSelectionAllowed(range: Range, selection: Selection) {
+    let container = range.commonAncestorContainer;
+
+    if (!container || !range || !selection) {
+      return false;
+    }
+    if (container.nodeType === Node.TEXT_NODE) {
+      if (!container.parentElement) {
+        return false;
+      }
+      container = container.parentElement;
+    }
+
+    const allHighlights = (container as HTMLElement).querySelectorAll(
+      "termit-h"
+    );
+
+    return Array.from(allHighlights).every(
+      (highlight) =>
+        !selection.containsNode(highlight, true) ||
+        Annotation.getElementDepth(highlight as HTMLElement) <
+          Constants.MAX_HIGHLIGHT_DEPTH
+    );
   }
 
   public showPopup(annotation: Annotation) {
@@ -170,6 +204,12 @@ export default class Annotator {
     annotationsData
       .flatMap((annotationData) => annotationData)
       .forEach((annotation) => this.annotations.push(annotation));
+
+    this.updateOccurrences();
+  }
+
+  public updateOccurrences() {
+    this.annotations.forEach((annotation) => annotation.updateAppearance());
   }
 
   public getAnnotations() {
