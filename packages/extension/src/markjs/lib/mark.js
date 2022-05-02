@@ -1,6 +1,6 @@
 /* eslint-disable */
-import DOMIterator from './domiterator';
-import RegExpCreator from './regexpcreator';
+import DOMIterator from "./domiterator";
+import RegExpCreator from "./regexpcreator";
 
 /**
  * Marks search terms in DOM elements
@@ -12,7 +12,6 @@ import RegExpCreator from './regexpcreator';
  * new Mark('.context').markRanges([{start:10,length:0}]);
  */
 class Mark {
-
   /**
    * @param {HTMLElement|HTMLElement[]|NodeList|string} ctx - The context DOM
    * element, an array of DOM elements, a NodeList or a selector
@@ -33,7 +32,7 @@ class Mark {
      */
     this.ie = false;
     const ua = window.navigator.userAgent;
-    if (ua.indexOf('MSIE') > -1 || ua.indexOf('Trident') > -1) {
+    if (ua.indexOf("MSIE") > -1 || ua.indexOf("Trident") > -1) {
       this.ie = true;
     }
   }
@@ -47,22 +46,26 @@ class Mark {
    * @access protected
    */
   set opt(val) {
-    this._opt = Object.assign({}, {
-      'element': '',
-      'className': '',
-      'exclude': [],
-      'iframes': false,
-      'iframesTimeout': 5000,
-      'separateWordSearch': true,
-      'acrossElements': false,
-      'ignoreGroups': 0,
-      'each': () => {},
-      'noMatch': () => {},
-      'filter': () => true,
-      'done': () => {},
-      'debug': false,
-      'log': window.console
-    }, val);
+    this._opt = Object.assign(
+      {},
+      {
+        element: "",
+        className: "",
+        exclude: [],
+        iframes: false,
+        iframesTimeout: 5000,
+        separateWordSearch: true,
+        acrossElements: false,
+        ignoreGroups: 0,
+        each: () => {},
+        noMatch: () => {},
+        filter: () => true,
+        done: () => {},
+        debug: false,
+        log: window.console,
+      },
+      val
+    );
   }
 
   get opt() {
@@ -91,12 +94,12 @@ class Mark {
    * <code>error</code>, <code>debug</code>
    * @access protected
    */
-  log(msg, level = 'debug') {
+  log(msg, level = "debug") {
     const log = this.opt.log;
     if (!this.opt.debug) {
       return;
     }
-    if (typeof log === 'object' && typeof log[level] === 'function') {
+    if (typeof log === "object" && typeof log[level] === "function") {
       log[level](`mark.js: ${msg}`);
     }
   }
@@ -116,13 +119,13 @@ class Mark {
    */
   getSeparatedKeywords(sv) {
     let stack = [];
-    sv.forEach(kw => {
+    sv.forEach((kw) => {
       if (!this.opt.separateWordSearch) {
         if (kw.trim() && stack.indexOf(kw) === -1) {
           stack.push(kw);
         }
       } else {
-        kw.split(' ').forEach(kwSplitted => {
+        kw.split(" ").forEach((kwSplitted) => {
           if (kwSplitted.trim() && stack.indexOf(kwSplitted) === -1) {
             stack.push(kwSplitted);
           }
@@ -131,10 +134,10 @@ class Mark {
     });
     return {
       // sort because of https://git.io/v6USg
-      'keywords': stack.sort((a, b) => {
+      keywords: stack.sort((a, b) => {
         return b.length - a.length;
       }),
-      'length': stack.length
+      length: stack.length,
     };
   }
 
@@ -179,21 +182,21 @@ class Mark {
     // quick validity check of the first entry only
     if (
       !Array.isArray(array) ||
-      Object.prototype.toString.call(array[0]) !== '[object Object]'
+      Object.prototype.toString.call(array[0]) !== "[object Object]"
     ) {
-      this.log('markRanges() will only accept an array of objects');
+      this.log("markRanges() will only accept an array of objects");
       this.opt.noMatch(array);
       return [];
     }
     const stack = [];
     let last = 0;
     array
-    // ensure there is no overlap in start & end offsets
+      // ensure there is no overlap in start & end offsets
       .sort((a, b) => {
         return a.start - b.start;
       })
-      .forEach(item => {
-        let {start, end, valid} = this.callNoMatchOnInvalidRanges(item, last);
+      .forEach((item) => {
+        let { start, end, valid } = this.callNoMatchOnInvalidRanges(item, last);
         if (valid) {
           // preserve item in case there are extra key:values within
           item.start = start;
@@ -224,9 +227,10 @@ class Mark {
    * @access protected
    */
   callNoMatchOnInvalidRanges(range, last) {
-    let start, end,
+    let start,
+      end,
       valid = false;
-    if (range && typeof range.start !== 'undefined') {
+    if (range && typeof range.start !== "undefined") {
       start = parseInt(range.start, 10);
       end = start + parseInt(range.length, 10);
       // ignore overlapping values & non-numeric entries
@@ -239,8 +243,7 @@ class Mark {
         valid = true;
       } else {
         this.log(
-          'Ignoring invalid or overlapping range: ' +
-          `${JSON.stringify(range)}`
+          "Ignoring invalid or overlapping range: " + `${JSON.stringify(range)}`
         );
         this.opt.noMatch(range);
       }
@@ -251,7 +254,7 @@ class Mark {
     return {
       start: start,
       end: end,
-      valid: valid
+      valid: valid,
     };
   }
 
@@ -285,16 +288,16 @@ class Mark {
       valid = false;
       this.log(`Invalid range: ${JSON.stringify(range)}`);
       this.opt.noMatch(range);
-    } else if (string.substring(start, end).replace(/\s+/g, '') === '') {
+    } else if (string.substring(start, end).replace(/\s+/g, "") === "") {
       valid = false;
       // whitespace only; even if wrapped it is not visible
-      this.log('Skipping whitespace only range: ' + JSON.stringify(range));
+      this.log("Skipping whitespace only range: " + JSON.stringify(range));
       this.opt.noMatch(range);
     }
     return {
       start: start,
       end: end,
-      valid: valid
+      valid: valid,
     };
   }
 
@@ -323,26 +326,31 @@ class Mark {
    * @access protected
    */
   getTextNodes(cb) {
-    let val = '',
+    let val = "",
       nodes = [];
-    this.iterator.forEachNode(NodeFilter.SHOW_TEXT, node => {
-      nodes.push({
-        start: val.length,
-        end: (val += node.textContent).length,
-        node
-      });
-    }, node => {
-      if (this.matchesExclude(node.parentNode)) {
-        return NodeFilter.FILTER_REJECT;
-      } else {
-        return NodeFilter.FILTER_ACCEPT;
+    this.iterator.forEachNode(
+      NodeFilter.SHOW_TEXT,
+      (node) => {
+        nodes.push({
+          start: val.length,
+          end: (val += node.textContent).length,
+          node,
+        });
+      },
+      (node) => {
+        if (this.matchesExclude(node.parentNode)) {
+          return NodeFilter.FILTER_REJECT;
+        } else {
+          return NodeFilter.FILTER_ACCEPT;
+        }
+      },
+      () => {
+        cb({
+          value: val,
+          nodes: nodes,
+        });
       }
-    }, () => {
-      cb({
-        value: val,
-        nodes: nodes
-      });
-    });
+    );
   }
 
   /**
@@ -354,10 +362,17 @@ class Mark {
    * @access protected
    */
   matchesExclude(el) {
-    return DOMIterator.matches(el, this.opt.exclude.concat([
-      // ignores the elements itself, not their childrens (selector *)
-      'script', 'style', 'title', 'head', 'html'
-    ]));
+    return DOMIterator.matches(
+      el,
+      this.opt.exclude.concat([
+        // ignores the elements itself, not their childrens (selector *)
+        "script",
+        "style",
+        "title",
+        "head",
+        "html",
+      ])
+    );
   }
 
   /**
@@ -371,13 +386,13 @@ class Mark {
    * @access protected
    */
   wrapRangeInTextNode(node, start, end) {
-    const hEl = !this.opt.element ? 'mark' : this.opt.element,
+    const hEl = !this.opt.element ? "mark" : this.opt.element,
       startNode = node.splitText(start),
       ret = startNode.splitText(end - start);
     let repl = document.createElement(hEl);
-    repl.setAttribute('data-markjs', 'true');
+    repl.setAttribute("data-markjs", "true");
     if (this.opt.className) {
-      repl.setAttribute('class', this.opt.className);
+      repl.setAttribute("class", this.opt.className);
     }
     repl.textContent = startNode.textContent;
     startNode.parentNode.replaceChild(repl, startNode);
@@ -421,17 +436,24 @@ class Mark {
    */
   wrapRangeInMappedTextNode(dict, start, end, filterCb, eachCb) {
     // iterate over all text nodes to find the one matching the positions
+    console.log("on iteration: ", dict, start, end);
+    let matchedFirstPart = false;
+    
     dict.nodes.every((n, i) => {
       const sibl = dict.nodes[i + 1];
-      if (typeof sibl === 'undefined' || sibl.start > start) {
-        if (!filterCb(n.node)) {
-          return false;
-        }
+      if (typeof sibl === "undefined" || sibl.start > start) {
         // map range from dict.value to text node
         const s = start - n.start,
           e = (end > n.end ? n.end : end) - n.start,
           startStr = dict.value.substr(0, n.start),
           endStr = dict.value.substr(e + n.start);
+
+        // console.log('s, e: ', s, e);
+        // console.log("n: ", n, ", i: ", i, ", sibl: ", sibl);
+        // console.log('matchedFirstPart: ', matchedFirstPart);
+        if (!matchedFirstPart && !filterCb(n.node, s, start)) {
+          return false;
+        }
         n.node = this.wrapRangeInTextNode(n.node, s, e);
         // recalculate positions to also find subsequent matches in the
         // same text node. Necessary as the text node in dict now only
@@ -447,6 +469,7 @@ class Mark {
         });
         end -= e;
         eachCb(n.node.previousSibling, n.start);
+        matchedFirstPart = true;
         if (end > n.end) {
           start = n.end;
         } else {
@@ -458,11 +481,11 @@ class Mark {
   }
 
   /**
-  * @param {HTMLElement} node - The text node where the match occurs
-  * @param {number} pos - The current position of the match within the node
-  * @param {number} len - The length of the current match within the node
-  * @param {Mark~wrapMatchesEachCallback} eachCb
-  */
+   * @param {HTMLElement} node - The text node where the match occurs
+   * @param {number} pos - The current position of the match within the node
+   * @param {number} len - The length of the current match within the node
+   * @param {Mark~wrapMatchesEachCallback} eachCb
+   */
   wrapGroups(node, pos, len, eachCb) {
     node = this.wrapRangeInTextNode(node, pos, pos + len);
     eachCb(node.previousSibling);
@@ -517,22 +540,16 @@ class Mark {
    */
   wrapMatches(regex, ignoreGroups, filterCb, eachCb, endCb) {
     const matchIdx = ignoreGroups === 0 ? 0 : ignoreGroups + 1;
-    this.getTextNodes(dict => {
-      dict.nodes.forEach(node => {
+    this.getTextNodes((dict) => {
+      dict.nodes.forEach((node) => {
         node = node.node;
         let match;
         while (
           (match = regex.exec(node.textContent)) !== null &&
-          match[matchIdx] !== ''
+          match[matchIdx] !== ""
         ) {
-          if (this.opt.separateGroups && match.length !== 1){
-            node = this.separateGroups(
-              node,
-              match,
-              matchIdx,
-              filterCb,
-              eachCb
-            );
+          if (this.opt.separateGroups && match.length !== 1) {
+            node = this.separateGroups(node, match, matchIdx, filterCb, eachCb);
           } else {
             let offset = match.index;
             if (matchIdx !== 0) {
@@ -589,11 +606,11 @@ class Mark {
    */
   wrapMatchesAcrossElements(regex, ignoreGroups, filterCb, eachCb, endCb) {
     const matchIdx = ignoreGroups === 0 ? 0 : ignoreGroups + 1;
-    this.getTextNodes(dict => {
+    this.getTextNodes((dict) => {
       let match;
       while (
         (match = regex.exec(dict.value)) !== null &&
-        match[matchIdx] !== ''
+        match[matchIdx] !== ""
       ) {
         // calculate range inside dict.value
         let start = match.index;
@@ -606,12 +623,18 @@ class Mark {
         // note that dict will be updated automatically, as it'll change
         // in the wrapping process, due to the fact that text
         // nodes will be splitted
-        this.wrapRangeInMappedTextNode(dict, start, end, (node, offset) => {
-          return filterCb(match[matchIdx], node, offset);
-        }, (node, lastIndex) => {
-          regex.lastIndex = lastIndex;
-          eachCb(node);
-        });
+        this.wrapRangeInMappedTextNode(
+          dict,
+          start,
+          end,
+          (node, offsetInCurrNode, totalOffset) => {
+            return filterCb(match[matchIdx], node, offsetInCurrNode, totalOffset);
+          },
+          (node, lastIndex) => {
+            regex.lastIndex = lastIndex;
+            eachCb(node);
+          }
+        );
       }
       endCb();
     });
@@ -647,25 +670,31 @@ class Mark {
    * @access protected
    */
   wrapRangeFromIndex(ranges, filterCb, eachCb, endCb) {
-    this.getTextNodes(dict => {
+    this.getTextNodes((dict) => {
       const originalLength = dict.value.length;
       ranges.forEach((range, counter) => {
-        let {start, end, valid} = this.checkWhitespaceRanges(
+        let { start, end, valid } = this.checkWhitespaceRanges(
           range,
           originalLength,
           dict.value
         );
         if (valid) {
-          this.wrapRangeInMappedTextNode(dict, start, end, node => {
-            return filterCb(
-              node,
-              range,
-              dict.value.substring(start, end),
-              counter
-            );
-          }, node => {
-            eachCb(node, range);
-          });
+          this.wrapRangeInMappedTextNode(
+            dict,
+            start,
+            end,
+            (node) => {
+              return filterCb(
+                node,
+                range,
+                dict.value.substring(start, end),
+                counter
+              );
+            },
+            (node) => {
+              eachCb(node, range);
+            }
+          );
         }
       });
       endCb();
@@ -686,9 +715,11 @@ class Mark {
       docFrag.appendChild(node.removeChild(node.firstChild));
     }
     parent.replaceChild(docFrag, node);
-    if (!this.ie) { // use browser's normalize method
+    if (!this.ie) {
+      // use browser's normalize method
       parent.normalize();
-    } else { // custom method (needs more time)
+    } else {
+      // custom method (needs more time)
       this.normalizeTextNode(parent);
     }
   }
@@ -786,22 +817,28 @@ class Mark {
     this.opt = opt;
     this.log(`Searching with expression "${regexp}"`);
     let totalMatches = 0,
-      fn = 'wrapMatches';
-    const eachCb = element => {
+      fn = "wrapMatches";
+    const eachCb = (element) => {
       totalMatches++;
       this.opt.each(element);
     };
     if (this.opt.acrossElements) {
-      fn = 'wrapMatchesAcrossElements';
+      fn = "wrapMatchesAcrossElements";
     }
-    this[fn](regexp, this.opt.ignoreGroups, (match, node) => {
-      return this.opt.filter(node, match, totalMatches);
-    }, eachCb, () => {
-      if (totalMatches === 0) {
-        this.opt.noMatch(regexp);
+    this[fn](
+      regexp,
+      this.opt.ignoreGroups,
+      (match, node) => {
+        return this.opt.filter(node, match, totalMatches);
+      },
+      eachCb,
+      () => {
+        if (totalMatches === 0) {
+          this.opt.noMatch(regexp);
+        }
+        this.opt.done(totalMatches);
       }
-      this.opt.done(totalMatches);
-    });
+    );
   }
 
   /**
@@ -835,34 +872,40 @@ class Mark {
   mark(sv, opt) {
     this.opt = opt;
     let totalMatches = 0,
-      fn = 'wrapMatches';
-    const {
-        keywords: kwArr,
-        length: kwArrLen
-      } = this.getSeparatedKeywords(typeof sv === 'string' ? [sv] : sv),
-      handler = kw => { // async function calls as iframes are async too
+      fn = "wrapMatches";
+    const { keywords: kwArr, length: kwArrLen } = this.getSeparatedKeywords(
+        typeof sv === "string" ? [sv] : sv
+      ),
+      handler = (kw) => {
+        // async function calls as iframes are async too
         const regex = new RegExpCreator(this.opt).create(kw);
         let matches = 0;
         this.log(`Searching with expression "${regex}"`);
-        this[fn](regex, 1, (term, node, offset) => {
-          return this.opt.filter(node, kw, offset, totalMatches, matches);
-        }, element => {
-          matches++;
-          totalMatches++;
-          this.opt.each(element);
-        }, () => {
-          if (matches === 0) {
-            this.opt.noMatch(kw);
+        this[fn](
+          regex,
+          1,
+          (term, node, offsetInCurrNode, totalOffset) => {
+            return this.opt.filter(node, kw, offsetInCurrNode, totalOffset, totalMatches, matches);
+          },
+          (element) => {
+            matches++;
+            totalMatches++;
+            this.opt.each(element);
+          },
+          () => {
+            if (matches === 0) {
+              this.opt.noMatch(kw);
+            }
+            if (kwArr[kwArrLen - 1] === kw) {
+              this.opt.done(totalMatches);
+            } else {
+              handler(kwArr[kwArr.indexOf(kw) + 1]);
+            }
           }
-          if (kwArr[kwArrLen - 1] === kw) {
-            this.opt.done(totalMatches);
-          } else {
-            handler(kwArr[kwArr.indexOf(kw) + 1]);
-          }
-        });
+        );
       };
     if (this.opt.acrossElements) {
-      fn = 'wrapMatchesAcrossElements';
+      fn = "wrapMatchesAcrossElements";
     }
     if (kwArrLen === 0) {
       this.opt.done(totalMatches);
@@ -915,16 +958,18 @@ class Mark {
       ranges = this.checkRanges(rawRanges);
     if (ranges && ranges.length) {
       this.log(
-        'Starting to mark with the following ranges: ' +
-        JSON.stringify(ranges)
+        "Starting to mark with the following ranges: " + JSON.stringify(ranges)
       );
       this.wrapRangeFromIndex(
-        ranges, (node, range, match, counter) => {
+        ranges,
+        (node, range, match, counter) => {
           return this.opt.filter(node, range, match, counter);
-        }, (element, range) => {
+        },
+        (element, range) => {
           totalMatches++;
           this.opt.each(element, range);
-        }, () => {
+        },
+        () => {
           this.opt.done(totalMatches);
         }
       );
@@ -942,23 +987,28 @@ class Mark {
    */
   unmark(opt) {
     this.opt = opt;
-    let sel = this.opt.element ? this.opt.element : '*';
-    sel += '[data-markjs]';
+    let sel = this.opt.element ? this.opt.element : "*";
+    sel += "[data-markjs]";
     if (this.opt.className) {
       sel += `.${this.opt.className}`;
     }
     this.log(`Removal selector "${sel}"`);
-    this.iterator.forEachNode(NodeFilter.SHOW_ELEMENT, node => {
-      this.unwrapMatches(node);
-    }, node => {
-      const matchesSel = DOMIterator.matches(node, sel),
-        matchesExclude = this.matchesExclude(node);
-      if (!matchesSel || matchesExclude) {
-        return NodeFilter.FILTER_REJECT;
-      } else {
-        return NodeFilter.FILTER_ACCEPT;
-      }
-    }, this.opt.done);
+    this.iterator.forEachNode(
+      NodeFilter.SHOW_ELEMENT,
+      (node) => {
+        this.unwrapMatches(node);
+      },
+      (node) => {
+        const matchesSel = DOMIterator.matches(node, sel),
+          matchesExclude = this.matchesExclude(node);
+        if (!matchesSel || matchesExclude) {
+          return NodeFilter.FILTER_REJECT;
+        } else {
+          return NodeFilter.FILTER_ACCEPT;
+        }
+      },
+      this.opt.done
+    );
   }
 }
 

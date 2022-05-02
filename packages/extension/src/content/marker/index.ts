@@ -104,7 +104,10 @@ export const markTerms = (
         // NOTE: partially is safer, as we may not have an exhaustive list of limiters, and since we know the exact position
         // of the word, there's no reason not to use it (even though it might not be used very often)
         accuracy: "partially",
-        filter(node, term, offestInCurrentNode) {
+        filter(node, term, offestInCurrentNode, totalOffset) {
+          // console.log("node, offestInCurrentNode: ", node, offestInCurrentNode);
+          // // return false;
+          // calculate offset within initial element
           let calculatedOffset = node.textContent.slice(0, offestInCurrentNode);
           let currNode = node;
           while (currNode.previousSibling) {
@@ -114,8 +117,29 @@ export const markTerms = (
             }
           }
 
+          let commonAncestor = selectedElements[0];
+          let currentElement = node.parentElement;
+
+          while (currentElement !== commonAncestor) {
+            let currentPreviousSibling = currentElement.previousSibling;
+            while (currentPreviousSibling) {
+              calculatedOffset = (currentPreviousSibling.textContent || "") + calculatedOffset;
+              currentPreviousSibling = currentPreviousSibling.previousSibling;
+            }
+            currentElement = currentElement.parentNode!;
+          }
+
           const pureLeft = calculatedOffset.replace(/\s/g, "").length;
           const pureRight = textPositionSelector.start;
+
+          // console.log(
+          //   "calculatedOffset: ",
+          //   calculatedOffset,
+          //   ", pureLeft: ",
+          //   pureLeft,
+          //   ", pureRight: ",
+          //   pureRight
+          // );
 
           console.log("got to filter: ", pureLeft, pureRight);
 
@@ -126,13 +150,13 @@ export const markTerms = (
         exclude: ["termit-h"], // don't allow matches within matches
         caseSensitive: true,
         separateWordSearch: false,
-        // acrossElements: true,
+        acrossElements: true,
         // TODO: determine term types and corresponding classes dynamically
         className: annotation.getClassName(),
         each(element) {
-          console.log("registering listener");
+          // console.log("registering listener: ", element);
           element.addEventListener("click", handleElementClick(annotation));
-          annotation.setElement(element);
+          annotation.addElement(element);
         },
         done(numberOfMatches) {
           if (numberOfMatches === 1) {

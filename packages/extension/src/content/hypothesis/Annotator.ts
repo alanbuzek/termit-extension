@@ -8,6 +8,7 @@ import { markTerms } from "../marker";
 import { Annotation } from "../../common/util/Annotation";
 import { ContentState } from "..";
 import TermOccurrence from "../../common/model/TermOccurrence";
+import HtmlDomUtils from '../../common/component/annotator/HtmlDomUtils';
 
 /**
  * `Annotator` is the central class of the annotator that handles anchoring (locating)
@@ -89,6 +90,7 @@ export default class Annotator {
       this.onClearSelection();
       return;
     }
+    // HtmlDomUtils.extendSelectionToWords();
     const selectionRange = window.getSelection()?.getRangeAt(0);
     this.isPopupOpen = true;
     this.contentPopup.show(focusRect, isBackwards, selectionRange);
@@ -96,8 +98,9 @@ export default class Annotator {
 
   public showPopup(annotation: Annotation) {
     this.currentAnnotation = annotation;
+    // TODO: maybe this should not be the first element but the last?
     const elementRect = this.currentAnnotation
-      .getElement()!
+      .getElements()[0]
       .getBoundingClientRect();
     this.contentPopup.show(
       new DOMRect(

@@ -1,4 +1,4 @@
-import { occurrenceTypes } from '../../content/components/Sidebar/FiltersPanel';
+import { occurrenceTypes } from "../../content/components/Sidebar/FiltersPanel";
 import { unmarkTerm } from "../../content/marker";
 import Term from "../model/Term";
 import TermOccurrence from "../model/TermOccurrence";
@@ -51,7 +51,7 @@ export class Annotation {
   public termOccurrence: TermOccurrence;
   public term: Term | null = null;
   private annotatationStatus: AnnotationStatus = AnnotationStatus.PENDING;
-  private element?: HTMLElement;
+  private elements: HTMLElement[] = [];
   // methods:
   // markAnnotation(); (called by contructor)
   // remove(); (will hide the annotation)
@@ -108,16 +108,24 @@ export class Annotation {
 
   public getTypeName() {
     const className = this.getClassName();
-    return occurrenceTypes.find(type => type.value == className)?.name || 'Uknown annotation type';
+    return (
+      occurrenceTypes.find((type) => type.value == className)?.name ||
+      "Uknown annotation type"
+    );
   }
 
   public focusAnnotation() {
-    this.element?.scrollIntoView({ block: "center", inline: "nearest" });
-    this.element?.classList.add("annotation-focused");
-    // this.element?.click();
-    setTimeout(() => {
-      this.element?.classList.remove("annotation-focused");
-    }, 4000);
+    if (!this.elements.length) {
+      return;
+    }
+    this.elements.forEach((element) => {
+      element.scrollIntoView({ block: "center", inline: "nearest" });
+      element.classList.add("annotation-focused");
+      // this.element.click();
+      setTimeout(() => {
+        element.classList.remove("annotation-focused");
+      }, 4000);
+    });
   }
 
   public set status(newStaus) {
@@ -128,31 +136,35 @@ export class Annotation {
     return this.annotatationStatus;
   }
 
-  public setElement(newElement) {
-    this.element = newElement;
+  public addElement(newElement: HTMLElement) {
+    this.elements.push(newElement);
   }
 
-  public getElement() {
-    return this.element;
+  public getElements() {
+    return this.elements;
   }
 
   public assignTerm(term: Term, annotationType: string) {
     this.term = term;
     this.termOccurrence.term = term;
-    if (annotationType === AnnotationType.DEFINITION){
+    if (annotationType === AnnotationType.DEFINITION) {
       this.termOccurrence.types.push(VocabularyUtils.DEFINITIONAL_OCCURRENCE);
     }
     // delete this.termOccurrence.score;
 
-    this.termOccurrence.types = this.termOccurrence.types.filter(type => type !== VocabularyUtils.SUGGESTED_TERM_OCCURRENCE);
+    this.termOccurrence.types = this.termOccurrence.types.filter(
+      (type) => type !== VocabularyUtils.SUGGESTED_TERM_OCCURRENCE
+    );
     this.updateAppearance();
   }
 
-  public async removeOccurrence() {
-    return unmarkTerm(this.element!);
+  public removeOccurrence() {
+    return Promise.all(this.elements.map((element) => unmarkTerm(element)));
   }
 
   private updateAppearance() {
-    this.element!.className = this.getClassName();
+    this.elements.forEach((element) => {
+      element!.className = this.getClassName();
+    });
   }
 }
