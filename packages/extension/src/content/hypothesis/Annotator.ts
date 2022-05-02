@@ -10,18 +10,13 @@ import { ContentState } from "..";
 import TermOccurrence from "../../common/model/TermOccurrence";
 import HtmlDomUtils from "../../common/component/annotator/HtmlDomUtils";
 
-
-
-const termitElements = [
-  "hypothesis-adder",
-  "hypothesis-sidebar",
-  "termit-h",
-];
+const termitElements = ["hypothesis-adder", "hypothesis-sidebar", "termit-h"];
 
 const isDescendantOfTermItElements = (element?: Element) => {
-  return !!element &&
-  termitElements.some((ancestor) => element.closest(ancestor))
-}
+  return (
+    !!element && termitElements.some((ancestor) => element.closest(ancestor))
+  );
+};
 
 /**
  * `Annotator` is the central class of the annotator that handles anchoring (locating)
@@ -64,14 +59,21 @@ export default class Annotator {
     );
 
     // TODO: remove hypothesis from name, add more elements (e.g, message panel if needed);
-    
+
     // TODO: fix up selection observer handling
+
+    let ignoreNextSelectionTimeout: any = null;
     this.selectionObserver = new SelectionObserver((range, event?: Event) => {
       let shouldIgnore = false;
+      if (ignoreNextSelectionTimeout) {
+        return;
+      }
 
       if (this.contentPopup.isOpen() && event) {
         if (event.type === "selectionchange") {
-          const activeElement = event?.target?.activeElement as Element | undefined;
+          const activeElement = event?.target?.activeElement as
+            | Element
+            | undefined;
           shouldIgnore = isDescendantOfTermItElements(activeElement);
         } else if (event.type === "click") {
           const targetElement = event?.target as Element | undefined;
@@ -87,6 +89,11 @@ export default class Annotator {
       this.onClearSelection();
 
       if (range) {
+        clearTimeout(ignoreNextSelectionTimeout);
+        ignoreNextSelectionTimeout = setTimeout(() => {
+          clearTimeout(ignoreNextSelectionTimeout);
+          ignoreNextSelectionTimeout = null;
+        }, 300);
         this.onSelection(range);
       }
     });
@@ -121,7 +128,7 @@ export default class Annotator {
       this.onClearSelection();
       return;
     }
-    // HtmlDomUtils.extendSelectionToWords();
+    HtmlDomUtils.extendSelectionToWords();
     const selectionRange = window.getSelection()?.getRangeAt(0);
     this.contentPopup.show(focusRect, isBackwards, selectionRange);
   }
