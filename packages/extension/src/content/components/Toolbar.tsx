@@ -213,7 +213,7 @@ export default function Toolbar({
           {isSidebarOpen ? <ArrowRight /> : <ArrowLeft />}
         </ToolbarButton>
       )}
-      {!useMinimalControls && (
+      {/* {!useMinimalControls && (
         <div className="Toolbar__buttonbar">
           <ToolbarButton
             label="Show highlights"
@@ -233,7 +233,7 @@ export default function Toolbar({
             <AnnotationIcon />
           </ToolbarButton>
         </div>
-      )}
+      )} */}
     </div>
   );
 }
