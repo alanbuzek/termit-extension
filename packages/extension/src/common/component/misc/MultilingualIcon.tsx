@@ -18,9 +18,9 @@ const MultilingualIcon: React.FC<MultilingualIconProps> = (props) => {
   return (
     <>
       <HiTranslate id={props.id} className={cls} />
-      {/* <UncontrolledTooltip target={props.id} placement={props.placement}>
+      <UncontrolledTooltip target={props.id} placement={props.placement}>
         {i18n("multilingual.title")}
-      </UncontrolledTooltip> */}
+      </UncontrolledTooltip>
     </>
   );
 };

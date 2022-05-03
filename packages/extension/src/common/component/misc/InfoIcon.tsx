@@ -15,9 +15,9 @@ const InfoIcon: React.FC<InfoIconProps> = (props) => {
   return (
     <>
       <FaInfoCircle id={props.id} className={cls} />
-      {/* <UncontrolledTooltip target={props.id} placement={props.placement}>
+      <UncontrolledTooltip target={props.id} placement={props.placement}>
         {props.text}
-      </UncontrolledTooltip> */}
+      </UncontrolledTooltip>
     </>
   );
 };

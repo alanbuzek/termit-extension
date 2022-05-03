@@ -15,10 +15,9 @@ import {
   createTermValueRenderer,
 } from "../misc/treeselect/Renderers";
 import { HasI18n } from "../hoc/withI18n";
-import { useI18n } from '../hook/useI18n';
-import { TermsMap } from '../../../content';
+import { useI18n } from "../hook/useI18n";
+import { TermsMap } from "../../../content";
 
-type Term = any;
 interface GlossaryTermsProps extends HasI18n {
   vocabulary?: Vocabulary;
   terms: TermsMap;
@@ -68,7 +67,7 @@ export class AnnotationTerms extends React.Component<AnnotationTermsProps> {
   }
 
   private handleChange = (term: TermData | null) => {
-    console.log('term: ', term);
+    console.log("term: ", term);
     if (term === null) {
       this.props.selectVocabularyTerm(term);
       this.props.onChange(null);
@@ -97,7 +96,7 @@ export class AnnotationTerms extends React.Component<AnnotationTermsProps> {
       )
     );
 
-    console.log('processed terms are here: ', terms);
+    console.log("processed terms are here: ", terms);
 
     return (
       <FormGroup>
@@ -121,7 +120,7 @@ export class AnnotationTerms extends React.Component<AnnotationTermsProps> {
             </Button>
           )}
         </div>
-        <IntelligentTreeSelect  
+        <IntelligentTreeSelect
           ref={this.treeComponent}
           className="p-0 mt-1"
           onChange={this.handleChange}

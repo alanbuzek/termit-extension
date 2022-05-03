@@ -5,13 +5,14 @@ import withI18n, { HasI18n } from "../hoc/withI18n";
 import { IntelligentTreeSelect } from "intelligent-tree-select";
 import "intelligent-tree-select/lib/styles.css";
 import Term, { TermData } from "../../model/Term";
-// import { FormFeedback, FormGroup, Label } from "reactstrap";
+import { FormFeedback, FormGroup, Label } from "reactstrap";
 import VocabularyUtils from "../../util/VocabularyUtils";
 import { getLocalized } from "../../model/MultilingualString";
 import { getShortLocale } from "../../util/IntlUtil";
 import IntlData from "../../model/IntlData";
 import _ from "lodash";
 import api from "../../../api";
+import HelpIcon from "../misc/HelpIcon";
 
 interface TermTypesEditProps extends HasI18n {
   termTypes: string[];
@@ -78,41 +79,41 @@ export class TermTypesEdit extends React.Component<TermTypesEditProps> {
 
     const types = getTypesForSelector(availableTypes);
     const selected = this.resolveSelectedTypes(types);
-    const { intl } = this.props;
+    const { intl, i18n } = this.props;
     return (
       <div>
-        {/*  <FormGroup> */}
-        {/* <Label className="attribute-label">
-          {i18n("term.metadata.types")}
-          <HelpIcon id={"test-types-edit"} text={i18n("term.types.help")} />
-        </Label> */}
+        <FormGroup>
+          <Label className="attribute-label">
+            {i18n("term.metadata.types")}
+            <HelpIcon id={"test-types-edit"} text={i18n("term.types.help")} />
+          </Label>
 
-        <IntelligentTreeSelect
-          onChange={this.onChange}
-          value={selected}
-          options={types}
-          valueKey="iri"
-          getOptionLabel={(option: TermData) =>
-            getLocalized(option.label, getShortLocale(intl.locale))
-          }
-          childrenKey="subTerms"
-          showSettings={false}
-          maxHeight={150}
-          multi={false}
-          displayInfoOnHover={true}
-          expanded={true}
-          renderAsTree={true}
-          placeholder=""
-        />
-        {/* {this.props.validationMessage && (
-          <FormFeedback
-            className="validation-feedback"
-            title={i18n("validation.message.tooltip")}
-          >
-            {this.props.validationMessage}
-          </FormFeedback>
-        )} */}
-        {/* </FormGroup> */}
+          <IntelligentTreeSelect
+            onChange={this.onChange}
+            value={selected}
+            options={types}
+            valueKey="iri"
+            getOptionLabel={(option: TermData) =>
+              getLocalized(option.label, getShortLocale(intl.locale))
+            }
+            childrenKey="subTerms"
+            showSettings={false}
+            maxHeight={150}
+            multi={false}
+            displayInfoOnHover={true}
+            expanded={true}
+            renderAsTree={true}
+            placeholder=""
+          />
+          {this.props.validationMessage && (
+            <FormFeedback
+              className="validation-feedback"
+              title={i18n("validation.message.tooltip")}
+            >
+              {this.props.validationMessage}
+            </FormFeedback>
+          )}
+        </FormGroup>
       </div>
     );
   }

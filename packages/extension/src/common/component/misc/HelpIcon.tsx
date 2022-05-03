@@ -2,24 +2,17 @@ import * as React from "react";
 import { InfoIconProps } from "./InfoIcon";
 import classNames from "classnames";
 import { FaQuestionCircle } from "react-icons/fa";
-import { Button, Popover, PopoverBody, PopoverHeader } from "reactstrap";
-// import "./InfoIcon.scss";
+import { Popover, PopoverBody, PopoverHeader } from "reactstrap";
 import { useI18n } from "../hook/useI18n";
+
 
 const HelpIcon: React.FC<InfoIconProps> = (props) => {
   const cls = classNames("info-icon", "help-icon", props.className);
   const { i18n } = useI18n();
   const [open, setOpen] = React.useState(false);
-  const [pinned, setPinned] = React.useState(false);
   const show = () => setOpen(true);
   const mouseOut = () => {
-    if (!pinned) {
-      setOpen(false);
-    }
-  };
-  const onClick = () => {
-    setOpen(!pinned);
-    setPinned(!pinned);
+    setOpen(false);
   };
 
   return (
@@ -27,7 +20,6 @@ const HelpIcon: React.FC<InfoIconProps> = (props) => {
       <FaQuestionCircle
         id={props.id}
         className={cls}
-        onClick={onClick}
         onMouseOver={show}
         onMouseOut={mouseOut}
       />
@@ -37,9 +29,9 @@ const HelpIcon: React.FC<InfoIconProps> = (props) => {
         isOpen={open}
         popperClassName="help-icon-popover"
       >
-        <PopoverHeader>
+        <PopoverHeader
+        >
           {i18n("help.title")}
-          <Button onClick={onClick} close={true} className="mt-1" />
         </PopoverHeader>
         <PopoverBody>{props.text}</PopoverBody>
       </Popover>

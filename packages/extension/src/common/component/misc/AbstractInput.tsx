@@ -52,9 +52,8 @@ export default class AbstractInput<
 
   private renderHelp() {
     return this.props.help ? (
-      // <HelpIcon id={this.props.name!} text={this.props.help!} />
-      null
-      ) : null;
+      <HelpIcon id={this.props.name!} text={this.props.help!} />
+    ) : null;
   }
 
   protected renderHint() {

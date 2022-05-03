@@ -224,4 +224,8 @@ export default class Annotator {
     this.annotations.forEach((annotation) => annotation.removeOccurrence());
     this.destroy();
   }
+
+  public getContentPoup(){
+    return this.contentPopup;
+  }
 }

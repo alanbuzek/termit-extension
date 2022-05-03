@@ -1,3 +1,300 @@
+
+
+/* popovoer start */
+
+.popover {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 106000;
+  display: block;
+  max-width: 276px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
+    "Segoe UI Symbol", "Noto Color Emoji";
+  font-style: normal;
+  font-weight: 400;
+  line-height: 1.5;
+  text-align: left;
+  text-align: start;
+  text-decoration: none;
+  text-shadow: none;
+  text-transform: none;
+  letter-spacing: normal;
+  word-break: normal;
+  word-spacing: normal;
+  white-space: normal;
+  line-break: auto;
+  font-size: 0.875rem;
+  word-wrap: break-word;
+  background-color: #fff;
+  background-clip: padding-box;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+}
+.popover .arrow {
+  position: absolute;
+  display: block;
+  width: 1rem;
+  height: 0.5rem;
+  margin: 0 0.3rem;
+}
+.popover .arrow::before,
+.popover .arrow::after {
+  position: absolute;
+  display: block;
+  content: "";
+  border-color: transparent;
+  border-style: solid;
+}
+.bs-popover-top,
+.bs-popover-auto[x-placement^="top"] {
+  margin-bottom: 0.5rem;
+}
+.bs-popover-top .arrow,
+.bs-popover-auto[x-placement^="top"] .arrow {
+  bottom: calc((0.5rem + 1px) * -1);
+}
+.bs-popover-top .arrow::before,
+.bs-popover-auto[x-placement^="top"] .arrow::before,
+.bs-popover-top .arrow::after,
+.bs-popover-auto[x-placement^="top"] .arrow::after {
+  border-width: 0.5rem 1rem 0;
+}
+.bs-popover-top .arrow::before,
+.bs-popover-auto[x-placement^="top"] .arrow::before {
+  bottom: 0;
+  border-top-color: rgba(0, 0, 0, 0.25);
+}
+.bs-popover-top .arrow::after,
+.bs-popover-auto[x-placement^="top"] .arrow::after {
+  bottom: 1px;
+  border-top-color: #fff;
+}
+.bs-popover-right,
+.bs-popover-auto[x-placement^="right"] {
+  margin-left: 0.5rem;
+}
+.bs-popover-right .arrow,
+.bs-popover-auto[x-placement^="right"] .arrow {
+  left: calc((0.5rem + 1px) * -1);
+  width: 0.5rem;
+  height: 1rem;
+  margin: 0.3rem 0;
+}
+.bs-popover-right .arrow::before,
+.bs-popover-auto[x-placement^="right"] .arrow::before,
+.bs-popover-right .arrow::after,
+.bs-popover-auto[x-placement^="right"] .arrow::after {
+  border-width: 1rem 0.5rem 1rem 0;
+}
+.bs-popover-right .arrow::before,
+.bs-popover-auto[x-placement^="right"] .arrow::before {
+  left: 0;
+  border-right-color: rgba(0, 0, 0, 0.25);
+}
+.bs-popover-right .arrow::after,
+.bs-popover-auto[x-placement^="right"] .arrow::after {
+  left: 1px;
+  border-right-color: #fff;
+}
+.bs-popover-bottom,
+.bs-popover-auto[x-placement^="bottom"] {
+  margin-top: 0.5rem;
+}
+.bs-popover-bottom .arrow,
+.bs-popover-auto[x-placement^="bottom"] .arrow {
+  top: calc((0.5rem + 1px) * -1);
+}
+.bs-popover-bottom .arrow::before,
+.bs-popover-auto[x-placement^="bottom"] .arrow::before,
+.bs-popover-bottom .arrow::after,
+.bs-popover-auto[x-placement^="bottom"] .arrow::after {
+  border-width: 0 1rem 0.5rem 1rem;
+}
+.bs-popover-bottom .arrow::before,
+.bs-popover-auto[x-placement^="bottom"] .arrow::before {
+  top: 0;
+  border-bottom-color: rgba(0, 0, 0, 0.25);
+}
+.bs-popover-bottom .arrow::after,
+.bs-popover-auto[x-placement^="bottom"] .arrow::after {
+  top: 1px;
+  border-bottom-color: #fff;
+}
+.bs-popover-bottom .popover-header::before,
+.bs-popover-auto[x-placement^="bottom"] .popover-header::before {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  display: block;
+  width: 1rem;
+  margin-left: 1rem;
+  content: "";
+  border-bottom: 1px solid #f7f7f7;
+}
+.bs-popover-left,
+.bs-popover-auto[x-placement^="left"] {
+  margin-right: 0.5rem;
+}
+.bs-popover-left .arrow,
+.bs-popover-auto[x-placement^="left"] .arrow {
+  right: calc((0.5rem + 1px) * -1);
+  width: 0.5rem;
+  height: 1rem;
+  margin: 0.3rem 0;
+}
+.bs-popover-left .arrow::before,
+.bs-popover-auto[x-placement^="left"] .arrow::before,
+.bs-popover-left .arrow::after,
+.bs-popover-auto[x-placement^="left"] .arrow::after {
+  border-width: 1rem 0 1rem 0.5rem;
+}
+.bs-popover-left .arrow::before,
+.bs-popover-auto[x-placement^="left"] .arrow::before {
+  right: 0;
+  border-left-color: rgba(0, 0, 0, 0.25);
+}
+.bs-popover-left .arrow::after,
+.bs-popover-auto[x-placement^="left"] .arrow::after {
+  right: 1px;
+  border-left-color: #fff;
+}
+.popover-header {
+  padding: 0.5rem 0.75rem;
+  margin-bottom: 0;
+  font-size: 1rem;
+  color: inherit;
+  background-color: #f7f7f7;
+  border-bottom: 1px solid #ebebeb;
+}
+.popover-header:empty {
+  display: none;
+}
+.popover-body {
+  padding: 0.5rem 0.75rem;
+  color: #212529;
+}
+
+/* ---- popover end --- */
+
+:root {
+  --zindex-tooltip: 107000;
+  --tooltip-margin: 0;
+  /* TODO: adjust */
+  --tooltip-font-size: 0.875rem;
+  --tooltip-opacity: 0.9;
+  --tooltip-arrow-width: 0.8rem;
+  --tooltip-arrow-width-half: 0.4rem;
+  --tooltip-arrow-height: 0.4rem;
+  --tooltip-arrow-color: #000000;
+  --tooltip-max-width: 200px;
+  --tooltip-padding-y: 0.25rem;
+  --tooltip-padding-x: 0.5rem;
+  --tooltip-color: #ffffff;
+  --tooltip-bg: #000000;
+}
+
+/* tooltip */
+.tooltip {
+  position: absolute;
+  z-index: var(--zindex-tooltip);
+  display: block;
+  margin: var(--tooltip-margin);
+  font-size: var(--tooltip-font-size);
+  word-wrap: break-word;
+  opacity: 0;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.tooltip.show {
+  opacity: var(--tooltip-opacity);
+}
+
+.tooltip .arrow {
+  position: absolute;
+  display: block;
+  width: var(--tooltip-arrow-width);
+  height: var(--tooltip-arrow-height);
+}
+
+.tooltip .arrow::before {
+  position: absolute;
+  content: "";
+  border-color: transparent;
+  border-style: solid;
+}
+
+.bs-tooltip-top {
+  padding: var(--tooltip-arrow-height) 0;
+}
+
+.bs-tooltip-top.arrow {
+  bottom: 0;
+}
+.bs-tooltip-top.arrow::before {
+  top: 0;
+  border-width: var(--tooltip-arrow-height) var(--tooltip-arrow-width-half) 0;
+  border-top-color: var(--tooltip-arrow-color);
+}
+
+.bs-tooltip-right {
+  padding: 0 var(--tooltip-arrow-height);
+}
+.bs-tooltip-right .arrow {
+  left: 0;
+  width: var(--tooltip-arrow-height);
+  height: var(--tooltip-arrow-width);
+}
+
+.bs-tooltip-right .arrow::before {
+  right: 0;
+  border-width: var(--tooltip-arrow-width-half) var(--tooltip-arrow-height)
+    var(--tooltip-arrow-width-half) 0;
+  border-right-color: var(--tooltip-arrow-color);
+}
+
+.bs-tooltip-bottom {
+  padding: var(--tooltip-arrow-height) 0;
+}
+
+.bs-tooltip-bottom .arrow {
+  top: 0;
+}
+.bs-tooltip-bottom .arrow::before {
+  bottom: 0;
+  border-width: 0 var(--tooltip-arrow-width-half) var(--tooltip-arrow-height);
+  border-bottom-color: var(--tooltip-arrow-color);
+}
+
+.bs-tooltip-left {
+  padding: 0 var(--tooltip-arrow-height);
+}
+
+.bs-tooltip-auto[x-placement^="top"] {
+  padding: var(--tooltip-arrow-height) 0;
+}
+.bs-tooltip-auto[x-placement^="right"] {
+  padding: 0 var(--tooltip-arrow-height);
+}
+.bs-tooltip-auto[x-placement^="bottom"] {
+  padding: var(--tooltip-arrow-height) 0;
+}
+.bs-tooltip-auto[x-placement^="left"] {
+  padding: 0 var(--tooltip-arrow-height);
+}
+
+/* Wrapper for the tooltip content */
+.tooltip-inner {
+  max-width: var(--tooltip-max-width);
+  padding: var(--tooltip-padding-y) var(--tooltip-padding-x);
+  color: var(--tooltip-color);
+  text-align: center;
+  background-color: var(--tooltip-bg);
+}
+
+/* ----end of tooltips ---------------******* */
+
 #masterlingo-popup {
   width: 300px;
   height: auto;

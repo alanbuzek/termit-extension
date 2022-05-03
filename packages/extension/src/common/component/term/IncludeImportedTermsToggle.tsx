@@ -1,5 +1,5 @@
 import * as React from "react";
-// import { UncontrolledTooltip } from "reactstrap";
+import { UncontrolledTooltip } from "reactstrap";
 import Toggle from "react-bootstrap-toggle";
 import { useI18n } from "../hook/useI18n";
 
@@ -25,7 +25,7 @@ const IncludeImportedTermsToggle: React.FC<IncludeImportedTermsToggleProps> = (
   return (
     <>
       &nbsp;
-      {/* <Toggle
+      <Toggle
         id={props.id}
         onClick={props.onToggle}
         on={i18n("glossary.includeImported")}
@@ -40,14 +40,14 @@ const IncludeImportedTermsToggle: React.FC<IncludeImportedTermsToggleProps> = (
         style={toggleStyle}
         active={props.includeImported}
         recalculateOnResize={true}
-      /> */}
-      {/* <UncontrolledTooltip target={props.id} placement="right">
+      />
+      <UncontrolledTooltip target={props.id} placement="right">
         {i18n(
           props.includeImported
             ? "glossary.includeImported.help"
             : "glossary.excludeImported.help"
         )}
-      </UncontrolledTooltip> */}
+      </UncontrolledTooltip>
     </>
   );
 };

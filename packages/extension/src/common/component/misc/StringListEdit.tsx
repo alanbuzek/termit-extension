@@ -76,11 +76,10 @@ export class StringListEdit extends React.Component<
       <div className="form-group">
         <Label className="attribute-label">
           {this.getText("label")}
-          {/* <MultilingualIcon id={"string-list-edit-multilingual" + Date.now()} />
           <HelpIcon
             id={"string-list-edit" + Date.now()}
             text={this.getText("help")}
-          /> */}
+          />
         </Label>
         <InputGroup className="form-group no-bottom-margin">
           <Input
@@ -157,4 +156,4 @@ export class StringListEdit extends React.Component<
   }
 }
 
-export default injectIntl(withI18n(StringListEdit));
+export default injectIntl(withI18n(StringListEdit)) as any;

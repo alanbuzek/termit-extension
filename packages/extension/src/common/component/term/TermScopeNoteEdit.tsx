@@ -27,12 +27,7 @@ export const TermScopeNoteEdit: React.FC<TermScopeNoteEditProps> = (props) => {
         <Col xs={12}>
           <TextArea
             name="create-term-comment"
-            label={
-              <>
-                {i18n("term.metadata.comment")}
-                {/* <MultilingualIcon id="create-term-comment-multilingual" /> */}
-              </>
-            }
+            label={i18n("term.metadata.comment")}
             labelClass="attribute-label"
             type="textarea"
             rows={4}

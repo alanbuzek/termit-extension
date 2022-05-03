@@ -4,8 +4,11 @@ import ReactDOM from "react-dom";
 import { IntlProvider } from "react-intl";
 import cs from "../../cs.locale";
 import { overlay } from "../helper/overlay";
-import { Annotation, isDefinitionAnnotation } from "../../common/util/Annotation";
-import { ContentState } from '..';
+import {
+  Annotation,
+  isDefinitionAnnotation,
+} from "../../common/util/Annotation";
+import { ContentState } from "..";
 
 // TODO: probably don't need this for now
 /**
@@ -68,7 +71,7 @@ function stopEventPropagation(element) {
  * @param {HTMLElement} container - Container element to render the UI into
  * @return {ShadowRoot}
  */
-export function createShadowRoot(container) {
+export function createShadowRoot(container: HTMLElement) {
   const shadowRoot = container.attachShadow({ mode: "open" });
   loadStyles(shadowRoot);
 
@@ -163,7 +166,7 @@ function nearestPositionedAncestor(el) {
  */
 export class ContentPopupContainer {
   private outerContainer: HTMLElement;
-  private shadowRoot: any;
+  private shadowRoot: ShadowRoot;
   private view: any;
   private width: () => any;
   private height: () => any;
@@ -388,8 +391,8 @@ export class ContentPopupContainer {
     }
   }
 
-  public isOpen(){
-    return this.isVisible
+  public isOpen() {
+    return this.isVisible;
   }
 
   private render(selectionRange?) {
@@ -406,16 +409,15 @@ export class ContentPopupContainer {
 
     let initialPopupType = PopupType.PurposeSelection;
     if (this.currentAnnotation) {
-      if (isDefinitionAnnotation(this.currentAnnotation.termOccurrence.types)){
+      if (isDefinitionAnnotation(this.currentAnnotation.termOccurrence.types)) {
         initialPopupType = PopupType.TermDefinition;
       } else {
         initialPopupType = PopupType.TermOccurrence;
       }
-
     }
 
     this.destroy();
-    
+
     ReactDOM.render(
       <IntlProvider locale="cs-CZ" defaultLocale="en" messages={cs}>
         <ContentPopup
@@ -446,6 +448,10 @@ export class ContentPopupContainer {
   // TODO: pull back the functionality from hypothesis client if needed
   private findZindex(left, top) {
     return 10000;
+  }
+
+  public getShadowRoot() {
+    return this.shadowRoot;
   }
 }
 

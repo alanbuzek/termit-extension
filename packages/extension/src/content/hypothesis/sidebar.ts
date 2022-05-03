@@ -26,6 +26,7 @@ export class Sidebar {
   private hypothesisSidebar: HTMLElement;
   private listeners: any;
   private toolbar: any;
+  private shadowRoot: ShadowRoot;
 
   /**
    * @param {HTMLElement} element
@@ -55,8 +56,8 @@ export class Sidebar {
 
     // Wrap up the 'iframeContainer' element into a shadow DOM so it is not affected by host CSS styles
     this.hypothesisSidebar = document.createElement("hypothesis-sidebar");
-    const shadowRoot = createShadowRoot(this.hypothesisSidebar);
-    shadowRoot.appendChild(this.iframeContainer);
+    this.shadowRoot = createShadowRoot(this.hypothesisSidebar);
+    this.shadowRoot.appendChild(this.iframeContainer);
 
     element.appendChild(this.hypothesisSidebar);
 
@@ -198,5 +199,9 @@ export class Sidebar {
 
   render() {
     this.sidebarComponent.render();
+  }
+
+  public getShadowRoot(){
+    return this.shadowRoot;
   }
 }

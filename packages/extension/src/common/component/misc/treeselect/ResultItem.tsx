@@ -1,11 +1,9 @@
 import * as React from "react";
 // @ts-ignore
 import { ToggleMinusIcon, TogglePlusIcon } from "intelligent-tree-select";
-// import Utils from "../../../util/Utils";
-// import TooltipItem from "./TooltipItem";
-// import { ValueMapper } from "../../../util/Types";
-import Utils from '../../../util/Utils';
-import { ValueMapper } from '../../../util/Types';
+import Utils from "../../../util/Utils";
+import { ValueMapper } from "../../../util/Types";
+import TooltipItem from './TooltipItem';
 
 interface ResultItemProps {
   option: any;
@@ -70,14 +68,12 @@ class ResultItem extends React.Component<ResultItemProps> {
         className={this.props.className}
         onMouseEnter={this.onMouseEnter}
         style={this.props.style}
-        onClick={this.onClick}
       >
         {this.props.renderAsTree && (
           <div className="tree-result-item-toggle-button">{button}</div>
         )}
-        {label}
-        {/* TODO: handle this? */}
-        {/* <TooltipItem
+
+        <TooltipItem
           targetId={"tooltip-" + Utils.hashCode(value)}
           option={option}
           label={label}
@@ -87,7 +83,7 @@ class ResultItem extends React.Component<ResultItemProps> {
           tooltipKey={this.props.tooltipKey}
           addonBefore={this.props.addonBefore}
           addonAfter={this.props.addonAfter}
-        /> */}
+        />
 
         {option.fetchingChild && (
           <span className="Select-loading-zone" aria-hidden="true">

@@ -54,7 +54,6 @@ export const TermDefinitionBlockEdit: React.FC<TermDefinitionBlockEditProps> = (
             >
               <Label className="attribute-label definition">
                 {i18n("term.metadata.definition.text")}
-                {/* <MultilingualIcon id="term-definition-multilingual" /> */}
               </Label>
               <Button
                 id="create-term-select-definition"
@@ -71,7 +70,6 @@ export const TermDefinitionBlockEdit: React.FC<TermDefinitionBlockEditProps> = (
             <FormGroup style={{ marginBottom: 0 }}>
               <Label className="attribute-label definition">
                 {i18n("term.metadata.definition.text")}
-                {/* <MultilingualIcon id="term-definition-multilingual" /> */}
               </Label>
             </FormGroup>
           )}

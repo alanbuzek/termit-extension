@@ -18,10 +18,9 @@ import {
 import { checkLabelUniqueness } from "./TermValidationUtils";
 import ShowAdvancedAssetFields from "../asset/ShowAdvancedAssetFields";
 import { loadIdentifier } from "../asset/AbstractCreateAsset";
-import MultilingualIcon from "../misc/MultilingualIcon";
 import TermScopeNoteEdit from "./TermScopeNoteEdit";
 import ValidationResult from "../../model/form/ValidationResult";
-import CustomInput from '../misc/CustomInput';
+import CustomInput from "../misc/CustomInput";
 
 interface TermMetadataCreateFormProps extends HasI18n {
   onChange: (change: object, callback?: () => void) => void;
@@ -149,12 +148,7 @@ export class TermMetadataCreateForm extends React.Component<
           <Col xs={12}>
             <CustomInput
               name="create-term-label"
-              label={
-                <>
-                  {i18n("asset.label")}
-                  {/* <MultilingualIcon id="create-term-label-multilingual" /> */}
-                </>
-              }
+              label={i18n("asset.label")}
               help={i18n("term.label.help")}
               hint={i18n("required")}
               onChange={this.onLabelChange}
@@ -189,17 +183,6 @@ export class TermMetadataCreateForm extends React.Component<
             language={language}
             onChange={this.props.onChange}
           />
-
-          <Row>
-            <Col xs={12}>
-              <ParentTermSelector
-                id="create-term-parent"
-                onChange={this.onParentSelect}
-                parentTerms={termData.parentTerms}
-                vocabularyIri={this.props.vocabularyIri}
-              />
-            </Col>
-          </Row>
         </AttributeSectionContainer>
 
         <ShowAdvancedAssetFields>

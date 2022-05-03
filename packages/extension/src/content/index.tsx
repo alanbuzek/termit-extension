@@ -55,14 +55,35 @@ const internalActions = {};
 /**
  * all important global content script calls should be done here
  */
+
+const originalQuerySelectorAll = document.querySelectorAll.bind(document);
+
+const internals = {
+  activatePage() {
+    annotator = new Annotator(document.body, contentState);
+
+    // so that reactboostrap works fine (needs be able to query select elements withing shadow dom)
+    document.querySelectorAll = function (str) {
+      const originalResult = originalQuerySelectorAll(str);
+      const contentPopupResult = annotator!
+        .getContentPoup()
+        .getShadowRoot()
+        .querySelectorAll(str);
+      const sidebarResult = sidebar!.getShadowRoot().querySelectorAll(str);
+      return [...originalResult, ...contentPopupResult, ...sidebarResult] as any;
+    };
+  },
+  deactivatePage(){
+    document.querySelectorAll = originalQuerySelectorAll;
+  }
+};
+
 export const ContentActions = {
   showPopup(annotation: Annotation) {
     annotator!.showPopup(annotation);
   },
   async annotateNewWebsite(vocabulary: Vocabulary) {
-    // overlay.on();
-
-    annotator = new Annotator(document.body, contentState);
+    internals.activatePage();
 
     contentState.website = await api.createWebsiteInDocument(
       document.URL,
@@ -120,7 +141,7 @@ export const ContentActions = {
       return;
     }
 
-    annotator = new Annotator(document.body, contentState);
+    internals.activatePage();
 
     const { website, vocabulary } = foundExistingWebsite;
     // TODO: how to handle multiple vocabularies? schema adjustments, state adjustments
@@ -170,7 +191,7 @@ export const ContentActions = {
       selectionRange,
       annotationType,
       contentState.website?.iri,
-      contentState.terms,
+      contentState.terms
     );
 
     const [newAnnotation] = await markTerms(
@@ -225,7 +246,6 @@ export const ContentActions = {
     await BrowserApi.storage.set("vocabularies", contentState.vocabularies);
 
     // reset page
-    // contentState = getEmptyContentState();
     annotator!.turnOffAnnotations();
     resetContentState();
     contentState.vocabularies = await api.loadVocabularies();
