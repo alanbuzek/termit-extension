@@ -153,12 +153,12 @@ export function createTermsWithImportsOptionRendererAndUnusedTermsAndQualityBadg
 
 export function createTermValueRenderer(vocabularyIri: string) {
   return (option: Term) => (
-    <>
+    <div>
       <TermLink term={option} />
       {vocabularyIri !== option.vocabulary?.iri ? (
         <VocabularyNameBadge vocabulary={option.vocabulary} />
       ) : null}
-    </>
+    </div>
   );
 }
 

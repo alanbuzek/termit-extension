@@ -7,8 +7,11 @@ import { Annotation } from "../../../common/util/Annotation";
 import AssetLink from "../../../common/component/misc/AssetLink";
 import VocabularyUtils from "../../../common/util/VocabularyUtils";
 import { DropdownComponent } from "./FiltersPanel";
-import { FaBook } from "react-icons/fa";
+import { FaBook, FaHighlighter } from "react-icons/fa";
 import { GoPencil } from "react-icons/go";
+import { IntelligentTreeSelect } from "intelligent-tree-select";
+import { getLocalized } from "../../../common/model/MultilingualString";
+import { getShortLocale } from "../../../common/util/IntlUtil";
 
 export const getUrlInfo = (url) => {
   const urlObject = new URL(url);
@@ -52,8 +55,7 @@ const SidebarControlPanel = ({
   const loading = false;
   const disabled = false;
 
-  const [selectedVocabulary, setSelectedVocabulary] =
-    useState<Vocabulary | null>(null);
+  const [selectedVocabulary, setSelectedVocabulary] = useState<Vocabulary>();
   const onVocabularyChange = (vIri: string) => {
     const vocabulary = vocabularies!.find((v) => v.iri === vIri);
     setSelectedVocabulary(vocabulary);
@@ -72,19 +74,50 @@ const SidebarControlPanel = ({
     return (
       <div className="p-3 mb-4">
         {/* {allowPanel} */}
-        <p className="font-semibold">This page hasn't be annotated yet.</p>
-        <DropdownComponent
-          defaultOptionText={"Choose vocabulary"}
-          options={vocabularies!.map((vocab) => ({
-            name: vocab.label,
-            value: vocab.iri,
+        <img
+          src={chrome.runtime.getURL("/static/img/annotate.png")}
+          className="w-36 mb-4 mt-8 mx-auto"
+        />
+        <p className="font-semibold text-lg text-center">
+          Choose a vocabulary to start annotating with.
+        </p>
+        <IntelligentTreeSelect
+          onChange={(value) => {
+            if (!value) {
+              setSelectedVocabulary(undefined);
+              return;
+            }
+            const foundVocabulary = vocabularies?.find(
+              (vocab) => vocab.iri === value.iri
+            );
+            setSelectedVocabulary(foundVocabulary);
+          }}
+          value={
+            selectedVocabulary
+              ? {
+                  iri: selectedVocabulary.iri,
+                  label: selectedVocabulary.label,
+                }
+              : null
+          }
+          options={vocabularies!.map((vocabulary) => ({
+            iri: vocabulary.iri,
+            label: vocabulary.label,
           }))}
-          id="vocabulary-select"
-          label={"Vocabulary to annotate with"}
-          value={selectedVocabulary?.iri}
-          setValue={(newValue) => onVocabularyChange(newValue)}
-        ></DropdownComponent>
+          valueKey="iri"
+          getOptionLabel={(option: Vocabulary) => option.label}
+          childrenKey="subTerms"
+          showSettings={false}
+          maxHeight={200}
+          multi={false}
+          displayInfoOnHover={false}
+          expanded={true}
+          renderAsTree={false}
+          placeholder="Choose vocabulary"
+          valueRenderer={(option) => option.label}
+        />
         <Button
+          className="mx-auto mt-4"
           disabled={!selectedVocabulary}
           onClick={() => {
             setAnnotationLoading(true);
@@ -96,8 +129,11 @@ const SidebarControlPanel = ({
             }, 200);
           }}
           loading={annotationLoading}
+          size="big"
         >
-          Annotate page
+          Annotate Page
+          {/* with{" "}{selectedVocabulary ? `vocabulary ${selectedVocabulary.label}` : ""} */}
+          <FaHighlighter className="ml-2 text-lg" />
         </Button>
       </div>
     );
@@ -121,7 +157,7 @@ const SidebarControlPanel = ({
             {vocabulary!.label}
           </div>
         </div>
-        <div className='mb-1.5'>
+        <div className="mb-1.5">
           <GoPencil className="text-lg text-gray-600 hover:text-gray-800 cursor-pointer mr-2" />
         </div>
       </div>
