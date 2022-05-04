@@ -1,3 +1,22 @@
+/* termit-h.termit-h-hovered {
+  background-color: rgb(126, 241, 32) !important;
+} */
+.assigned-term-occurrence:hover {
+  background: rgba(116, 237, 108, 0.8) !important;
+}
+.suggested-term-occurrence:hover {
+  background: rgba(253, 203, 168, 0.8) !important;
+}
+.invalid-term-occurrence:hover {
+  background: rgba(235, 5, 5, 0.7) !important;
+}
+.term-definition:hover {
+  background: rgba(80, 200, 255, 0.8) !important;
+}
+.pending-term-definition:hover {
+  background: rgba(26, 0, 157, 0.2) !important;
+}
+
 svg {
   display: inline-block !important;
 }

@@ -6,7 +6,7 @@ import Vocabulary from "../../../common/model/Vocabulary";
 import { Annotation } from "../../../common/util/Annotation";
 import AssetLink from "../../../common/component/misc/AssetLink";
 import VocabularyUtils from "../../../common/util/VocabularyUtils";
-import { DropdownComponent } from "./FiltersPanel";
+import FiltersPanel, { DropdownComponent } from "./FiltersPanel";
 import { FaBook, FaHighlighter } from "react-icons/fa";
 import { GoPencil } from "react-icons/go";
 import { IntelligentTreeSelect } from "intelligent-tree-select";
@@ -132,7 +132,6 @@ const SidebarControlPanel = ({
           size="big"
         >
           Annotate Page
-          {/* with{" "}{selectedVocabulary ? `vocabulary ${selectedVocabulary.label}` : ""} */}
           <FaHighlighter className="ml-2 text-lg" />
         </Button>
       </div>

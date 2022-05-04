@@ -337,10 +337,6 @@ termit-h.termit-h-hovered {
   background-color: rgb(126, 241, 32) !important;
 } */
 
-termit-h.assigned-term-occurrence.proposed-occurrence {
-  border: 0.15em dotted green;
-}
-
 termit-h.assigned-term-occurrence {
   background: rgba(188, 239, 184, 0.7);
 }

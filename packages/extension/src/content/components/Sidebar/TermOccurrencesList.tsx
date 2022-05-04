@@ -24,11 +24,11 @@ export const ExternalLinkIcon = ({ className = "h-3 w-3 ml-2" }) => {
 
 const TermOccurrencesList = ({ annotations }) => {
   return (
-    <div>
+    <div className='px-2.5'>
       {(annotations as Annotation[]).map((annotation) => {
         return (
           <div
-            className="shadow-md rounded-md p-3 border border-gray-400 mb-3 cursor-pointer bg-white hover:bg-gray-300 relative hover:shadow-none"
+            className="rounded-md p-3 border border-gray-400 mb-2.5 cursor-pointer bg-white hover:bg-gray-300 relative"
             onClick={() => annotation.focusAnnotation()}
           >
             <div className="mb-0 text-lg font-semibold">
@@ -42,7 +42,7 @@ const TermOccurrencesList = ({ annotations }) => {
               </div>
             )}
             <span
-              className={`absolute top-1 right-1 inline-flex items-center justify-center px-2 py-1 md:px-2.5 md:py-2.5 text-xs font-medium leading-none text-gray-500 transform translate-x-2 -translate-y-1/2 rounded-md ${annotation.getClassName()}`}
+              className={`absolute top-1 right-1 inline-flex items-center justify-center px-2 py-1 md:px-2 md:py-2 text-xs font-medium leading-none text-gray-500 transform translate-x-2 -translate-y-1/2 rounded-md ${annotation.getClassName()}`}
             >
               {annotation.getTypeName()}
             </span>

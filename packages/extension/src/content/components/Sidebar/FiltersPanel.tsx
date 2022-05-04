@@ -1,22 +1,6 @@
 import React from "react";
-import { useState } from "react";
-// import Select from "react-dropdown-select";
-
-// // import Select from "react-select";
-
-// // const options = [
-// //   { value: "chocolate", label: "Chocolate" },
-// //   { value: "strawberry", label: "Strawberry" },
-// //   { value: "vanilla", label: "Vanilla" },
-// // ];
-
-// // const MyComponent = () => <Select options={options} />;
-
-// import Dropdown from "react-dropdown";
-// // import "react-dropdown/style.css";P
-
-const options = ["one", "two", "three"];
-const defaultOption = options[0];
+import { IntelligentTreeSelect } from "intelligent-tree-select";
+import { Input } from "reactstrap";
 
 export const DropdownComponent = ({
   id,
@@ -39,7 +23,7 @@ export const DropdownComponent = ({
         }}
         className="p-2"
       >
-        <option value="">{defaultOptionText || 'All'}</option>
+        <option value="">{defaultOptionText || "All"}</option>
         {options.map((option) => (
           <option value={option.value} selected={option.value == value}>
             {/* TODO */}
@@ -56,11 +40,11 @@ export const DropdownComponent = ({
 export const occurrenceTypes = [
   {
     value: "suggested-term-occurrence selected-occurrence",
-    name: "Occurrence of an unknown term",
+    name: "Unknown term",
   },
   {
     value: "assigned-term-occurrence selected-occurrence",
-    name: "Occurrence of an existing term",
+    name: "Existing term",
   },
   {
     value: "term-definition selected-occurrence",
@@ -68,38 +52,77 @@ export const occurrenceTypes = [
   },
   {
     value: "pending-term-definition selected-occurrence",
-    name: "Definition of an unknown term",
+    name: "Unknown term defintion",
   },
   {
     value: "suggested-term-occurrence proposed-occurrence",
-    name: "Proposed occurrence of an new term",
+    name: "Proposed new term",
   },
-  {
-    value: "suggested-term-occurrence assigned-term-occurrence",
-    name: "Proposed occurrence of an existing term",
-  },
+  // TODO: put back in
+  // {
+  //   value: "assigned-term-occurrence suggested-term-occurrence",
+  //   name: "Proposed existing term",
+  // },
 ];
 
 const FiltersPanel = ({
   occurrenceTypeFilter,
   setOccurrenceTypeFilter,
+  occurrenceTextFilter,
+  setOccurrenceTextFilter,
   annotationsCount,
 }) => {
   return (
-    <div>
-      <div className="flex">
-        <DropdownComponent
-          id="occurrence-type"
-          options={occurrenceTypes}
-          value={occurrenceTypeFilter}
-          setValue={setOccurrenceTypeFilter}
-          label={"Occurrence type filter"}
+    <>
+      <div className="flex px-2.5">
+        <Input
+          name="occurrence-text-filter"
+          value={occurrenceTextFilter}
+          onChange={(e) => setOccurrenceTextFilter(e.target.value)}
+          bsSize="sm"
+          placeholder={"Filter by text"}
+          className="flex-1"
         />
+        <div style={{ flex: 2 }}>
+          <IntelligentTreeSelect
+            onChange={(value) => {
+              if (!value) {
+                setOccurrenceTypeFilter(undefined);
+                return;
+              }
+              setOccurrenceTypeFilter(value);
+            }}
+            value={occurrenceTypeFilter}
+            options={occurrenceTypes}
+            valueKey="value"
+            optionRenderer={({ option, selectValue }) => {
+              console.log("option className: ", option.value);
+              return (
+                <div
+                  className={`${option.value} py-0.5 px-2 cursor-pointer`}
+                  onClick={() => selectValue(option)}
+                >
+                  {option.name}
+                </div>
+              );
+            }}
+            showSettings={false}
+            maxHeight={300}
+            multi={false}
+            displayInfoOnHover={false}
+            expanded={true}
+            renderAsTree={false}
+            placeholder="All occurrences"
+            valueRenderer={(option) => {
+              return option.name;
+            }}
+          />
+        </div>
       </div>
-      <div className="text-gray-800 text-base">
+      <div className="text-gray-600 text-sm px-3 mt-2 mb-1">
         {annotationsCount} annotations found.
       </div>
-    </div>
+    </>
   );
 };
 

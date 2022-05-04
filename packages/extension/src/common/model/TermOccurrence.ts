@@ -117,9 +117,10 @@ export const createTermOccurrences = (
         const termOccurrenceData = {
           id: about,
           // iri: VocabularyUtils.WEBSITE_TERM_OCCURRENCE + `/${about}`,
-          types: annotationType === AnnotationType.DEFINITION
-            ? [VocabularyUtils.TERM_DEFINITION_SOURCE]
-            : [VocabularyUtils.WEBSITE_TERM_OCCURRENCE],
+          types:
+            annotationType === AnnotationType.DEFINITION
+              ? [VocabularyUtils.TERM_DEFINITION_SOURCE]
+              : [VocabularyUtils.WEBSITE_TERM_OCCURRENCE],
           score,
           term: resource ? terms[resource] : undefined,
           target: {
@@ -270,5 +271,12 @@ export default class TermOccurrence extends TermAssignment {
 
   public getTextContent() {
     return this.getTextQuoteSelector().exactMatch;
+  }
+
+  public getSanitizedExactMatch() {
+    return this.getTextQuoteSelector().exactMatch.replace(
+      /(\r\n|\n|\r)/gm,
+      " "
+    );
   }
 }
