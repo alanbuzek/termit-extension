@@ -144,15 +144,6 @@ export const markTerms = (
           const pureLeft = calculatedOffset.replace(/\s/g, "").length;
           const pureRight = textPositionSelector.start;
 
-          // console.log(
-          //   "calculatedOffset: ",
-          //   calculatedOffset,
-          //   ", pureLeft: ",
-          //   pureLeft,
-          //   ", pureRight: ",
-          //   pureRight
-          // );
-
 
           return pureLeft === pureRight;
         },

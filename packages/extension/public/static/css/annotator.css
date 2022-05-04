@@ -3782,12 +3782,12 @@ Ensure the default browser behavior of the `hidden` attribute.
   pointer-events: none;
   position: absolute;
   height: 100%;
-  width: 23px;
-  left: -22px;
+  width: 8px;
+  left: -8px;
 }
 
 .annotator-collapsed .Buckets__list {
-  background: rgba(0, 0, 0, 0.08);
+  background: rgba(0, 0, 0, 0.02);
 }
 
 .Buckets__bucket {
@@ -5873,7 +5873,7 @@ Ensure the default browser behavior of the `hidden` attribute.
 @media screen and (min-width: 37.5em) {
   .annotator-frame {
     transition: margin-left 150ms cubic-bezier(0.55, 0, 0.2, 0.8);
-    width: 300px;
+    width: 350px;
     margin-left: -300px;
   }
 }

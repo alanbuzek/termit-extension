@@ -13,7 +13,7 @@ const TermOccurrencesFeed = ({ annotations }) => {
     );
   });
   return (
-    <div>
+    <div className='px-2.5'>
       <FiltersPanel
         occurrenceTypeFilter={occurrenceTypeFilter}
         setOccurrenceTypeFilter={setOccurrenceTypeFilter}

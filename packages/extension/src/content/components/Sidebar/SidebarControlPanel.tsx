@@ -2,18 +2,38 @@ import React from "react";
 import Button from "../Button";
 import Toggle from "react-toggle";
 import { useState } from "react";
-import VocabularySelect from "../../../common/component/vocabulary/VocabularySelect";
 import Vocabulary from "../../../common/model/Vocabulary";
 import { Annotation } from "../../../common/util/Annotation";
 import AssetLink from "../../../common/component/misc/AssetLink";
 import VocabularyUtils from "../../../common/util/VocabularyUtils";
 import { DropdownComponent } from "./FiltersPanel";
+import { FaBook } from "react-icons/fa";
+import { GoPencil } from "react-icons/go";
 
 export const getUrlInfo = (url) => {
   const urlObject = new URL(url);
 
   const checkedHostname = urlObject.hostname.replace("www.", "");
   return { checkedHostname, urlObject };
+};
+
+const TrashIcon = () => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      className="h-6 w-6"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      strokeWidth={2}
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+      />
+    </svg>
+  );
 };
 
 const SidebarControlPanel = ({
@@ -47,30 +67,10 @@ const SidebarControlPanel = ({
   };
 
   const [annotationLoading, setAnnotationLoading] = useState(false);
-  const { checkedHostname } = getUrlInfo(window.location.href);
-  const allowPanel = (
-    <label className="flex justify-between rounded-lg px-3 py-2 items-center mb-1.5 bg-gray-200">
-      <div
-        className={` text-base flex items-center ${
-          loading && !disabled ? "text-gray-400" : "text-gray-800"
-        }`}
-      >
-        Allow on {checkedHostname}{" "}
-        {/* {loading && !disabled && <Spinner size="5" className="ml-3" />} */}
-      </div>
-      <Toggle
-        disabled={loading}
-        checked={!disabled}
-        icons={false}
-        onChange={() => {
-        }}
-      />
-    </label>
-  );
 
   if (!annotations) {
     return (
-      <div className="p-3 mb-4 rounded-md bg-gray-100 border-gray-600 border">
+      <div className="p-3 mb-4">
         {/* {allowPanel} */}
         <p className="font-semibold">This page hasn't be annotated yet.</p>
         <DropdownComponent
@@ -104,9 +104,29 @@ const SidebarControlPanel = ({
   }
 
   return (
-    <div>
-      {allowPanel}
-      <div className="p-3 mb-3 rounded-md bg-gray-100 border-gray-600 border">
+    <div className="px-3 pt-3.5 pb-4 bg-gray-100 border-b border-gray-200">
+      <div className="flex justify-between items-end">
+        <div>
+          <div className="text-gray-600 text-base mb-2">
+            Page annotated with:
+          </div>
+          <div className="flex text-xl font-semibold text-gray-700 items-center">
+            <FaBook id={"props.id"} className={"block mr-2"} />
+            {/* <AssetLink
+          asset={vocabulary!}
+          path={`http://localhost:3000/#/vocabularies/${
+            VocabularyUtils.create(vocabulary!.iri!).fragment
+          }?namespace=http://onto.fel.cvut.cz/ontologies/slovnik/`}
+        /> */}
+            {vocabulary!.label}
+          </div>
+        </div>
+        <div className='mb-1.5'>
+          <GoPencil className="text-lg text-gray-600 hover:text-gray-800 cursor-pointer mr-2" />
+        </div>
+      </div>
+
+      {/* <div className="p-3 mb-3 rounded-md">
         <div className="text-base font-semibold text-gray-800 rounded-md mb-2">
           Selected vocabulary:{" "}
           <AssetLink
@@ -121,19 +141,16 @@ const SidebarControlPanel = ({
           annotations on this page.
         </h3>
       </div>
-      <div className="flex">
+      <div className="flex ml-auto mr-2">
         <Button
           disabled={deleteLoading}
           onClick={handlePageDeleteClick}
           color="alertLight"
           className="mr-2"
         >
-          Delete all annotations
+          Delete website <TrashIcon />
         </Button>
-        {/* <Button onClick={handlePageDelete} color="alert">
-          Delete suggested annotations
-        </Button> */}
-      </div>
+      </div> */}
     </div>
   );
 };
