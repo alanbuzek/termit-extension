@@ -5,8 +5,8 @@ import * as rangeUtil from "./utils/rangeUtils";
 import SelectionObserver from "./utils/SelectionObserver";
 import Vocabulary from "../../common/model/Vocabulary";
 import { markTerms } from "../marker";
-import { Annotation } from "../../common/util/Annotation";
-import { ContentState } from "..";
+import { Annotation, AnnotationType } from "../../common/util/Annotation";
+import { ContentActions, ContentState } from "..";
 import TermOccurrence from "../../common/model/TermOccurrence";
 import HtmlDomUtils from "../../common/component/annotator/HtmlDomUtils";
 import Constants from "../../common/util/Constants";
@@ -50,13 +50,19 @@ export default class Annotator {
   private integration: any;
   private currentAnnotation?: Annotation;
   private contentState: ContentState;
+  private isSelectingDefinition: boolean = false;
+  private onDefinitionSelected;
 
   public constructor(rootElement: HTMLElement, contentState: ContentState) {
     this.contentState = contentState;
     this.rootElement = rootElement;
     this.contentPopup = new ContentPopupContainer(
       this.rootElement,
-      this.contentState
+      this.contentState,
+      (onDefinitionSelected) => {
+        this.isSelectingDefinition = true;
+        this.onDefinitionSelected = onDefinitionSelected;
+      }
     );
 
     // TODO: remove hypothesis from name, add more elements (e.g, message panel if needed);
@@ -72,6 +78,7 @@ export default class Annotator {
 
       if (this.contentPopup.isOpen() && event) {
         if (event.type === "selectionchange") {
+          // @ts-ignore
           const activeElement = event?.target?.activeElement as
             | Element
             | undefined;
@@ -111,7 +118,7 @@ export default class Annotator {
   private destroy() {
     this.selectionObserver.disconnect();
     this.contentPopup.destroy();
-    this.integration.destroy();
+    // this.integration.destroy()§12345678;lo
   }
 
   /**
@@ -132,14 +139,27 @@ export default class Annotator {
     HtmlDomUtils.extendSelectionToWords();
 
     let updatedSelection = window.getSelection()!;
-    let updateRange = updatedSelection!.getRangeAt(0);
-    if (!this.isSelectionAllowed(updateRange, updatedSelection)) {
+    let updatedRange = updatedSelection!.getRangeAt(0);
+
+    if (!this.isSelectionAllowed(updatedRange, updatedSelection)) {
       this.onClearSelection();
       console.log("is not allowed");
       return;
     }
 
-    this.contentPopup.show(focusRect, isBackwards, updateRange);
+    console.log("this.isSelectingDefinition: ", this.isSelectingDefinition);
+    if (this.isSelectingDefinition) {
+      ContentActions.createUnknownOccurrenceFromRange(
+        updatedRange,
+        AnnotationType.DEFINITION
+      ).then((annotation) => {
+        this.onDefinitionSelected(annotation);
+        this.isSelectingDefinition = false;
+      });
+      return;
+    }
+
+    this.contentPopup.show(focusRect, isBackwards, updatedRange);
   }
 
   private isSelectionAllowed(range: Range, selection: Selection) {
@@ -168,6 +188,10 @@ export default class Annotator {
   }
 
   public showPopup(annotation: Annotation) {
+    if (this.isSelectingDefinition) {
+      return;
+    }
+
     this.currentAnnotation = annotation;
     // TODO: maybe this should not be the first element but the last?
     const elementRect = this.currentAnnotation
@@ -217,6 +241,10 @@ export default class Annotator {
   }
 
   private onClearSelection() {
+    if (this.isSelectingDefinition) {
+      return;
+    }
+
     this.contentPopup.hide();
   }
 
@@ -225,7 +253,7 @@ export default class Annotator {
     this.destroy();
   }
 
-  public getContentPoup(){
+  public getContentPoup() {
     return this.contentPopup;
   }
 }

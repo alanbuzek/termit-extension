@@ -13,12 +13,16 @@ export const overlay = {
     this.isInitiated = true;
   },
   on() {
+    this.init();
     this.previousOverflowValue = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     document.getElementById("termit-overlay")!.style.display = "block";
     this.isActive = true;
   },
   off() {
+    if (!this.isInitiated){
+      return;
+    }
     document.body.style.overflow = this.previousOverflowValue;
     document.getElementById("termit-overlay")!.style.display = "none";
     this.isActive = false;

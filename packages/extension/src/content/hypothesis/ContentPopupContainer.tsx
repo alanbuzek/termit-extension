@@ -28,7 +28,7 @@ export const isTouchDevice = (_window = window) => {
  */
 export function loadStyles(shadowRoot, fileName = "annotator") {
   // Find the preloaded stylesheet added by the boot script.
-  const url = /** @type {HTMLLinkElement|undefined} */ document.querySelector(
+  const url = document.querySelector(
     `link[rel="preload"][href*="/static/css/${fileName}.css"]`
   )?.href;
 
@@ -174,6 +174,7 @@ export class ContentPopupContainer {
   private arrowDirection: string;
   private currentAnnotation: Annotation | null = null;
   private contentState: ContentState;
+  private onSelectDefinition: () => any;
   annotationsForSelection: never[];
   /**
    * Create the toolbar's container and hide it.
@@ -184,9 +185,14 @@ export class ContentPopupContainer {
    * @param {AdderOptions} options - Options object specifying onAnnotate and onHighlight
    *        event handlers.
    */
-  constructor(element: HTMLElement, contentState: ContentState) {
+  constructor(
+    element: HTMLElement,
+    contentState: ContentState,
+    onSelectDefinition
+  ) {
     this.contentState = contentState;
     this.outerContainer = document.createElement("hypothesis-adder");
+    this.onSelectDefinition = onSelectDefinition;
     element.appendChild(this.outerContainer);
     this.shadowRoot = createShadowRoot(this.outerContainer);
 
@@ -261,6 +267,7 @@ export class ContentPopupContainer {
     selectionRange,
     annotation: Annotation | null = null
   ) {
+    console.log('called show with annotation: ', annotation);
     this.currentAnnotation = annotation;
     const { left, top, arrowDirection } = this.calculateTarget(
       selectionRect,
@@ -430,6 +437,7 @@ export class ContentPopupContainer {
           annotation={this.currentAnnotation}
           initialPopupType={initialPopupType}
           contentState={this.contentState}
+          onSelectDefinition={this.onSelectDefinition}
         />
       </IntlProvider>,
       this.shadowRoot,

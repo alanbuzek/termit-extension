@@ -8,7 +8,6 @@ import { Annotation } from "../../../common/util/Annotation";
 import AssetLink from "../../../common/component/misc/AssetLink";
 import VocabularyUtils from "../../../common/util/VocabularyUtils";
 import { DropdownComponent } from "./FiltersPanel";
-import { overlay } from "../../helper/overlay";
 
 export const getUrlInfo = (url) => {
   const urlObject = new URL(url);
@@ -44,7 +43,6 @@ const SidebarControlPanel = ({
 
   const handlePageDeleteClick = () => {
     setDeleteLoading(true);
-    overlay.on();
     handlePageDelete();
   };
 

@@ -8,22 +8,17 @@ import { Annotation } from "../common/util/Annotation";
 import JsonLdUtils from "../common/util/JsonLdUtils";
 import Utils from "../common/util/Utils";
 import VocabularyUtils, { IRI, IRIImpl } from "../common/util/VocabularyUtils";
-import mockTypes from "./mockData/mockTypes";
 import Constants from "../common/util/Constants";
 import Website from "../common/model/Website";
 import { cachedCall } from "./cache";
 import TermOccurrence, {
   TermOccurrenceData,
   CONTEXT as OCCURRENCE_CONTEXT,
-  CssSelector,
-  TextQuoteSelector,
-  TextPositionSelector,
 } from "../common/model/TermOccurrence";
-import SecurityUtils from "../common/util/SecurityUtils";
 import BrowserApi from "../shared/BrowserApi";
 import User, { UserData } from "../common/model/User";
 import { TermsMap } from "../content";
-import Document, { DocumentData } from "../common/model/Document";
+import { DocumentData } from "../common/model/Document";
 
 // TODO: remove all Promise.resolve() statements and uncomment real back-end calls when ready
 // TODO (optional): use fetch-mock or similar library to mock api server responses, will likely be needed to testing
@@ -287,6 +282,18 @@ function resolveTermCreationUrl(term: Term, targetVocabularyIri: IRI) {
   return url;
 }
 
+export function loadTerm(termNormalizedName: string, vocabularyIri: IRI) {
+  return termitApi.get(`/vocabularies/${
+      vocabularyIri.fragment
+    }/terms/${termNormalizedName}`,
+    param("namespace", vocabularyIri.namespace)
+  )
+    .then((data: object) =>
+      JsonLdUtils.compactAndResolveReferences<TermData>(data, TERM_CONTEXT)
+    )
+    .then((data: TermData) => new Term(data));
+}
+
 export function createTerm(term: Term, vocabularyIri: IRI) {
   const url = resolveTermCreationUrl(term, vocabularyIri);
   const data = Object.assign(term.toJsonLd(), {
@@ -300,6 +307,58 @@ export function createTerm(term: Term, vocabularyIri: IRI) {
     content(data)
       .contentType(Constants.JSON_LD_MIME_TYPE)
       .param("namespace", vocabularyIri.namespace)
+  );
+}
+
+export function updateTerm(term: Term) {
+  const termIri = VocabularyUtils.create(term.iri);
+  const vocabularyIri = VocabularyUtils.create(term.vocabulary!.iri!);
+  const reqUrl =
+    "/vocabularies/" + vocabularyIri.fragment + "/terms/" + termIri.fragment;
+  return termitApi.put(
+    reqUrl,
+    content(term.toJsonLd()).params({
+      namespace: vocabularyIri.namespace,
+    })
+  );
+}
+
+export function setTermDefinitionSource(
+  source: TermOccurrence,
+  term: Term,
+  website: Website
+) {
+  const termIri = VocabularyUtils.create(term.iri);
+  source.target.selectors.forEach((selector) => {
+    if (selector.iri) {
+      delete selector.iri;
+    }
+  });
+
+  if (source.target.iri) {
+    delete source.target.iri;
+  }
+
+  if (source.iri) {
+    delete source.iri;
+  }
+
+  return termitApi
+    .put(
+      `/terms/${termIri.fragment}/definition-source`,
+      param("namespace", termIri.namespace).content(source.toJsonLd())
+    )
+    .then((result) => {
+      source.iri = result["@id"];
+    });
+}
+
+export function removeTermDefinitionSource(source: TermOccurrence, term: Term) {
+  const termIri = VocabularyUtils.create(term.iri);
+
+  return termitApi.delete(
+    `/terms/${termIri.fragment}/definition-source`,
+    param("namespace", termIri.namespace)
   );
 }
 
@@ -431,4 +490,8 @@ export default {
   updateTermOccurrence,
   getUser,
   removeWebsiteFromDocument,
+  setTermDefinitionSource,
+  removeTermDefinitionSource,
+  updateTerm,
+  loadTerm,
 };

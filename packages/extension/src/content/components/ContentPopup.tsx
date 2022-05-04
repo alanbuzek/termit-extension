@@ -41,6 +41,8 @@ type ContentPopupProps = {
   showAt: any;
   hide: any;
   selectionRange: any;
+  isMinimized: boolean;
+  onSelectDefinition: any;
 };
 
 /**
@@ -73,8 +75,11 @@ function ContentPopup({
   selectionRange,
   annotation,
   contentState,
+  onSelectDefinition,
 }: ContentPopupProps) {
   const [currPopup, setCurrPopup] = useState(initialPopupType);
+  const [isMinimized, setIsMinimized] = useState(false);
+  const [definitionAnnotation, setDefinitionAnnotation] = useState<Annotation>();
   const closePopup = () => {
     hide();
   };
@@ -97,12 +102,21 @@ function ContentPopup({
               overlay.off();
             }}
             // TODO: all this should either be deleted if not needed or use real, not hard-coded values
-            onMinimize={() => 0}
+            onMinimize={() => {
+              setIsMinimized(true);
+              overlay.off();
+              onSelectDefinition((definitionAnnotation: Annotation) => {
+                overlay.on();
+                console.log('in callback definitionAnnotation: ', definitionAnnotation);
+                setIsMinimized(false);
+                setDefinitionAnnotation(definitionAnnotation);
+              });
+            }}
             onTermCreated={() => 0}
             // TODO: handle fallback when no vocabulary is selected
             vocabularyIri={vocabularyIri}
             createTerm={(term: Term) => {
-              return ContentActions.createTerm(term, vocabularyIri, annotation);
+              return ContentActions.createTerm(term, vocabularyIri, annotation, definitionAnnotation);
             }}
             i18n={() => ""}
             formatMessag={() => Promise.resolve()}
@@ -111,17 +125,24 @@ function ContentPopup({
             locale="cs-CZ"
             language={"cs"}
             contentState={contentState}
+            definitionAnnotation={definitionAnnotation}
           />
         );
       case PopupType.PurposeSelection:
         return (
           <HighlightedTextAdder
             onMarkOccurrence={() => {
-              ContentActions.createUnknownOccurrenceFromRange(selectionRange, AnnotationType.OCCURRENCE);
+              ContentActions.createUnknownOccurrenceFromRange(
+                selectionRange,
+                AnnotationType.OCCURRENCE
+              );
               setCurrPopup(PopupType.TermOccurrence);
             }}
             onMarkDefinition={() => {
-              ContentActions.createUnknownOccurrenceFromRange(selectionRange, AnnotationType.DEFINITION);
+              ContentActions.createUnknownOccurrenceFromRange(
+                selectionRange,
+                AnnotationType.DEFINITION
+              );
               setCurrPopup(PopupType.TermDefinition);
             }}
           />
@@ -136,10 +157,12 @@ function ContentPopup({
             // }
             // TODO: tweak these defaults
             annotationClass={
-              annotation?.getTermState() || AnnotationTypeClass.SUGGESTED_OCCURRENCE
+              annotation?.getTermState() ||
+              AnnotationTypeClass.SUGGESTED_OCCURRENCE
             }
             annotationOrigin={
-              annotation?.getTermCreatorState() || AnnotationOriginClass.PROPOSED
+              annotation?.getTermCreatorState() ||
+              AnnotationOriginClass.PROPOSED
             }
             // TODO: do we need is open? or will that be fully managed by the above layer (more likely)
             isOpen={true}
@@ -148,7 +171,11 @@ function ContentPopup({
               return ContentActions.removeOccurrence(annotation);
             }}
             onSelectTerm={(term: Term) =>
-              ContentActions.assignTermToSuggestedOccurrence(term, annotation, AnnotationType.OCCURRENCE)
+              ContentActions.assignTermToOccurrence(
+                term,
+                annotation,
+                AnnotationType.OCCURRENCE
+              )
             }
             onCreateTerm={() => {
               showAt(0, 0, true);
@@ -164,7 +191,8 @@ function ContentPopup({
           <TermDefinitionAnnotation
             term={annotation?.term}
             text={
-              annotation?.termOccurrence?.getTextContent() || selectionRange.toString()
+              annotation?.termOccurrence?.getTextContent() ||
+              selectionRange.toString()
             }
             isOpen={true}
             onRemove={() => {
@@ -172,7 +200,11 @@ function ContentPopup({
               return ContentActions.removeOccurrence(annotation);
             }}
             onSelectTerm={(term: Term) => {
-              return ContentActions.assignTermToSuggestedOccurrence(term, annotation, AnnotationType.DEFINITION)
+              return ContentActions.assignTermToOccurrence(
+                term,
+                annotation,
+                AnnotationType.DEFINITION
+              );
             }}
             onToggleDetailOpen={() => 0}
             onClose={closePopup}
@@ -183,6 +215,14 @@ function ContentPopup({
         return null;
     }
   };
+
+  let style: any = {
+    visibility: isMinimized ? "hidden" : "visible",
+  };
+
+  if (currPopup === PopupType.CreateTermModal) {
+    style = { ...style, width: 800, height: 800, overflowY: "scroll" };
+  }
 
   return (
     <div
@@ -195,12 +235,7 @@ function ContentPopup({
           "is-active": isVisible,
         }
       )}
-      style={
-        currPopup === PopupType.CreateTermModal
-          ? { width: 800, height: 800, overflowY: "scroll" }
-          : null
-      }
-      // style={{ visibility: isVisible ? 'visible' : 'hidden' }}
+      style={style}
     >
       <div
         className="hyp-u-layout-row AdderToolbar__actions p-2"

@@ -1,13 +1,33 @@
-import { resolve } from "path";
 import "regenerator-runtime/runtime.js";
-import api from "../api";
-import { SKIP_CACHE } from "../api/cache";
+// import api from "../api";
 import { UserData } from "../common/model/User";
+import Ajax, { content } from "../common/util/Ajax";
 import Constants from "../common/util/Constants";
 import SecurityUtils from "../common/util/SecurityUtils";
 import BrowserApi from "../shared/BrowserApi";
 import { MessageType } from "../types/messageTypes";
 // import { JSDOM } from 'jsdom';
+
+const annotaceApi = new Ajax({ baseURL: Constants.ANNOTACE_SERVER_URL });
+
+export function runPageAnnotationAnalysis(
+  vocabulary: string,
+  pageHtml: string
+) {
+  return annotaceApi.post(
+    "/annotate",
+    content({
+      content: pageHtml,
+      vocabularyRepository: vocabulary,
+      vocabularyContexts: [],
+      // TODO: language
+      language: "cs",
+    })
+      .param("enableKeywordExtraction", "true")
+      .accept(Constants.JSON_MIME_TYPE)
+      .contentType(Constants.JSON_MIME_TYPE)
+  );
+}
 
 export enum ExtensionMessage {
   LoginEvent,
@@ -33,8 +53,7 @@ function handleMessages(message, sender, sendResponse) {
   switch (message.type) {
     // TODO: why not just call it directly from content script?
     case MessageType.GetPageAnnotationsAnalysis: {
-      api
-        .runPageAnnotationAnalysis(
+      runPageAnnotationAnalysis(
           message.payload.vocabulary,
           message.payload.pageHtml
         )
@@ -83,10 +102,7 @@ chrome.action.onClicked.addListener((tab) => {
   if (!tab || !tab.id) {
     return;
   }
-  chrome.tabs.sendMessage(
-    tab.id,
-    { type: MessageType.OpenToolbar },
-  );
+  chrome.tabs.sendMessage(tab.id, { type: MessageType.OpenToolbar });
 });
 
 // if (SecurityUtils.isLoggedIn()){

@@ -1,19 +1,15 @@
 import * as React from "react";
 import withI18n, { HasI18n } from "../hoc/withI18n";
 import Term, { TermData } from "../../model/Term";
-import {
-  Button,
-  ButtonToolbar,
-  Col,
-  Row,
-} from "reactstrap";
+import { Button, ButtonToolbar, Col, Row } from "reactstrap";
 import TermMetadataCreateForm from "../term/TermMetadataCreateForm";
 import { injectIntl } from "react-intl";
 import { IRI } from "../../util/VocabularyUtils";
 import AssetFactory from "../../util/AssetFactory";
 import { langString } from "../../model/MultilingualString";
 import { isTermValid, LabelExists } from "../term/TermValidationUtils";
-import { ContentState } from '../../../content';
+import { ContentState } from "../../../content";
+import { Annotation } from "../../util/Annotation";
 
 interface CreateTermFromAnnotationProps extends HasI18n {
   show: boolean;
@@ -24,6 +20,7 @@ interface CreateTermFromAnnotationProps extends HasI18n {
   language: string;
   contentState: ContentState;
   createTerm: (term: Term) => Promise<any>;
+  definitionAnnotation?: Annotation;
 }
 
 interface CreateTermFromAnnotationState extends TermData {
@@ -41,6 +38,21 @@ export class CreateTermFromAnnotation extends React.Component<
       AssetFactory.createEmptyTermData(props.language),
       { labelExists: {} }
     );
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (
+      this.props.definitionAnnotation &&
+      this.props.definitionAnnotation !== prevProps.definitionAnnotation
+    ) {
+      this.setDefinition(
+        this.props.definitionAnnotation.termOccurrence
+          .getTextQuoteSelector()
+          // replace new line characters
+          // TODO: abstract into helper method, or right into Annotation
+          .exactMatch.replace(/(\r\n|\n|\r)/gm, " ")
+      );
+    }
   }
 
   /**
@@ -110,6 +122,7 @@ export class CreateTermFromAnnotation extends React.Component<
               this.props.vocabularyIri.fragment
             }
             labelExist={this.state.labelExists}
+            definitionAnnotation={this.props.definitionAnnotation}
           />
           <Row>
             <Col xs={12}>
@@ -141,6 +154,5 @@ export class CreateTermFromAnnotation extends React.Component<
     );
   }
 }
-
 
 export default injectIntl(withI18n(CreateTermFromAnnotation)) as any;

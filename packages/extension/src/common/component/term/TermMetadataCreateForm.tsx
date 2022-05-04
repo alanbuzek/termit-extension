@@ -4,7 +4,6 @@ import Term, { TermData } from "../../model/Term";
 import Utils from "../../util/Utils";
 import { Col, Form, Row } from "reactstrap";
 import TermTypesEdit from "./TermTypesEdit";
-import ParentTermSelector from "./ParentTermSelector";
 import VocabularyUtils from "../../util/VocabularyUtils";
 import { injectIntl } from "react-intl";
 import TermDefinitionBlockEdit from "./TermDefinitionBlockEdit";
@@ -17,10 +16,10 @@ import {
 } from "../../model/MultilingualString";
 import { checkLabelUniqueness } from "./TermValidationUtils";
 import ShowAdvancedAssetFields from "../asset/ShowAdvancedAssetFields";
-import { loadIdentifier } from "../asset/AbstractCreateAsset";
 import TermScopeNoteEdit from "./TermScopeNoteEdit";
 import ValidationResult from "../../model/form/ValidationResult";
 import CustomInput from "../misc/CustomInput";
+import { loadIdentifier } from '../../../api';
 
 interface TermMetadataCreateFormProps extends HasI18n {
   onChange: (change: object, callback?: () => void) => void;

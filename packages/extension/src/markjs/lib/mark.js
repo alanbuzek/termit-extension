@@ -436,7 +436,6 @@ class Mark {
    */
   wrapRangeInMappedTextNode(dict, start, end, filterCb, eachCb) {
     // iterate over all text nodes to find the one matching the positions
-    console.log("on iteration: ", dict, start, end);
     let matchedFirstPart = false;
     
     dict.nodes.every((n, i) => {

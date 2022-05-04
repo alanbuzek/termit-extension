@@ -153,7 +153,6 @@ export const markTerms = (
           //   pureRight
           // );
 
-          console.log("got to filter: ", pureLeft, pureRight);
 
           return pureLeft === pureRight;
         },
@@ -299,9 +298,9 @@ export const occurrenceFromRange = (
   newTerm.termOccurrences.push(termOccurrence);
   const [termOccurrenceResult] = createTermOccurrences(
     [newTerm],
-    websiteIri,
-    termsMap,
-    [annotationType]
+    websiteIri!,
+    termsMap!,
+    annotationType
   );
 
   console.log(

@@ -1,20 +1,11 @@
 import * as React from "react";
-import api from "../../../api";
-// import Constants from "../../util/Constants";
-// import last from "last";
+import { loadIdentifier } from '../../../api';
 
 export interface AbstractCreateAssetState {
   iri: string;
   label: string;
   generateIri: boolean;
 }
-
-let loadIdentifier = api.loadIdentifier;
-// This will cause the existing still running identifier requests to be ignored in favor of the most recent call
-// loadIdentifier = last(loadIdentifier);
-
-export { loadIdentifier };
-
 /**
  * Abstract asset creation component class.
  *

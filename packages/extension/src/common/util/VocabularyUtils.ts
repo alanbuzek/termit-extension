@@ -89,7 +89,7 @@ const VocabularyUtils = {
   MA_MUJ_POSLEDNI_KOMENTAR: _NS_TERMIT + "má-můj-poslední-komentář",
   SUGGESTED_TERM_OCCURRENCE: _NS_TERMIT + "navržený-výskyt-termu",
   ASSIGNMENT_TARGET: _NS_TERMIT + "c\u00edl",
-  TERM_OCCURRENCE_TARGET: _NS_TERMIT + "cíl-výskytu",
+  OCCURRENCE_TARGET: _NS_TERMIT + "cíl-výskytu",
   FILE_OCCURRENCE_TARGET: _NS_TERMIT + "c\u00edl-souborov\u00e9ho-v\u00fdskytu",
   DEFINITION_OCCURRENCE_TARGET:
     _NS_TERMIT + "c\u00edl-defini\u010dn\u00edho-v\u00fdskytu",

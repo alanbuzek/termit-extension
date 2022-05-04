@@ -20,28 +20,22 @@ export const AnnotationOriginClass = {
 
 export const AnnotationType = {
   OCCURRENCE: VocabularyUtils.TERM_OCCURRENCE,
-  DEFINITION: VocabularyUtils.DEFINITIONAL_OCCURRENCE,
+  DEFINITION: VocabularyUtils.TERM_DEFINITION_SOURCE,
 };
 
+// TODO: remove
 export enum AnnotationStatus {
   SUCCESS,
   FAILURE,
   PENDING,
 }
 
-// TODO: remove when no longer needed as a reference
-// export type TermOccurrence = {
-//   about: string;
-//   content: string;
-//   originalTerm: string;
-//   property: string;
-//   resource: string;
-//   score?: number;
-//   // TODO: change startOffset to a number
-//   startOffset: string;
-//   typeof: string;
-//   cssSelector: string;
-// };
+export const AnnotationFocusTime = {
+  SHORT: 4000,
+  MEDIUM: 8000,
+  LONG: 12000,
+  INFINITE: -1,
+};
 
 // TODO: we'll have to make sure that the mapping works ok here (e.g. ddo:definice vs full url)
 export function isDefinitionAnnotation(types: string[]) {
@@ -54,6 +48,7 @@ export class Annotation {
   private elements: HTMLElement[] = [];
   private hoveredElements = new Set<HTMLElement>();
   private containerElement: HTMLElement;
+  private focusTimeout;
   // methods:
   // markAnnotation(); (called by contructor)
   // remove(); (will hide the annotation)
@@ -82,12 +77,12 @@ export class Annotation {
 
     if (this.term === null) {
       // this.termOccurrence.typeof maybe be subject to change
-      return isDefinitionAnnotation(this.termOccurrence.types)
+      return this.isDefinition()
         ? AnnotationTypeClass.PENDING_DEFINITION
         : AnnotationTypeClass.SUGGESTED_OCCURRENCE;
     }
     if (this.termOccurrence) {
-      return isDefinitionAnnotation(this.termOccurrence.types)
+      return this.isDefinition()
         ? AnnotationTypeClass.DEFINITION
         : AnnotationTypeClass.ASSIGNED_OCCURRENCE;
     }
@@ -117,17 +112,24 @@ export class Annotation {
     );
   }
 
-  public focusAnnotation() {
+  public focusAnnotation(focusTime = AnnotationFocusTime.SHORT) {
     if (!this.elements.length) {
       return;
     }
     this.elements.forEach((element) => {
       element.scrollIntoView({ block: "center", inline: "nearest" });
       element.classList.add("annotation-focused");
-      // this.element.click();
-      setTimeout(() => {
-        element.classList.remove("annotation-focused");
-      }, 4000);
+    });
+    clearTimeout(this.focusTimeout);
+    if (focusTime !== AnnotationFocusTime.INFINITE) {
+      this.focusTimeout = setTimeout(this.unfocus.bind(this), focusTime);
+    }
+  }
+
+  public unfocus() {
+    clearTimeout(this.focusTimeout);
+    this.elements.forEach((element) => {
+      element.classList.remove("annotation-focused");
     });
   }
 
@@ -157,13 +159,9 @@ export class Annotation {
     return this.elements;
   }
 
-  public assignTerm(term: Term, annotationType: string) {
+  public assignTerm(term: Term) {
     this.term = term;
     this.termOccurrence.term = term;
-    if (annotationType === AnnotationType.DEFINITION) {
-      this.termOccurrence.types.push(VocabularyUtils.DEFINITIONAL_OCCURRENCE);
-    }
-    // delete this.termOccurrence.score;
 
     this.termOccurrence.types = this.termOccurrence.types.filter(
       (type) => type !== VocabularyUtils.SUGGESTED_TERM_OCCURRENCE
@@ -181,7 +179,11 @@ export class Annotation {
     const standardClassName = this.getClassName();
     const hoveredClassName = this.isHovered() ? " termit-h-hovered" : "";
     this.elements.forEach((element) => {
-      element!.className = standardClassName + hoveredClassName;
+      const focusedClassName = element.classList.contains("annotation-focused")
+        ? " annotation-focused"
+        : "";
+      element!.className =
+        standardClassName + hoveredClassName + focusedClassName;
       Annotation.updateElementDepthPadding(element);
     });
   }
@@ -203,8 +205,6 @@ export class Annotation {
       curreElement = curreElement.children[0] as HTMLElement;
     }
 
-    console.log("depth: ", depth);
-
     return depth;
   }
 
@@ -214,5 +214,9 @@ export class Annotation {
         Annotation.updateElementDepthPadding(element);
       }
     );
+  }
+
+  public isDefinition() {
+    return this.termOccurrence.types.includes(AnnotationType.DEFINITION);
   }
 }

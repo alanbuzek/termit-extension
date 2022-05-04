@@ -2,8 +2,12 @@ import Annotator from "./hypothesis/Annotator";
 import { Sidebar } from "./hypothesis/Sidebar";
 import Vocabulary from "../common/model/Vocabulary";
 import { preloadContentStyles } from "./hypothesis/helpers";
-import { overlay } from "./helper/overlay";
-import { Annotation, AnnotationType } from "../common/util/Annotation";
+import {
+  Annotation,
+  AnnotationFocusTime,
+  AnnotationType,
+  isDefinitionAnnotation,
+} from "../common/util/Annotation";
 import api from "../api";
 import VocabularyUtils, { IRI } from "../common/util/VocabularyUtils";
 import Term from "../common/model/Term";
@@ -15,6 +19,9 @@ import TermOccurrence, {
 } from "../common/model/TermOccurrence";
 import BrowserApi from "../shared/BrowserApi";
 import User from "../common/model/User";
+
+// TODO: this should be dynamic when language selection is implemented
+const language = "cs";
 
 // global important classes
 let sidebar: Sidebar | null = null;
@@ -70,12 +77,31 @@ const internals = {
         .getShadowRoot()
         .querySelectorAll(str);
       const sidebarResult = sidebar!.getShadowRoot().querySelectorAll(str);
-      return [...originalResult, ...contentPopupResult, ...sidebarResult] as any;
+      return [
+        ...originalResult,
+        ...contentPopupResult,
+        ...sidebarResult,
+      ] as any;
     };
   },
-  deactivatePage(){
+  deactivatePage() {
     document.querySelectorAll = originalQuerySelectorAll;
-  }
+  },
+  getPageUrl() {
+    console.log(
+      "shortened url: ",
+      document.URL.replace(/[?&]?termit-focus-annotation=.*$/, "")
+    );
+    return document.URL.replace(/[?&]?termit-focus-annotation=.*$/, "");
+  },
+  parseAnnotationToFocus() {
+    const match = document.URL.match(/termit-focus-annotation=(.+)$/);
+    if (!match){
+      return;
+    }
+
+    return match[1];
+  },
 };
 
 export const ContentActions = {
@@ -84,16 +110,18 @@ export const ContentActions = {
   },
   async annotateNewWebsite(vocabulary: Vocabulary) {
     internals.activatePage();
+    console.log("annotated new website called");
 
     contentState.website = await api.createWebsiteInDocument(
-      document.URL,
+      internals.getPageUrl(),
       VocabularyUtils.create(vocabulary.document!.iri)
     );
+    console.log("about to run text analysis");
     const textAnalysisResult = await backgroundApi.getPageAnnotations(
       vocabulary.iri,
       document.body.outerHTML
     );
-
+    console.log("load all terms, textAnalysisResult: ", textAnalysisResult);
     const vocabularyTerms = await api.loadAllTerms(
       VocabularyUtils.create(vocabulary.iri)
     );
@@ -106,6 +134,7 @@ export const ContentActions = {
       textAnalysisResult,
       contentState.website.iri,
       contentState.terms!,
+      AnnotationType.OCCURRENCE,
       [VocabularyUtils.SUGGESTED_TERM_OCCURRENCE]
     );
 
@@ -122,7 +151,7 @@ export const ContentActions = {
 
     // update vocabulary cache
     await BrowserApi.storage.set("vocabularies", contentState.vocabularies);
-    overlay.off();
+
     // this makes sure to re-render sidebar on data update
     sidebar!.render();
 
@@ -132,7 +161,7 @@ export const ContentActions = {
   },
   async attemptAnnotatingExistingWebsite() {
     const foundExistingWebsite = await api.getExistingWebsite(
-      document.URL,
+      internals.getPageUrl(),
       contentState.vocabularies
     );
 
@@ -156,29 +185,101 @@ export const ContentActions = {
     contentState.vocabulary = vocabulary;
     contentState.website = website;
 
+    const occurrenceToFocusIri = internals.parseAnnotationToFocus()
+
+    if (occurrenceToFocusIri){
+      const foundAnnotation = contentState.annotations.find(annotation => annotation.termOccurrence.iri === occurrenceToFocusIri);
+      if (!foundAnnotation){
+        throw new Error('Focused annotation not found: ', foundAnnotation);
+      }
+
+      foundAnnotation.focusAnnotation(AnnotationFocusTime.LONG);
+    }
+
     sidebar!.render();
     // TODO: fix bug where this opens on the wrong side
     setTimeout(() => {
       sidebar!.open();
     }, 200);
   },
-  async assignTermToSuggestedOccurrence(
+  async assignTermToOccurrence(
     term: Term,
     annotation: Annotation,
-    annotationType: string
+    annotationType: string,
+    isDuringTermCreation: boolean = false
   ) {
-    annotation.assignTerm(term, annotationType);
+    const originalTerm = annotation.term;
+    annotation.assignTerm(term);
     annotator!.hidePopup();
-    if (!annotation.termOccurrence.iri) {
-      // term occurrence doesn't exist in the back-end yet
+    const hasBeenPersisted = !!annotation.termOccurrence.iri;
+    const isDefinition = annotationType === AnnotationType.DEFINITION;
+    console.log("contentState: ", contentState);
+    if (isDefinition) {
+      if (hasBeenPersisted) {
+        // if we got here, we must be reassigning definition to a new element -> delete old definition source
+        await api.removeTermDefinitionSource(
+          annotation.termOccurrence,
+          originalTerm!
+        );
+      }
+
+      if (!isDuringTermCreation) {
+        const annotationIdx = contentState.annotations!.findIndex(
+          (currAnnotation) =>
+            currAnnotation?.term?.iri === term.iri &&
+            currAnnotation.isDefinition() &&
+            annotation !== currAnnotation
+        );
+
+        // delete previous definition annotation from the same term (can only have one)
+        // from front-end only, back-end will automatically delete previous existing
+        if (annotationIdx >= 0) {
+          // TODO: put into an internals helper function and remove
+          contentState.annotations![annotationIdx].removeOccurrence();
+          contentState.annotations?.splice(annotationIdx, 1);
+        }
+
+        // this must mean we're updating a definition source of a term -> also update the definition
+
+        // get full term from API, as standard loaded terms don't contain certain properties (e.g, glossary, causing issues during updates)
+        const fullTerm = await api.loadTerm(
+          VocabularyUtils.create(term.iri).fragment,
+          VocabularyUtils.create(contentState.vocabulary!.iri)
+        );
+
+        fullTerm.definition = {
+          ...fullTerm.definition,
+          [language]: annotation.termOccurrence
+            .getTextQuoteSelector()
+            .exactMatch.replace(/(\r\n|\n|\r)/gm, " "),
+        };
+
+        term.definition = {
+          ...term.definition,
+          [language]: annotation.termOccurrence
+            .getTextQuoteSelector()
+            .exactMatch.replace(/(\r\n|\n|\r)/gm, " "),
+        };
+
+        console.log("full term: ", fullTerm);
+
+        await api.updateTerm(fullTerm);
+      }
+
+      await api.setTermDefinitionSource(
+        annotation.termOccurrence,
+        term,
+        contentState.website!
+      );
+    } else if (hasBeenPersisted) {
+      await api.updateTermOccurrence(annotation.termOccurrence);
+    } else {
       await api.createTermOccurrences(
         [annotation.termOccurrence],
         contentState.website!,
         annotationType,
         contentState.vocabulary!.iri
       );
-    } else {
-      await api.updateTermOccurrence(annotation.termOccurrence);
     }
 
     sidebar?.render();
@@ -205,8 +306,14 @@ export const ContentActions = {
     this.showPopup(newAnnotation);
 
     sidebar?.render();
+    return newAnnotation;
   },
-  async createTerm(term: Term, vocabularyIri: IRI, annotation: Annotation) {
+  async createTerm(
+    term: Term,
+    vocabularyIri: IRI,
+    annotation: Annotation,
+    definitionAnnotation?: Annotation
+  ) {
     annotator?.hidePopup();
     await api.createTerm(term, vocabularyIri);
     contentState.terms![term.iri] = term;
@@ -214,19 +321,33 @@ export const ContentActions = {
       iri: contentState!.vocabulary!.iri,
       types: contentState!.vocabulary!.types,
     };
-    await this.assignTermToSuggestedOccurrence(
+    await this.assignTermToOccurrence(
       term,
       annotation,
       AnnotationType.OCCURRENCE
     );
-    overlay.off();
+    if (definitionAnnotation) {
+      await this.assignTermToOccurrence(
+        term,
+        definitionAnnotation,
+        AnnotationType.DEFINITION,
+        true
+      );
+    }
 
     sidebar?.render();
   },
   async removeOccurrence(annotation: Annotation) {
     await annotation.removeOccurrence();
     if (annotation.termOccurrence.iri) {
-      await api.removeOccurrence(annotation.termOccurrence);
+      if (annotation.isDefinition()) {
+        await api.removeTermDefinitionSource(
+          annotation.termOccurrence,
+          annotation.term!
+        );
+      } else {
+        await api.removeOccurrence(annotation.termOccurrence);
+      }
     }
     const annotationIdx = contentState.annotations!.indexOf(annotation);
     contentState.annotations?.splice(annotationIdx, 1);
@@ -251,7 +372,6 @@ export const ContentActions = {
     contentState.vocabularies = await api.loadVocabularies();
 
     sidebar!.render();
-    overlay.off();
     initPage();
   },
 };
@@ -259,7 +379,6 @@ export const ContentActions = {
 const initPage = async () => {
   contentState.user = await api.getUser();
   preloadContentStyles();
-  overlay.init();
 
   if (!contentState.user) {
     initSidebar();

@@ -7,6 +7,7 @@ import TermAssignment, {
 import Utils from "../util/Utils";
 import VocabularyUtils from "../util/VocabularyUtils";
 import { TermsMap } from "../../content";
+import { AnnotationType } from "../util/Annotation";
 
 // TODO: move to there when possible
 // import { isAnnotationWithMinimumScore } from "../component/annotator/AnnotationDomHelper";
@@ -79,6 +80,7 @@ export interface CssSelector extends Selector {
 
 export interface OccurrenceTarget extends Target {
   selectors: Selector[];
+  iri?: string;
 }
 
 export interface TermOccurrenceData extends TermAssignmentData {
@@ -91,6 +93,7 @@ export const createTermOccurrences = (
   results: any[],
   websiteIri: string,
   terms: TermsMap,
+  annotationType: string,
   extraTypes?: string[]
 ): TermOccurrence[][] => {
   return results.map(({ cssSelectors, termOccurrences }) => {
@@ -104,9 +107,7 @@ export const createTermOccurrences = (
       .map((termOccurrence) => {
         const {
           about,
-          property,
           resource,
-          content,
           typeof: typeOf,
           score,
           startOffset,
@@ -116,31 +117,30 @@ export const createTermOccurrences = (
         const termOccurrenceData = {
           id: about,
           // iri: VocabularyUtils.WEBSITE_TERM_OCCURRENCE + `/${about}`,
-          types: [
-            VocabularyUtils.TERM_OCCURRENCE,
-            VocabularyUtils.WEBSITE_TERM_OCCURRENCE,
-          ],
+          types: annotationType === AnnotationType.DEFINITION
+            ? [VocabularyUtils.TERM_DEFINITION_SOURCE]
+            : [VocabularyUtils.WEBSITE_TERM_OCCURRENCE],
           score,
           term: resource ? terms[resource] : undefined,
           target: {
             // iri: VocabularyUtils.WEBSITE_OCCURRENCE_TARGET + "/instance1749321978",
             types: [
-              VocabularyUtils.TERM_OCCURRENCE_TARGET,
-              VocabularyUtils.WEBSITE_OCCURRENCE_TARGET,
+              // VocabularyUtils.OCCURRENCE_TARGET,
+              VocabularyUtils.HAS_WEBSITE_OCCURRENCE_TARGET,
             ],
             selectors: [
               {
                 // iri: VocabularyUtils.TEXT_QUOTE_SELECTOR + "/instance-1673666643",
                 types: [
                   VocabularyUtils.TEXT_QUOTE_SELECTOR,
-                  VocabularyUtils.SELECTOR,
+                  // VocabularyUtils.SELECTOR,
                 ],
                 exactMatch: originalTerm,
               },
               {
                 // iri: VocabularyUtils.TEXT_POSITION_SELECTOR + "/instance1202492151",
                 types: [
-                  VocabularyUtils.SELECTOR,
+                  // VocabularyUtils.SELECTOR,
                   VocabularyUtils.TEXT_POSITION_SELECTOR,
                 ],
                 // TODO; maybe remove this?
@@ -150,7 +150,10 @@ export const createTermOccurrences = (
               },
               {
                 // iri: VocabularyUtils.CSS_SELECTOR + "/instance455547086",
-                types: [VocabularyUtils.SELECTOR, VocabularyUtils.CSS_SELECTOR],
+                types: [
+                  // VocabularyUtils.SELECTOR,
+                  VocabularyUtils.CSS_SELECTOR,
+                ],
                 // TODO: this should be changed to an array later?
                 value: cssSelectors[0],
               },
