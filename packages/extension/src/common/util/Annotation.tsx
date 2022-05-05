@@ -41,11 +41,15 @@ export class Annotation {
   private hoveredElements = new Set<HTMLElement>();
   private containerElement: HTMLElement;
   private focusTimeout;
+  private failed: boolean = false;
 
   constructor(termOccurrence, containerElement, term = null) {
     this.termOccurrence = termOccurrence;
     this.term = term;
     this.containerElement = containerElement;
+    if (!this.containerElement) {
+      this.setFailed(true);
+    }
   }
 
   public getTermState() {
@@ -173,6 +177,9 @@ export class Annotation {
   }
 
   public updateRelatedAnnotationElements() {
+    if (this.isFailed()) {
+      return;
+    }
     Array.from(this.containerElement.querySelectorAll("termit-h")).forEach(
       (element) => {
         Annotation.updateElementDepthPadding(element);
@@ -182,5 +189,13 @@ export class Annotation {
 
   public isDefinition() {
     return this.termOccurrence.types.includes(AnnotationType.DEFINITION);
+  }
+
+  public setFailed(value: boolean) {
+    this.failed = value;
+  }
+
+  public isFailed() {
+    return this.failed;
   }
 }

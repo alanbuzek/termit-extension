@@ -20,7 +20,7 @@ import BrowserApi from "../shared/BrowserApi";
 import User from "../common/model/User";
 import Constants from "../common/util/Constants";
 import { markTerm } from "./marker";
-import { overlay } from './helper/overlay';
+import { overlay } from "./helper/overlay";
 
 // TODO: this should be dynamic when language selection is implemented
 const language = "cs";
@@ -35,7 +35,7 @@ export type ContentState = {
   // api data
   vocabulary: Vocabulary | null;
   annotations: Annotation[] | null;
-  notFoundTermOccurrences: TermOccurrence[] | null;
+  failedAnnotations: Annotation[] | null;
   terms: TermsMap | null;
   website: Website | null;
   // local state data
@@ -48,7 +48,7 @@ export type ContentState = {
 
 const resetContentState = async () => {
   contentState.annotations = null;
-  contentState.notFoundTermOccurrences = null;
+  contentState.failedAnnotations = null;
   contentState.vocabulary = null;
   contentState.terms = null;
   contentState.website = null;
@@ -180,10 +180,9 @@ export const ContentActions = {
       contentState.terms!
     );
 
-    await annotator!.annotatePage(termOccurrences, true);
+    await annotator!.annotatePage(termOccurrences, false);
     contentState.annotations = annotator!.getAnnotations();
-    contentState.notFoundTermOccurrences =
-      annotator!.getNotFoundTermOccurrences();
+    contentState.failedAnnotations = annotator!.getFailedAnnotations();
 
     await api.savePageAnnotationResults(
       annotator!.getFoundTermOccurrences(),
@@ -221,7 +220,6 @@ export const ContentActions = {
       return;
     }
 
-
     const { website, vocabulary } = foundExistingWebsite;
 
     contentState.terms = await api.loadAllTerms(
@@ -235,8 +233,7 @@ export const ContentActions = {
 
     await annotator!.annotatePage(termOccurrences);
     contentState.annotations = annotator!.getAnnotations();
-    contentState.notFoundTermOccurrences =
-      annotator!.getNotFoundTermOccurrences();
+    contentState.failedAnnotations = annotator!.getFailedAnnotations();
     contentState.vocabulary = vocabulary;
     contentState.website = website;
 
@@ -266,7 +263,12 @@ export const ContentActions = {
     annotationType: string,
     isDuringTermCreation: boolean = false
   ) {
-    console.log('term, annotation, annotationType: ', term, annotation, annotationType);
+    console.log(
+      "term, annotation, annotationType: ",
+      term,
+      annotation,
+      annotationType
+    );
     const originalTerm = annotation.term;
     annotation.assignTerm(term);
     annotator!.hidePopup();
@@ -358,7 +360,7 @@ export const ContentActions = {
       newTermOccurrence
     );
 
-    console.log('new annotation created: ', newAnnotation);
+    console.log("new annotation created: ", newAnnotation);
 
     internals.updateSidebar();
     return newAnnotation;
@@ -404,8 +406,12 @@ export const ContentActions = {
         await api.removeOccurrence(annotation.termOccurrence);
       }
     }
-    const annotationIdx = contentState.annotations!.indexOf(annotation);
-    contentState.annotations?.splice(annotationIdx, 1);
+    const annotationsArray = annotation.isFailed()
+      ? contentState.failedAnnotations
+      : contentState.annotations;
+
+    const annotationIdx = annotationsArray!.indexOf(annotation);
+    annotationsArray?.splice(annotationIdx, 1);
 
     internals.updateSidebar();
   },

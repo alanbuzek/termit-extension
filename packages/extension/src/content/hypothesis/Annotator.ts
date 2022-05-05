@@ -46,7 +46,7 @@ export default class Annotator {
   private contentPopup: ContentPopupContainer;
   private selectionObserver: SelectionObserver;
   private annotations: Annotation[] = [];
-  private notFoundTermOccurrences: TermOccurrence[] = [];
+  private failedAnnotations: Annotation[] = [];
   private currentAnnotation?: Annotation;
   private contentState: ContentState;
   private isSelectingDefinition: boolean = false;
@@ -104,7 +104,6 @@ export default class Annotator {
         this.onSelection(range);
       }
     });
-
   }
 
   public destroy() {
@@ -206,7 +205,10 @@ export default class Annotator {
     this.contentPopup.hide();
   }
 
-  public async annotatePage(termOccurrences: TermOccurrence[], isNewPage = false) {
+  public async annotatePage(
+    termOccurrences: TermOccurrence[],
+    isNewPage = false
+  ) {
     const annotationsData = await Promise.all(
       termOccurrences.map((termOccurrence) =>
         markTerm(termOccurrence, this.contentState.terms)
@@ -215,12 +217,12 @@ export default class Annotator {
 
     // add all annotatations to the set for later reference
     annotationsData.forEach((annotation) => {
-      if (annotation instanceof Annotation) {
+      if (!annotation.isFailed()) {
         this.annotations.push(annotation);
       } else if (!isNewPage) {
         // just ignore any not found term occurrences on the first automatic annotation
 
-        this.notFoundTermOccurrences.push(annotation);
+        this.failedAnnotations.push(annotation);
       }
     });
 
@@ -249,9 +251,8 @@ export default class Annotator {
 
   public async annotateTermOccurrence(termOccurrence: TermOccurrence) {
     const result = await markTerm(termOccurrence, this.contentState.terms);
-    console.log('result: ', result);
-    if (result instanceof TermOccurrence) {
-      this.notFoundTermOccurrences!.push(result);
+    if (result.isFailed()) {
+      this.failedAnnotations!.push(result);
       return null;
     } else {
       this.annotations!.push(result);
@@ -261,8 +262,8 @@ export default class Annotator {
     }
   }
 
-  public getNotFoundTermOccurrences() {
-    return this.notFoundTermOccurrences;
+  public getFailedAnnotations() {
+    return this.failedAnnotations;
   }
 
   public getFoundTermOccurrences() {

@@ -11,6 +11,7 @@ import { AnnotationType } from "../util/Annotation";
 import getCssSelector from "css-selector-generator";
 import { calculateRangeOffset } from "../../content/marker";
 import JsonLdUtils from "../util/JsonLdUtils";
+import {finder} from '@medv/finder'
 
 // TODO: move to there when possible
 // import { isAnnotationWithMinimumScore } from "../component/annotator/AnnotationDomHelper";
@@ -149,13 +150,16 @@ export const TermOccurrenceFactory = {
   ) {
     const { offset, parentElement } = calculateRangeOffset(range);
     const generatedCssSelector = getCssSelector(parentElement);
+    const secondCssSelector = finder(parentElement as Element);
+
+    console.log('generatedCssSelector: ', generatedCssSelector, ', second: ', secondCssSelector);
     const selectionContent = range.toString();
 
     const termOccurrence = TermOccurrenceFactory.create(
       {
         annotationType,
         cssSelector: {
-          cssSelector: generatedCssSelector,
+          cssSelector: secondCssSelector,
           startOffset: offset,
         },
         id: JsonLdUtils.generateBlankNodeId(),

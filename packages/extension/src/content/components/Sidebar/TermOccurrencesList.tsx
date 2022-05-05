@@ -59,7 +59,7 @@ const TermOccurrencesList = ({ annotations, onDeleteAnnotation }) => {
                   onClick={async (e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    if (deletingAnnotation) {
+                    if (deletingAnnotation){
                       return;
                     }
                     setDeletingAnnotation(annotation);

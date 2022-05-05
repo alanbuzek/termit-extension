@@ -19,6 +19,7 @@ const SidebarOccurrencesContainer = ({
       />
       {state.annotations && (
         <TermOccurrencesFeed
+          failedAnnotations={state.failedAnnotations}
           annotations={state.annotations}
           onDeleteAnnotation={onDeleteAnnotation}
         />

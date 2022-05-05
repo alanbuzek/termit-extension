@@ -66,8 +66,9 @@ const markJsInstancesCache = {};
 export const markTerm = (
   termOccurrence: TermOccurrence,
   termsMap
-): Promise<Annotation | TermOccurrence> => {
+): Promise<Annotation> => {
   const cssSelector = termOccurrence.getCssSelector();
+  const term = termOccurrence.term?.iri && termsMap[termOccurrence.term.iri];
 
   return new Promise((resolve) => {
     let markInstance = markJsInstancesCache[cssSelector.value]?.markInstance;
@@ -85,7 +86,7 @@ export const markTerm = (
         console.error(
           `Failure: Selector "${cssSelector.value}" selected ${selectedElements.length} elements instead of 1!`
         );
-        resolve(termOccurrence);
+        resolve(new Annotation(termOccurrence, null, term));
         return;
       }
       selectedElement = selectedElements[0];
@@ -98,7 +99,6 @@ export const markTerm = (
       console.log("using cache: ", markInstance, selectedElement);
     }
 
-    const term = termOccurrence.term?.iri && termsMap[termOccurrence.term.iri];
     const annotation = new Annotation(termOccurrence, selectedElement, term);
     const textPositionSelector = termOccurrence.getTextPositionSelector();
     const textQuoteSelector = termOccurrence.getTextQuoteSelector();
@@ -142,19 +142,18 @@ export const markTerm = (
       acrossElements: true,
       className: annotation.getClassName(),
       each(element) {
-        console.log('adding listener: ', element);
+        console.log("adding listener: ", element);
         element.addEventListener("click", handleElementClick(annotation));
         element.dataset.termOccurrenceIri = annotation.termOccurrence.id;
         annotation.addElement(element);
       },
       done(numberOfMatches) {
-        console.log('number of matches: ', 1);
+        console.log("number of matches: ", 1);
         if (numberOfMatches === 0) {
           console.error(
             `Failure: Selector "${cssSelector.value}" matched 0 annotations!`
           );
-          resolve(termOccurrence);
-          return;
+          annotation.setFailed(true);
         }
 
         resolve(annotation);
