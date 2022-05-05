@@ -11,8 +11,7 @@ interface PopupWithActionsProps {
 }
 
 const handler = (e: any) => {
-  // console.log('propagation stopped')
-  // e.stopPropagation();
+  // TODO: just delte?
 };
 
 const SimplePopupWithActions: React.FC<PopupWithActionsProps> = (props) => {

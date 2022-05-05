@@ -44,7 +44,6 @@ export const TermDefinitionBlockEdit: React.FC<TermDefinitionBlockEditProps> = (
             <Button
               color="secondary"
               onClick={(e) => {
-                console.log('go here!!')
                 e.preventDefault();
                 e.stopPropagation();
                 props.definitionSelector();

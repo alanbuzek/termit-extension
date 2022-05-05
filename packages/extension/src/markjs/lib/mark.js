@@ -447,9 +447,6 @@ class Mark {
           startStr = dict.value.substr(0, n.start),
           endStr = dict.value.substr(e + n.start);
 
-        // console.log('s, e: ', s, e);
-        // console.log("n: ", n, ", i: ", i, ", sibl: ", sibl);
-        // console.log('matchedFirstPart: ', matchedFirstPart);
         if (!matchedFirstPart && !filterCb(n.node, s, start)) {
           return false;
         }

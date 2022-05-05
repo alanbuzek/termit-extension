@@ -67,7 +67,6 @@ export class AnnotationTerms extends React.Component<AnnotationTermsProps> {
   }
 
   private handleChange = (term: TermData | null) => {
-    console.log("term: ", term);
     if (term === null) {
       this.props.selectVocabularyTerm(term);
       this.props.onChange(null);
@@ -95,8 +94,6 @@ export class AnnotationTerms extends React.Component<AnnotationTermsProps> {
         vocabulary!.iri
       )
     );
-
-    console.log("processed terms are here: ", terms);
 
     return (
       <FormGroup>

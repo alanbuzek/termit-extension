@@ -101,7 +101,6 @@ export default function Toolbar({
   toggleSidebarRef,
   loading,
 }) {
-  console.log("loading: ", loading);
   return (
     <div className="Toolbar">
       <ToolbarButton

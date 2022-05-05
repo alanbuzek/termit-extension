@@ -75,7 +75,10 @@ export const markTerm = (
     let selectedElement =
       markJsInstancesCache[cssSelector.value]?.selectedElement;
 
-    if (!markInstance) {
+    // element may no longer exists within the dom (e.g., navigated to a different page and then back) -> don't use cache
+    const isConnectedToDom = (selectedElement as Node)?.isConnected;
+
+    if (!markInstance || !isConnectedToDom) {
       const selectedElements = Array.from(
         document.querySelectorAll(cssSelector.value)
       );
@@ -142,13 +145,11 @@ export const markTerm = (
       acrossElements: true,
       className: annotation.getClassName(),
       each(element) {
-        console.log("adding listener: ", element);
         element.addEventListener("click", handleElementClick(annotation));
         element.dataset.termOccurrenceIri = annotation.termOccurrence.id;
         annotation.addElement(element);
       },
       done(numberOfMatches) {
-        console.log("number of matches: ", 1);
         if (numberOfMatches === 0) {
           console.error(
             `Failure: Selector "${cssSelector.value}" matched 0 annotations!`

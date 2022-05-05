@@ -31,11 +31,9 @@ const getTypesForSelector = _.memoize(
     Object.keys(availableTypes).forEach(
       (t) => (typesMap[t] = new Term(availableTypes[t]))
     );
-    console.log("availableTypes: ", availableTypes);
     const types = Object.keys(typesMap).map((k) => typesMap[k]);
     types.forEach((t) => {
       if (t.subTerms) {
-        console.log("t.subTerms: ", t.subTerms, ", typesMap: ", typesMap);
 
         // The tree-select needs parent for proper function
         // @ts-ignore

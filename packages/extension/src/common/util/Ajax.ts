@@ -182,7 +182,6 @@ const callFetch = async (baseURL: string, path: string, config) => {
         SecurityUtils.clearToken();
         BrowserApi.storage.remove(Constants.STORAGE.USER);
         // TODO: how to handle unauthorized?
-        console.log("user unauthorized!");
       }
       throw new Error("Fetch failed");
     }
@@ -332,12 +331,7 @@ export class Ajax {
       return this.fetchInstance.post(path, formData, conf);
     } else {
       const query: string = config.getParams() ? "?" + par.toString() : "";
-      console.log(
-        "config.getContent() over here: ",
-        config.getContent(),
-        ", config: ",
-        config
-      );
+    
       return this.fetchInstance.post(
         path + paramsSerializer(config.getParams()),
         config.getContent(),

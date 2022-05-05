@@ -99,8 +99,6 @@ export const TermDefinitionAnnotation: React.FC<TermDefinitionAnnotationProps> =
         terms={props.contentState.terms!}
         vocabulary={props.contentState.vocabulary!}
         selectVocabularyTerm={(term: Term | null) => {
-          console.log('term came in: ', term);
-          
           if (!term){
             return;
           }

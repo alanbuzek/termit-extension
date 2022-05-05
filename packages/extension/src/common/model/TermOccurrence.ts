@@ -240,7 +240,6 @@ export const TermOccurrenceFactory = {
     };
 
     if (extraTypes) {
-      console.log("pushed extraTYpes: ", extraTypes);
       termOccurrenceData.types.push(...extraTypes);
     }
 

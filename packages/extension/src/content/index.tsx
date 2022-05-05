@@ -25,10 +25,10 @@ import { getPageUrl } from "./helper/url";
 
 // TODO: this should be dynamic when language selection is implemented
 const language = "cs";
-
 // global important classes
 let sidebar: Sidebar | null = null;
 let annotator: Annotator | null = null;
+let hasBeenPageInited = false;
 
 export type TermsMap = { [key: string]: Term };
 
@@ -45,6 +45,7 @@ export type ContentState = {
   user: User | null;
   extensionActive: boolean;
   globalLoading: boolean;
+  pageUrl: string;
 };
 
 const resetContentState = async () => {
@@ -75,6 +76,13 @@ const originalQuerySelectorAll = document.querySelectorAll.bind(document);
 
 const internals = {
   async initPage() {
+    if (hasBeenPageInited) {
+      return;
+    }
+    contentState.pageUrl = getPageUrl();
+
+    hasBeenPageInited = true;
+
     await resetContentState();
     contentState.user = await api.getUser();
     preloadContentStyles();
@@ -123,11 +131,6 @@ const internals = {
     internals.updateSidebar();
   },
   async initSidebar() {
-    // TODO: double check that this works ok
-    if (sidebar) {
-      return;
-    }
-
     sidebar = new Sidebar(
       document.body,
       contentState,
@@ -143,6 +146,27 @@ const internals = {
 
     return match[1];
   },
+  handleLocationChange() {
+    if (!contentState.pageUrl) {
+      // location changed before we page inited
+      return;
+    }
+
+    if (contentState.pageUrl !== getPageUrl()) {
+      console.log("change detected!");
+      // new url detected -> deactivate last page and try annotating again
+      contentState.pageUrl = getPageUrl();
+
+      internals.deactivatePage();
+      contentState.globalLoading = true;
+      internals.updateSidebar();
+
+      // avoid any possible race condions
+      setTimeout(() => {
+        ContentActions.tryAnnotatingExistingWebsite();
+      }, 100);
+    }
+  },
 };
 
 export const ContentActions = {
@@ -154,7 +178,7 @@ export const ContentActions = {
     internals.activatePage();
 
     contentState.website = await api.createWebsiteInDocument(
-      getPageUrl(),
+      contentState.pageUrl,
       VocabularyUtils.create(vocabulary.document!.iri)
     );
     const textAnalysisResult = await backgroundApi.runTextAnalysis(
@@ -203,9 +227,10 @@ export const ContentActions = {
     internals.updateSidebar();
 
     const foundExistingWebsite = await api.getExistingWebsite(
-      getPageUrl(),
+      contentState.pageUrl,
       contentState.vocabularies
     );
+
 
     if (!foundExistingWebsite) {
       contentState.globalLoading = false;
@@ -219,6 +244,7 @@ export const ContentActions = {
     contentState.terms = await api.loadAllTerms(
       VocabularyUtils.create(vocabulary.iri)
     );
+
     const termOccurrences = await api.getWebsiteTermOccurrences(
       website,
       contentState.terms!
@@ -257,12 +283,6 @@ export const ContentActions = {
     annotationType: string,
     isDuringTermCreation: boolean = false
   ) {
-    console.log(
-      "term, annotation, annotationType: ",
-      term,
-      annotation,
-      annotationType
-    );
     const originalTerm = annotation.term;
     annotation.assignTerm(term);
     annotator!.hidePopup();
@@ -316,8 +336,6 @@ export const ContentActions = {
             .exactMatch.replace(/(\r\n|\n|\r)/gm, " "),
         };
 
-        console.log("full term: ", fullTerm);
-
         await api.updateTerm(fullTerm);
       }
 
@@ -353,8 +371,6 @@ export const ContentActions = {
     const newAnnotation = await annotator!.annotateTermOccurrence(
       newTermOccurrence
     );
-
-    console.log("new annotation created: ", newAnnotation);
 
     internals.updateSidebar();
     return newAnnotation;
@@ -410,7 +426,6 @@ export const ContentActions = {
     internals.updateSidebar();
   },
   async removeWebsiteAnnotations() {
-    console.log("remove website annotations called");
     contentState.globalLoading = true;
     internals.updateSidebar();
 
@@ -459,3 +474,11 @@ export const ContentActions = {
 };
 
 window.addEventListener("load", internals.initPage);
+// don't wait too long for page load event, which might not fire until loading all unimportant parts (e.g., ads, iframes etc...) -> force it after 5s
+setTimeout(internals.initPage, 5000);
+
+const listeners = ["click", "popstate", "locationchange"];
+
+listeners.forEach((listener) =>
+  window.addEventListener(listener, internals.handleLocationChange)
+);
