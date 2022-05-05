@@ -50,20 +50,10 @@ const SidebarControlPanel = ({
   handlePageDelete: () => void;
   handleDeleteSuggestions: () => void;
 }) => {
-  const loading = false;
-  const disabled = false;
 
   const [selectedVocabulary, setSelectedVocabulary] = useState<Vocabulary>();
-  const onVocabularyChange = (vIri: string) => {
-    const vocabulary = vocabularies!.find((v) => v.iri === vIri);
-    setSelectedVocabulary(vocabulary);
-  };
-
-  const [deleteLoading, setDeleteLoading] = useState(false);
 
   const handlePageDeleteClick = () => {
-    console.log('handle page delete click')
-    setDeleteLoading(true);
     handlePageDelete();
   };
 
@@ -72,7 +62,6 @@ const SidebarControlPanel = ({
   if (!annotations) {
     return (
       <div className="p-3 mb-4">
-        {/* {allowPanel} */}
         <img
           src={chrome.runtime.getURL("/static/img/annotate.png")}
           className="w-36 mb-4 mt-5 mx-auto"
@@ -157,6 +146,7 @@ const SidebarControlPanel = ({
           <VocabularyEditDropdown
             handleDeleteAllAnnotations={handlePageDeleteClick}
             handleDeleteSuggestedAnnotations={handleDeleteSuggestions}
+            vocabulary={vocabulary}
           />
         </div>
       </div>

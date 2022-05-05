@@ -53,7 +53,7 @@ const SidebarApp = ({
         ) : (
           <>
             {!extensionActive && <ExtensionOffMessage />}
-            {extensionActive && state.vocabularies.length ? (
+            {extensionActive && state.vocabularies?.length ? (
               <SidebarOccurrencesContainer
                 state={state}
                 handleAnnotatePage={handleAnnotatePage}

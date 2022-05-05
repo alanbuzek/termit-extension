@@ -74,11 +74,16 @@ const TermOccurrencesFeed = ({
     return typeMatch && textMatch;
   });
 
-  const hasAnyFailedAnnotations = !!failedAnnotations.length;
+  const hasFailedAnnotations = !!failedAnnotations.length;
+
+  const showAnnotationsNotFoundSection =
+    hasFailedAnnotations && showFailedAnnotations;
+  const showAnnotationsNotFoundBanner =
+    hasFailedAnnotations && !failedAnnotationsDismissed;
 
   return (
     <div className="">
-      {!failedAnnotationsDismissed && hasAnyFailedAnnotations && (
+      {showAnnotationsNotFoundBanner && (
         <div
           className={`px-3 py-1.5 text-gray-50 font-semibold text-base cursor-pointer flex justify-between items-center transition-all duration-300 hover:bg-red-500 bg-red-400`}
           onClick={() => setShowFailedAnnotations(!showFailedAnnotations)}
@@ -100,14 +105,14 @@ const TermOccurrencesFeed = ({
         </div>
       )}
       <div className="flex text-lg px-2.5 py-2 my-2.5 font-semibold text-gray-700">
-        {showFailedAnnotations ? (
+        {showAnnotationsNotFoundSection ? (
           <span className="text-red-600">Not found annotations:</span>
         ) : (
           "Page annotations:"
         )}
       </div>
       <>
-        {!showFailedAnnotations && (
+        {!showAnnotationsNotFoundSection && (
           <>
             <FiltersPanel
               occurrenceTypeFilter={occurrenceTypeFilter}
@@ -121,7 +126,9 @@ const TermOccurrencesFeed = ({
         )}
         <TermOccurrencesList
           annotations={
-            showFailedAnnotations ? failedAnnotations : filteredAnnotations
+            showAnnotationsNotFoundSection
+              ? failedAnnotations
+              : filteredAnnotations
           }
           onDeleteAnnotation={onDeleteAnnotation}
         />

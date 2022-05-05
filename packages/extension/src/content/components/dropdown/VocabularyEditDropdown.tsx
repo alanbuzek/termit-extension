@@ -4,10 +4,12 @@ import DropdownItem from "./DropdownItem";
 import DropdownContainer from "./DropdownContainer";
 import DropdownButton from "./DropdownButton";
 import { GoPencil } from "react-icons/go";
+import VocabularyUtils from "../../../common/util/VocabularyUtils";
 
 const VocabularyEditDropdown = ({
   handleDeleteSuggestedAnnotations,
   handleDeleteAllAnnotations,
+  vocabulary,
 }) => {
   const { dropdownRef, isOpen, handleMenuClick, handleItemClick } = useDropdown(
     (id) => {
@@ -22,6 +24,12 @@ const VocabularyEditDropdown = ({
   );
 
   const options = [
+    {
+      name: <span>See&nbsp;vocabulary&nbsp;in&nbsp;TermIt</span>,
+      link: `http://localhost:3000/#/vocabularies/${
+        VocabularyUtils.create(vocabulary.iri).fragment
+      }`,
+    },
     {
       name: <span className="text-red-600">Delete&nbsp;suggestions</span>,
       id: "delete-suggestions",
