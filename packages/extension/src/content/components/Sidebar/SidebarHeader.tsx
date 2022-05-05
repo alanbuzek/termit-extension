@@ -1,7 +1,12 @@
 import React from "react";
 import ExtensionActiveSwitch from "./ExtensionActiveSwitch";
 
-const SidebarHeader = ({ user, extensionActive, setExtensionActive }) => {
+const SidebarHeader = ({
+  extensionActive,
+  setExtensionActive,
+  globalLoading,
+  user,
+}) => {
   return (
     <div className="flex justify-between items-center mt-2 px-3.5 pb-3 border-b border-gray-200">
       <a
@@ -11,10 +16,13 @@ const SidebarHeader = ({ user, extensionActive, setExtensionActive }) => {
       >
         TermIt
       </a>
-      <ExtensionActiveSwitch
-        isActive={extensionActive}
-        setActive={setExtensionActive}
-      />
+      {user && (
+        <ExtensionActiveSwitch
+          isActive={extensionActive}
+          setActive={setExtensionActive}
+          loading={globalLoading}
+        />
+      )}
     </div>
   );
 };

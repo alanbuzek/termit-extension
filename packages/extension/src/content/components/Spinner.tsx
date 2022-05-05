@@ -8,6 +8,7 @@ const sizes = {
   '5': 'h-5 w-6',
   '6': 'h-6 w-6',
   '8': 'h-8 w-8',
+  '12': 'h-12 w-12'
 };
 
 const Spinner: React.FC<{ size?: keyof typeof sizes; className?: string }> = ({

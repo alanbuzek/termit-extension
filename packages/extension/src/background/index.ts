@@ -52,7 +52,7 @@ function handleMessages(message, sender, sendResponse) {
 
   switch (message.type) {
     // TODO: why not just call it directly from content script?
-    case MessageType.GetPageAnnotationsAnalysis: {
+    case MessageType.RunPageTextAnalysis: {
       runPageAnnotationAnalysis(
           message.payload.vocabulary,
           message.payload.pageHtml

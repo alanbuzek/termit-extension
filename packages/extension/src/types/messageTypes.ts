@@ -1,5 +1,5 @@
 export enum MessageType {
-  GetPageAnnotationsAnalysis,
+  RunPageTextAnalysis,
   SaveAnnotaionResult,
   OpenToolbar,
   LoginEvent,

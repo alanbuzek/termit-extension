@@ -1,10 +1,11 @@
 import { userInfo } from "os";
 import React from "react";
 import { useState } from "react";
-import { ContentState } from "../..";
+import { ContentActions, ContentState } from "../..";
 import Vocabulary from "../../../common/model/Vocabulary";
-import { Annotation } from '../../../common/util/Annotation';
+import { Annotation } from "../../../common/util/Annotation";
 import Button from "../Button";
+import Spinner from "../Spinner";
 import ExtensionOffMessage from "./ExtensionOffMessage";
 import LoginPrompt from "./LoginPrompt";
 import SidebarControlPanel from "./SidebarControlPanel";
@@ -18,23 +19,18 @@ const SidebarApp = ({
   state,
   handleAnnotatePage,
   handleDeletePage,
-  handleDeleteAnnotation
+  handleDeleteAnnotation,
 }: {
   state: ContentState;
   handleAnnotatePage: (vocabulary: Vocabulary) => void;
   handleDeletePage: () => void;
   handleDeleteAnnotation: (annotation: Annotation) => void;
 }) => {
-  const [extensionActive, setExtensionActive] = useState(true);
+  const [extensionActive, setExtensionActive] = useState(state.extensionActive);
 
-  const handleExtensionActiveChange = (newValue) => {
-    console.log("new Value: ", newValue);
+  const handleExtensionActiveChange = async (newValue) => {
     setExtensionActive(newValue);
-    if (newValue) {
-      // TODO: activate
-    } else {
-      // TODO: deactivate
-    }
+    await ContentActions.toggleExtensionActive();
   };
 
   return (
@@ -44,17 +40,32 @@ const SidebarApp = ({
           user={state.user}
           extensionActive={extensionActive}
           setExtensionActive={handleExtensionActiveChange}
+          globalLoading={state.globalLoading}
         />
         <UserPanel user={state.user} />
-        {!extensionActive && <ExtensionOffMessage />}
-        {extensionActive && state.vocabularies.length ? (
-          <SidebarOccurrencesContainer
-            state={state}
-            handleAnnotatePage={handleAnnotatePage}
-            handleDeletePage={handleDeletePage}
-            onDeleteAnnotation={handleDeleteAnnotation}
-          />
-        ) : null}
+        {state.globalLoading ? (
+          <div className="flex flex-col mx-auto mt-6 justify-center items-center">
+            <Spinner className="text-green-500" size="12" />
+            <div className="mt-4 font-medium text-xl">Loading...</div>
+            <div className="text-gray-500 mt-3 text-base text-center px-3">
+              This operation may take a moment, depending on how many
+              annotations there are on the page.
+            </div>
+          </div>
+        ) : (
+          <>
+            {!extensionActive && <ExtensionOffMessage />}
+            {extensionActive && state.vocabularies.length ? (
+              <SidebarOccurrencesContainer
+                state={state}
+                handleAnnotatePage={handleAnnotatePage}
+                handleDeletePage={handleDeletePage}
+                onDeleteAnnotation={handleDeleteAnnotation}
+              />
+            ) : null}
+          </>
+        )}
+
         <SidebarFooter />
       </div>
     </div>

@@ -115,10 +115,10 @@ export default class Annotator {
     // Setup event handlers on the root element
   }
 
-  private destroy() {
+  public destroy() {
+    this.annotations.forEach((annotation) => annotation.removeOccurrence());
     this.selectionObserver.disconnect();
     this.contentPopup.destroy();
-    // this.integration.destroy()§12345678;lo
   }
 
   /**
@@ -246,11 +246,6 @@ export default class Annotator {
     }
 
     this.contentPopup.hide();
-  }
-
-  public turnOffAnnotations() {
-    this.annotations.forEach((annotation) => annotation.removeOccurrence());
-    this.destroy();
   }
 
   public getContentPoup() {

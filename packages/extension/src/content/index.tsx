@@ -19,6 +19,7 @@ import TermOccurrence, {
 } from "../common/model/TermOccurrence";
 import BrowserApi from "../shared/BrowserApi";
 import User from "../common/model/User";
+import Constants from "../common/util/Constants";
 
 // TODO: this should be dynamic when language selection is implemented
 const language = "cs";
@@ -39,23 +40,26 @@ export type ContentState = {
   // hasBeenAnnotated: boolean;
   vocabularies: Vocabulary[];
   user: User | null;
+  extensionActive: boolean;
+  globalLoading: boolean;
 };
 
-const resetContentState = () => {
+const resetContentState = async () => {
   contentState.annotations = null;
   contentState.vocabulary = null;
   contentState.terms = null;
   contentState.website = null;
-  contentState.vocabularies = [];
+  // NOTE: these two fields, we want to preserve even on content state reset
+  // contentState.vocabularies = [];
   // contentState.user = null;
+  contentState.extensionActive = false;
+  contentState.globalLoading = false;
+  contentState.extensionActive = await BrowserApi.storage.get(
+    Constants.STORAGE.EXTENSION_ACTIVE
+  );
 };
 
 let contentState = {} as ContentState;
-
-resetContentState();
-
-// helper functions also operating on global data if needed
-const internalActions = {};
 
 // TODO: on some of these actions, sidebar (or event annotator) will need to be updated to show the most up to date data (e.g., rerender the whole tree through reactDOM, roll out redux, or solve in another way, to be determined)
 // TODO: re-evaluate how things are done with respect to annotator, maybe can move all things there instead?
@@ -66,6 +70,26 @@ const internalActions = {};
 const originalQuerySelectorAll = document.querySelectorAll.bind(document);
 
 const internals = {
+  async initPage() {
+    await resetContentState();
+    contentState.user = await api.getUser();
+    preloadContentStyles();
+
+    if (!contentState.user) {
+      internals.initSidebar();
+      return;
+    }
+    contentState.vocabularies = await api.loadVocabularies();
+
+    internals.initSidebar();
+
+    if (contentState.extensionActive) {
+      await ContentActions.tryAnnotatingExistingWebsite();
+    }
+  },
+  updateSidebar() {
+    sidebar?.render();
+  },
   activatePage() {
     annotator = new Annotator(document.body, contentState);
 
@@ -84,8 +108,29 @@ const internals = {
       ] as any;
     };
   },
-  deactivatePage() {
+  async deactivatePage() {
     document.querySelectorAll = originalQuerySelectorAll;
+    // reset page
+    annotator!.destroy();
+    annotator = null;
+    await resetContentState();
+
+    contentState.globalLoading = false;
+    internals.updateSidebar();
+  },
+  async initSidebar() {
+    // TODO: double check that this works ok
+    if (sidebar) {
+      return;
+    }
+
+    sidebar = new Sidebar(
+      document.body,
+      // TODO: maybe not pass the whole state inside, or restructure state such that it doesn't contain whole classes instances of Annotator and Sidebar
+      contentState,
+      ContentActions.annotateNewWebsite,
+      ContentActions.removeOccurrence
+    );
   },
   getPageUrl() {
     console.log(
@@ -96,7 +141,7 @@ const internals = {
   },
   parseAnnotationToFocus() {
     const match = document.URL.match(/termit-focus-annotation=(.+)$/);
-    if (!match){
+    if (!match) {
       return;
     }
 
@@ -109,19 +154,17 @@ export const ContentActions = {
     annotator!.showPopup(annotation);
   },
   async annotateNewWebsite(vocabulary: Vocabulary) {
+    contentState.globalLoading = true;
     internals.activatePage();
-    console.log("annotated new website called");
 
     contentState.website = await api.createWebsiteInDocument(
       internals.getPageUrl(),
       VocabularyUtils.create(vocabulary.document!.iri)
     );
-    console.log("about to run text analysis");
-    const textAnalysisResult = await backgroundApi.getPageAnnotations(
+    const textAnalysisResult = await backgroundApi.runTextAnalysis(
       vocabulary.iri,
       document.body.outerHTML
     );
-    console.log("load all terms, textAnalysisResult: ", textAnalysisResult);
     const vocabularyTerms = await api.loadAllTerms(
       VocabularyUtils.create(vocabulary.iri)
     );
@@ -152,20 +195,26 @@ export const ContentActions = {
     // update vocabulary cache
     await BrowserApi.storage.set("vocabularies", contentState.vocabularies);
 
+    contentState.globalLoading = true;
     // this makes sure to re-render sidebar on data update
-    sidebar!.render();
+    internals.updateSidebar();
 
     setTimeout(() => {
-      sidebar?.render();
+      internals.updateSidebar();
     }, 200);
   },
-  async attemptAnnotatingExistingWebsite() {
+  async tryAnnotatingExistingWebsite() {
+    contentState.globalLoading = true;
+    internals.updateSidebar();
+
     const foundExistingWebsite = await api.getExistingWebsite(
       internals.getPageUrl(),
       contentState.vocabularies
     );
 
     if (!foundExistingWebsite) {
+      contentState.globalLoading = false;
+      internals.updateSidebar();
       // website hasn't been annotated yet, wait for explicit user action
       return;
     }
@@ -173,7 +222,6 @@ export const ContentActions = {
     internals.activatePage();
 
     const { website, vocabulary } = foundExistingWebsite;
-    // TODO: how to handle multiple vocabularies? schema adjustments, state adjustments
 
     contentState.terms = await api.loadAllTerms(
       VocabularyUtils.create(vocabulary.iri)
@@ -185,18 +233,21 @@ export const ContentActions = {
     contentState.vocabulary = vocabulary;
     contentState.website = website;
 
-    const occurrenceToFocusIri = internals.parseAnnotationToFocus()
+    const occurrenceToFocusIri = internals.parseAnnotationToFocus();
 
-    if (occurrenceToFocusIri){
-      const foundAnnotation = contentState.annotations.find(annotation => annotation.termOccurrence.iri === occurrenceToFocusIri);
-      if (!foundAnnotation){
-        throw new Error('Focused annotation not found: ', foundAnnotation);
+    if (occurrenceToFocusIri) {
+      const foundAnnotation = contentState.annotations.find(
+        (annotation) => annotation.termOccurrence.iri === occurrenceToFocusIri
+      );
+      if (!foundAnnotation) {
+        throw new Error("Focused annotation not found: ", foundAnnotation);
       }
 
       foundAnnotation.focusAnnotation(AnnotationFocusTime.LONG);
     }
 
-    sidebar!.render();
+    contentState.globalLoading = false;
+    internals.updateSidebar();
     // TODO: fix bug where this opens on the wrong side
     setTimeout(() => {
       sidebar!.open();
@@ -213,7 +264,7 @@ export const ContentActions = {
     annotator!.hidePopup();
     const hasBeenPersisted = !!annotation.termOccurrence.iri;
     const isDefinition = annotationType === AnnotationType.DEFINITION;
-    console.log("contentState: ", contentState);
+
     if (isDefinition) {
       if (hasBeenPersisted) {
         // if we got here, we must be reassigning definition to a new element -> delete old definition source
@@ -282,7 +333,7 @@ export const ContentActions = {
       );
     }
 
-    sidebar?.render();
+    internals.updateSidebar();
   },
   async createUnknownOccurrenceFromRange(
     selectionRange: Range,
@@ -303,9 +354,9 @@ export const ContentActions = {
     newAnnotation.updateRelatedAnnotationElements();
 
     contentState.annotations!.push(newAnnotation);
-    this.showPopup(newAnnotation);
+    ContentActions.showPopup(newAnnotation);
 
-    sidebar?.render();
+    internals.updateSidebar();
     return newAnnotation;
   },
   async createTerm(
@@ -321,13 +372,13 @@ export const ContentActions = {
       iri: contentState!.vocabulary!.iri,
       types: contentState!.vocabulary!.types,
     };
-    await this.assignTermToOccurrence(
+    await ContentActions.assignTermToOccurrence(
       term,
       annotation,
       AnnotationType.OCCURRENCE
     );
     if (definitionAnnotation) {
-      await this.assignTermToOccurrence(
+      await ContentActions.assignTermToOccurrence(
         term,
         definitionAnnotation,
         AnnotationType.DEFINITION,
@@ -335,7 +386,7 @@ export const ContentActions = {
       );
     }
 
-    sidebar?.render();
+    internals.updateSidebar();
   },
   async removeOccurrence(annotation: Annotation) {
     await annotation.removeOccurrence();
@@ -352,9 +403,11 @@ export const ContentActions = {
     const annotationIdx = contentState.annotations!.indexOf(annotation);
     contentState.annotations?.splice(annotationIdx, 1);
 
-    sidebar?.render();
+    internals.updateSidebar();
   },
   async removeWebsiteAnnotations() {
+    contentState.globalLoading = true;
+
     await api.removeWebsiteFromDocument(
       contentState.vocabulary!.document!,
       contentState.website!
@@ -366,43 +419,23 @@ export const ContentActions = {
     // update vocabulary cache
     await BrowserApi.storage.set("vocabularies", contentState.vocabularies);
 
-    // reset page
-    annotator!.turnOffAnnotations();
-    resetContentState();
-    contentState.vocabularies = await api.loadVocabularies();
+    internals.deactivatePage();
+  },
+  async toggleExtensionActive() {
+    contentState.globalLoading = true;
+    // if this is ever called, we assume having a logged-in user
+    contentState.extensionActive = !contentState.extensionActive;
+    await BrowserApi.storage.set(
+      Constants.STORAGE.EXTENSION_ACTIVE,
+      contentState.extensionActive
+    );
 
-    sidebar!.render();
-    initPage();
+    if (contentState.extensionActive) {
+      await ContentActions.tryAnnotatingExistingWebsite();
+    } else {
+      await internals.deactivatePage();
+    }
   },
 };
 
-const initPage = async () => {
-  contentState.user = await api.getUser();
-  preloadContentStyles();
-
-  if (!contentState.user) {
-    initSidebar();
-    return;
-  }
-  contentState.vocabularies = await api.loadVocabularies();
-
-  initSidebar();
-
-  await ContentActions.attemptAnnotatingExistingWebsite();
-};
-
-window.addEventListener("load", initPage);
-
-function initSidebar() {
-  if (sidebar) {
-    sidebar.destroy();
-  }
-
-  sidebar = new Sidebar(
-    document.body,
-    // TODO: maybe not pass the whole state inside, or restructure state such that it doesn't contain whole classes instances of Annotator and Sidebar
-    contentState,
-    ContentActions.annotateNewWebsite,
-    ContentActions.removeOccurrence
-  );
-}
+window.addEventListener("load", internals.initPage);

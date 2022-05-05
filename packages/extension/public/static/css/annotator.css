@@ -3809,8 +3809,8 @@ Ensure the default browser behavior of the `hidden` attribute.
   pointer-events: none;
   position: absolute;
   height: 100%;
-  width: 8px;
-  left: -8px;
+  width: 3px;
+  left: -3px;
 }
 
 .annotator-collapsed .Buckets__list {

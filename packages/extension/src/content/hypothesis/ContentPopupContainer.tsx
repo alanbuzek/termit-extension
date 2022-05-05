@@ -73,7 +73,6 @@ function stopEventPropagation(element) {
  */
 export function createShadowRoot(container: HTMLElement) {
   const shadowRoot = container.attachShadow({ mode: "open" });
-  loadStyles(shadowRoot);
 
   // @ts-ignore The window doesn't know about the polyfill
   // applyFocusVisiblePolyfill comes from the focus-visible package.
@@ -175,6 +174,7 @@ export class ContentPopupContainer {
   private currentAnnotation: Annotation | null = null;
   private contentState: ContentState;
   private onSelectDefinition: () => any;
+  private hasBeenRendered: boolean = false;
   annotationsForSelection: never[];
   /**
    * Create the toolbar's container and hide it.
@@ -194,7 +194,9 @@ export class ContentPopupContainer {
     this.outerContainer = document.createElement("hypothesis-adder");
     this.onSelectDefinition = onSelectDefinition;
     element.appendChild(this.outerContainer);
+    console.log('this.outerContainer: ', this.outerContainer);
     this.shadowRoot = createShadowRoot(this.outerContainer);
+    console.log('this.shadowRoot1: ', this.shadowRoot)
 
     // Set initial style
     Object.assign(this.outerContainer.style, {
@@ -208,12 +210,13 @@ export class ContentPopupContainer {
     this.view = /** @type {Window} */ element.ownerDocument.defaultView;
 
     this.width = () => {
-      const firstChild = /** @type {Element} */ this.shadowRoot.firstChild;
+      console.log('this.shadowRoot: ', this.shadowRoot)
+      const firstChild = this.shadowRoot.firstChild;
       return firstChild.getBoundingClientRect().width;
     };
 
     this.height = () => {
-      const firstChild = /** @type {Element} */ this.shadowRoot.firstChild;
+      const firstChild = this.shadowRoot.firstChild;
       return firstChild.getBoundingClientRect().height;
     };
 
@@ -245,10 +248,12 @@ export class ContentPopupContainer {
     });
   }
 
+  public unmount() {
+    ReactDOM.render(<div />, this.shadowRoot);
+  }
+
   public destroy() {
-    // TODO: maybe call unmount instead, this was using Preact before
-    ReactDOM.render(<div />, this.shadowRoot); // First, unload the Preact component
-    // this.outerContainer.remove();
+    this.outerContainer.remove();
   }
 
   /**
@@ -267,7 +272,7 @@ export class ContentPopupContainer {
     selectionRange,
     annotation: Annotation | null = null
   ) {
-    console.log('called show with annotation: ', annotation);
+    console.log("called show with annotation: ", annotation);
     this.currentAnnotation = annotation;
     const { left, top, arrowDirection } = this.calculateTarget(
       selectionRect,
@@ -423,7 +428,7 @@ export class ContentPopupContainer {
       }
     }
 
-    this.destroy();
+    this.unmount();
 
     ReactDOM.render(
       <IntlProvider locale="cs-CZ" defaultLocale="en" messages={cs}>
@@ -442,12 +447,12 @@ export class ContentPopupContainer {
       </IntlProvider>,
       this.shadowRoot,
       () => {
-        if (!calledRender) {
+        if (!this.hasBeenRendered) {
           // TODO: abstract this away
           loadStyles(this.shadowRoot, "annotator");
           loadStyles(this.shadowRoot, "styles");
           loadStyles(this.shadowRoot, "bootstrap-termit");
-          calledRender = true;
+          this.hasBeenRendered = true;
         }
       }
     );
@@ -463,4 +468,3 @@ export class ContentPopupContainer {
   }
 }
 
-let calledRender = false;
