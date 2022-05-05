@@ -42,6 +42,7 @@ export const TermDefinitionBlockEdit: React.FC<TermDefinitionBlockEditProps> = (
               {i18n("term.metadata.definition.text")}
             </Label>
             <Button
+              className="mb-2"
               color="secondary"
               onClick={(e) => {
                 e.preventDefault();

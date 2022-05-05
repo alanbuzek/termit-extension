@@ -230,7 +230,7 @@ function ContentPopup({
   };
 
   if (currPopup === PopupType.CreateTermModal) {
-    style = { ...style, width: 700, height: 500, overflowY: "scroll" };
+    style = { ...style, width: 700, height: 550, overflowY: "scroll" };
   }
 
   return (

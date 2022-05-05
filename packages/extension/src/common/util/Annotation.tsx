@@ -90,10 +90,16 @@ export class Annotation {
   }
 
   public focusAnnotation(focusTime = AnnotationFocusTime.SHORT) {
-    if (!this.elements.length) {
-      return;
+    const elementsToFocus = [...this.elements];
+    if (!elementsToFocus.length) {
+      if (this.isFailed() && this.containerElement) {
+        elementsToFocus.push(this.containerElement);
+      } else {
+        return;
+      }
     }
-    this.elements.forEach((element) => {
+
+    elementsToFocus.forEach((element) => {
       element.scrollIntoView({ block: "center", inline: "nearest" });
       element.classList.add("annotation-focused");
     });
@@ -104,8 +110,13 @@ export class Annotation {
   }
 
   public unfocus() {
+    const elementsToFocus = [...this.elements];
+    if (!elementsToFocus.length && this.isFailed() && this.containerElement) {
+      elementsToFocus.push(this.containerElement);
+    }
+
     clearTimeout(this.focusTimeout);
-    this.elements.forEach((element) => {
+    elementsToFocus.forEach((element) => {
       element.classList.remove("annotation-focused");
     });
   }

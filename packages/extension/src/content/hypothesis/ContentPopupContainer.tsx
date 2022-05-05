@@ -387,7 +387,7 @@ export class ContentPopupContainer {
         left: "50%",
         top: "50%",
         position: "fixed",
-        transform: "translate(-350px, -250px)",
+        transform: "translate(-350px, -275px)",
         zIndex: 2000
       });
     } else {
