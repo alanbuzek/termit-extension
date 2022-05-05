@@ -27,6 +27,7 @@ const BrowserApi = {
       });
     });
   },
+
   storage: {
     set(key: string, value: any) {
       return new Promise((resolve) => {
@@ -40,7 +41,6 @@ const BrowserApi = {
         chrome.storage.local.get([key], (result) => {
           resolve(result[key]);
         });
-
       });
     },
     remove(key: string) {

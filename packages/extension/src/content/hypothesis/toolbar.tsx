@@ -1,148 +1,70 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import { loadStyles } from './ContentPopupContainer';
+import { loadStyles } from "./ContentPopupContainer";
 
 import Toolbar from "../components/Toolbar";
+import { ContentState } from '..';
 
-/**
- * @typedef ToolbarOptions
- * @prop {() => any} createAnnotation
- * @prop {(open: boolean) => any} setSidebarOpen
- * @prop {(visible: boolean) => any} setHighlightsVisible
- */
 
 /**
  * Controller for the toolbar on the edge of the sidebar.
  *
- * This toolbar provides controls for opening and closing the sidebar, toggling
- * highlight visibility etc.
+ * This toolbar provides controls for opening and closing the.
  */
 export class ToolbarController {
-  _container: any;
-  _useMinimalControls: boolean;
-  _newAnnotationType: string;
-  _highlightsVisible: boolean;
-  _sidebarOpen: boolean;
-  _closeSidebar: () => any;
-  _toggleSidebar: () => any;
-  _toggleHighlights: () => any;
-  _createAnnotation: () => void;
-  _sidebarToggleButton: React.RefObject<unknown>;
-  /**
-   * @param {HTMLElement} container - Element into which the toolbar is rendered
-   * @param {ToolbarOptions} options
-   */
-  constructor(container, options) {
-    const { createAnnotation, setSidebarOpen, setHighlightsVisible } = options;
+  private container: HTMLElement;
+  private sidebarToggleButton;
+  private isSidebarOpen: boolean;
+  private state: ContentState;
+  private toggleSidebar: () => any;
 
-    this._container = container;
+  constructor(container, setSidebarOpen, state) {
 
-    this._useMinimalControls = false;
+    this.container = container;
+    this.state = state;
 
-    /** @type {'annotation'|'note'} */
-    this._newAnnotationType = "note";
+    this.isSidebarOpen = false;
 
-    this._highlightsVisible = false;
-    this._sidebarOpen = false;
-
-    this._closeSidebar = () => setSidebarOpen(false);
-    this._toggleSidebar = () => setSidebarOpen(!this._sidebarOpen);
-    this._toggleHighlights = () =>
-      setHighlightsVisible(!this._highlightsVisible);
-    this._createAnnotation = () => {
-      createAnnotation();
-      setSidebarOpen(true);
-    };
+    this.toggleSidebar = () => setSidebarOpen(!this.sidebarOpen);
 
     /** Reference to the sidebar toggle button. */
-    this._sidebarToggleButton = React.createRef();
+    this.sidebarToggleButton = React.createRef();
 
     this.render();
   }
 
   getWidth() {
-    const content = /** @type {HTMLElement} */ this._container.firstChild;
+    const content = this.container.firstChild as any;
     return content.getBoundingClientRect().width;
   }
 
-  /**
-   * Set whether the toolbar is in the "minimal controls" mode where
-   * only the "Close" button is shown.
-   */
-  set useMinimalControls(minimal) {
-    this._useMinimalControls = minimal;
-    this.render();
-  }
-
-  get useMinimalControls() {
-    return this._useMinimalControls;
-  }
 
   /**
    * Update the toolbar to reflect whether the sidebar is open or not.
    */
   set sidebarOpen(open) {
-    this._sidebarOpen = open;
+    this.isSidebarOpen = open;
     this.render();
   }
 
   get sidebarOpen() {
-    return this._sidebarOpen;
+    return this.isSidebarOpen;
   }
 
-  /**
-   * Update the toolbar to reflect whether the "Create annotation" button will
-   * create a page note (if there is no selection) or an annotation (if there is
-   * a selection).
-   */
-  set newAnnotationType(type) {
-    this._newAnnotationType = type;
-    this.render();
-  }
-
-  get newAnnotationType() {
-    return this._newAnnotationType;
-  }
-
-  /**
-   * Update the toolbar to reflect whether highlights are currently visible.
-   */
-  set highlightsVisible(visible) {
-    this._highlightsVisible = visible;
-    this.render();
-  }
-
-  get highlightsVisible() {
-    return this._highlightsVisible;
-  }
-
-  /**
-   * Return the DOM element that toggles the sidebar's visibility.
-   *
-   * @type {HTMLButtonElement}
-   */
-  get sidebarToggleButton() {
-    return this._sidebarToggleButton.current;
-  }
 
   render() {
     ReactDOM.render(
       <Toolbar
-        closeSidebar={this._closeSidebar}
-        createAnnotation={this._createAnnotation}
-        newAnnotationType={this._newAnnotationType}
-        isSidebarOpen={this._sidebarOpen}
-        showHighlights={this._highlightsVisible}
-        toggleHighlights={this._toggleHighlights}
-        toggleSidebar={this._toggleSidebar}
-        toggleSidebarRef={this._sidebarToggleButton}
-        useMinimalControls={this.useMinimalControls}
+        isSidebarOpen={this.isSidebarOpen}
+        toggleSidebar={this.toggleSidebar}
+        toggleSidebarRef={this.sidebarToggleButton.current}
+        loading={this.state.globalLoading}
       />,
-      this._container,
+      this.container,
       () => {
-        loadStyles(this._container, "annotator");
-        loadStyles(this._container, "styles");
-        loadStyles(this._container, "bootstrap-termit");
+        loadStyles(this.container, "annotator");
+        loadStyles(this.container, "styles");
+        loadStyles(this.container, "bootstrap-termit");
       }
     );
   }

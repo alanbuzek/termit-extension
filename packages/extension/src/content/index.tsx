@@ -126,7 +126,6 @@ const internals = {
 
     sidebar = new Sidebar(
       document.body,
-      // TODO: maybe not pass the whole state inside, or restructure state such that it doesn't contain whole classes instances of Annotator and Sidebar
       contentState,
       ContentActions.annotateNewWebsite,
       ContentActions.removeOccurrence

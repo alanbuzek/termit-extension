@@ -45,14 +45,9 @@ module.exports = {
     'react/jsx-props-no-spreading': 'off',
     '@typescript-eslint/no-empty-interface': 'off',
     'react-hooks/exhaustive-deps': 'off',
-    // TODO: we'll want to make things accessible at some point
-    // 'jsx-a11y/anchor-is-valid': 'off',
-    // 'jsx-a11y/click-events-have-key-events': 'off',
-    // 'jsx-a11y/no-static-element-interactions': 'off',
     '@typescript-eslint/ban-ts-comment': 'off',
     'consistent-return': 'off',
     '@typescript-eslint/no-use-before-define': 'off',
-    // 'no-case-declarations': 'off',
   },
 
   settings: {

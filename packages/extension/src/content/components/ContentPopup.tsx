@@ -5,7 +5,6 @@ import TermDefinitionAnnotation from "../../common/component/annotator/TermDefin
 import TermOccurrenceAnnotation from "../../common/component/annotator/TermOccurrenceAnnotation";
 import HighlightedTextAdder from "./HighlightedTextAdder";
 import { useState } from "react";
-import { markTerms } from "../marker";
 import {
   Annotation,
   AnnotationTypeClass,

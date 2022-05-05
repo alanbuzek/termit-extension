@@ -34,7 +34,7 @@ const SidebarApp = ({
   };
 
   return (
-    <div style={{ height: "100%" }}>
+    <div style={{ height: "100%" }} className="border-l-2 border-gray-200">
       <div className="h-full w-full py-2.5 overflow-x-auto flex flex-column bg-gray-50">
         <SidebarHeader
           user={state.user}
