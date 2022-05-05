@@ -1,5 +1,6 @@
 import React from "react";
 import { Button } from "reactstrap";
+import UserDropdown from "../dropdown/UserDropdown";
 
 const UserIcon = () => {
   return (
@@ -62,7 +63,7 @@ const CogIcon = () => {
   );
 };
 
-const MenuIcon = () => {
+export const MenuIcon = () => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -92,8 +93,9 @@ export const UserInfo = ({ user, loading }) => {
         <UserIcon />{" "}
         <span className="ml-2 text-base">{user.abbreviatedName}</span>
       </a>
-      {/* <CogIcon /> */}
-      <MenuIcon />
+      <div className="relative">
+        <UserDropdown />
+      </div>
     </div>
   );
 };

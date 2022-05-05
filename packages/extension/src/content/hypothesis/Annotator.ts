@@ -109,7 +109,7 @@ export default class Annotator {
   public destroy() {
     this.annotations.forEach((annotation) => annotation.removeOccurrence());
     this.selectionObserver.disconnect();
-    this.contentPopup.destroy();
+    this.contentPopup?.destroy();
   }
 
   /**
@@ -268,5 +268,19 @@ export default class Annotator {
 
   public getFoundTermOccurrences() {
     return this.annotations.map((annotation) => annotation.termOccurrence);
+  }
+
+  public removeSuggestedOccurrences() {
+    [this.annotations, this.failedAnnotations].forEach((annotationsArr) => {
+      const annotationsToRemove = annotationsArr.filter((annotation) =>
+        annotation.termOccurrence.isSuggested()
+      );
+
+      annotationsToRemove.forEach((annotation) => {
+        const annotationIdx = annotationsArr.indexOf(annotation);
+        annotationsArr.splice(annotationIdx, 1);
+        annotation.removeOccurrence()
+      });
+    });
   }
 }

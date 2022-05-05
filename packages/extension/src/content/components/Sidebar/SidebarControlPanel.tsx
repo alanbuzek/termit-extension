@@ -7,6 +7,7 @@ import { FaBook, FaHighlighter } from "react-icons/fa";
 import { GoPencil } from "react-icons/go";
 import { IntelligentTreeSelect } from "intelligent-tree-select";
 import { overlay } from "../../helper/overlay";
+import VocabularyEditDropdown from "../dropdown/VocabularyEditDropdown";
 
 export const getUrlInfo = (url) => {
   const urlObject = new URL(url);
@@ -40,12 +41,14 @@ const SidebarControlPanel = ({
   vocabularies,
   handleAnnotatePage,
   handlePageDelete,
+  handleDeleteSuggestions,
 }: {
   vocabulary?: Vocabulary;
   vocabularies?: Vocabulary[];
   annotations?: Annotation[];
   handleAnnotatePage: (v: Vocabulary) => void;
   handlePageDelete: () => void;
+  handleDeleteSuggestions: () => void;
 }) => {
   const loading = false;
   const disabled = false;
@@ -59,6 +62,7 @@ const SidebarControlPanel = ({
   const [deleteLoading, setDeleteLoading] = useState(false);
 
   const handlePageDeleteClick = () => {
+    console.log('handle page delete click')
     setDeleteLoading(true);
     handlePageDelete();
   };
@@ -149,8 +153,11 @@ const SidebarControlPanel = ({
             {vocabulary!.label}
           </div>
         </div>
-        <div className="mb-1.5">
-          <GoPencil className="text-lg text-gray-600 hover:text-gray-800 cursor-pointer mr-2" />
+        <div className="relative">
+          <VocabularyEditDropdown
+            handleDeleteAllAnnotations={handlePageDeleteClick}
+            handleDeleteSuggestedAnnotations={handleDeleteSuggestions}
+          />
         </div>
       </div>
 

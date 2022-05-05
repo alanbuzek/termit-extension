@@ -54,6 +54,7 @@ export default class SidebarContainer {
           handleDeleteAnnotation={this.handleDeleteAnnotation}
           handleAnnotatePage={this.handleAnnotatePage}
           handleDeletePage={ContentActions.removeWebsiteAnnotations}
+          handleDeleteSuggestions={ContentActions.removeSuggestedAnnotations}
           state={this._state}
         />
       </IntlProvider>,

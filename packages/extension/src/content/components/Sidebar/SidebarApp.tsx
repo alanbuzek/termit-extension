@@ -16,11 +16,13 @@ const SidebarApp = ({
   handleAnnotatePage,
   handleDeletePage,
   handleDeleteAnnotation,
+  handleDeleteSuggestions,
 }: {
   state: ContentState;
   handleAnnotatePage: (vocabulary: Vocabulary) => void;
   handleDeletePage: () => void;
   handleDeleteAnnotation: (annotation: Annotation) => void;
+  handleDeleteSuggestions: () => void;
 }) => {
   const [extensionActive, setExtensionActive] = useState(state.extensionActive);
 
@@ -57,6 +59,7 @@ const SidebarApp = ({
                 handleAnnotatePage={handleAnnotatePage}
                 handleDeletePage={handleDeletePage}
                 onDeleteAnnotation={handleDeleteAnnotation}
+                handleDeleteSuggestions={handleDeleteSuggestions}
               />
             ) : null}
           </>

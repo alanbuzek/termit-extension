@@ -114,7 +114,7 @@ const internals = {
   async deactivatePage() {
     document.querySelectorAll = originalQuerySelectorAll;
     // reset page
-    annotator!.destroy();
+    annotator?.destroy();
     annotator = null;
     await resetContentState();
 
@@ -416,7 +416,9 @@ export const ContentActions = {
     internals.updateSidebar();
   },
   async removeWebsiteAnnotations() {
+    console.log('remove website annotations called')
     contentState.globalLoading = true;
+    internals.updateSidebar();
 
     await api.removeWebsiteFromDocument(
       contentState.vocabulary!.document!,
@@ -430,6 +432,21 @@ export const ContentActions = {
     await BrowserApi.storage.set("vocabularies", contentState.vocabularies);
 
     internals.deactivatePage();
+  },
+  async removeSuggestedAnnotations() {
+    contentState.globalLoading = true;
+    internals.updateSidebar();
+
+    annotator!.removeSuggestedOccurrences();
+
+    await api.removeSuggestedOccurrences(
+      contentState.vocabulary!.document!,
+      contentState.website!
+    );
+
+    contentState.globalLoading = false;
+    internals.updateSidebar();
+
   },
   async toggleExtensionActive() {
     contentState.globalLoading = true;

@@ -113,7 +113,6 @@ export async function savePageAnnotationResults(
 export async function createWebsiteInDocument(url: string, documentIRI: IRI) {
   const website = new Website({ url });
 
-  // TODO: maybe don't need to load the identifier again?
   const websiteIri = await loadIdentifier({
     name: url,
     contextIri: documentIRI.toString(),
@@ -123,7 +122,6 @@ export async function createWebsiteInDocument(url: string, documentIRI: IRI) {
   website.label = `Website at ${url}`;
   website.iri = websiteIri;
 
-  // TODO: transform website into a format that we need
   await termitApi.post(
     `/resources/${documentIRI.fragment}/websites`,
     content(website.toJsonLd()).param("namespace", documentIRI.namespace)
@@ -139,9 +137,23 @@ export async function removeWebsiteFromDocument(
   const websiteIRI = VocabularyUtils.create(website.iri);
   const documentIRI = VocabularyUtils.create(document.iri);
 
-  // TODO: transform website into a format that we need
   await termitApi.delete(
     `/resources/${documentIRI.fragment}/websites/${websiteIRI.fragment}`,
+    param("namespace", websiteIRI.namespace)
+  );
+
+  return website;
+}
+
+export async function removeSuggestedOccurrences(
+  document: DocumentData,
+  website: Website
+) {
+  const websiteIRI = VocabularyUtils.create(website.iri);
+  const documentIRI = VocabularyUtils.create(document.iri);
+
+  await termitApi.delete(
+    `/resources/${documentIRI.fragment}/websites/${websiteIRI.fragment}/suggestions`,
     param("namespace", websiteIRI.namespace)
   );
 
@@ -467,4 +479,5 @@ export default {
   removeTermDefinitionSource,
   updateTerm,
   loadTerm,
+  removeSuggestedOccurrences,
 };

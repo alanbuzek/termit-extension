@@ -7,6 +7,7 @@ const SidebarOccurrencesContainer = ({
   handleAnnotatePage,
   handleDeletePage,
   onDeleteAnnotation,
+  handleDeleteSuggestions
 }) => {
   return (
     <>
@@ -16,6 +17,7 @@ const SidebarOccurrencesContainer = ({
         vocabulary={state.vocabulary}
         vocabularies={state.vocabularies}
         handlePageDelete={handleDeletePage}
+        handleDeleteSuggestions={handleDeleteSuggestions}
       />
       {state.annotations && (
         <TermOccurrencesFeed
