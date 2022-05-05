@@ -1,10 +1,9 @@
 import ListenerCollection from "./utils/listenerCollection";
 import { ContentPopupContainer } from "./ContentPopupContainer";
-import { createIntegration } from "./integrations";
 import * as rangeUtil from "./utils/rangeUtils";
 import SelectionObserver from "./utils/SelectionObserver";
 import Vocabulary from "../../common/model/Vocabulary";
-import { markTerms } from "../marker";
+import { markTerm } from "../marker";
 import { Annotation, AnnotationType } from "../../common/util/Annotation";
 import { ContentActions, ContentState } from "..";
 import TermOccurrence from "../../common/model/TermOccurrence";
@@ -47,7 +46,7 @@ export default class Annotator {
   private contentPopup: ContentPopupContainer;
   private selectionObserver: SelectionObserver;
   private annotations: Annotation[] = [];
-  private integration: any;
+  private notFoundTermOccurrences: TermOccurrence[] = [];
   private currentAnnotation?: Annotation;
   private contentState: ContentState;
   private isSelectingDefinition: boolean = false;
@@ -106,13 +105,6 @@ export default class Annotator {
       }
     });
 
-    /**
-     * Integration that handles document-type specific functionality in the
-     * guest. We currently support only HTML documents, but other integrations will be possible later, such as PDFs
-     */
-    this.integration = createIntegration(this);
-
-    // Setup event handlers on the root element
   }
 
   public destroy() {
@@ -214,25 +206,28 @@ export default class Annotator {
     this.contentPopup.hide();
   }
 
-  public async annotatePage(
-    vocabulary: Vocabulary,
-    termOccurrencesGrouped: TermOccurrence[][]
-  ) {
+  public async annotatePage(termOccurrences: TermOccurrence[], isNewPage = false) {
     const annotationsData = await Promise.all(
-      termOccurrencesGrouped.map((termOccurrencesGroup) =>
-        markTerms(termOccurrencesGroup, this.contentState.terms)
+      termOccurrences.map((termOccurrence) =>
+        markTerm(termOccurrence, this.contentState.terms)
       )
     );
 
     // add all annotatations to the set for later reference
-    annotationsData
-      .flatMap((annotationData) => annotationData)
-      .forEach((annotation) => this.annotations.push(annotation));
+    annotationsData.forEach((annotation) => {
+      if (annotation instanceof Annotation) {
+        this.annotations.push(annotation);
+      } else if (!isNewPage) {
+        // just ignore any not found term occurrences on the first automatic annotation
 
-    this.updateOccurrences();
+        this.notFoundTermOccurrences.push(annotation);
+      }
+    });
+
+    this.updateAnnotations();
   }
 
-  public updateOccurrences() {
+  public updateAnnotations() {
     this.annotations.forEach((annotation) => annotation.updateAppearance());
   }
 
@@ -250,5 +245,27 @@ export default class Annotator {
 
   public getContentPoup() {
     return this.contentPopup;
+  }
+
+  public async annotateTermOccurrence(termOccurrence: TermOccurrence) {
+    const result = await markTerm(termOccurrence, this.contentState.terms);
+    console.log('result: ', result);
+    if (result instanceof TermOccurrence) {
+      this.notFoundTermOccurrences!.push(result);
+      return null;
+    } else {
+      this.annotations!.push(result);
+      result.updateRelatedAnnotationElements();
+      ContentActions.showPopup(result);
+      return result;
+    }
+  }
+
+  public getNotFoundTermOccurrences() {
+    return this.notFoundTermOccurrences;
+  }
+
+  public getFoundTermOccurrences() {
+    return this.annotations.map((annotation) => annotation.termOccurrence);
   }
 }

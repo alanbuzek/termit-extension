@@ -4,15 +4,11 @@ import { useState } from "react";
 import { ContentActions, ContentState } from "../..";
 import Vocabulary from "../../../common/model/Vocabulary";
 import { Annotation } from "../../../common/util/Annotation";
-import Button from "../Button";
 import Spinner from "../Spinner";
 import ExtensionOffMessage from "./ExtensionOffMessage";
-import LoginPrompt from "./LoginPrompt";
-import SidebarControlPanel from "./SidebarControlPanel";
 import SidebarFooter from "./SidebarFooter";
 import SidebarHeader from "./SidebarHeader";
 import SidebarOccurrencesContainer from "./SidebarOccurrencesContainer";
-import TermOccurrencesFeed from "./TermOccurrencesFeed";
 import UserPanel from "./UserPanel";
 
 const SidebarApp = ({

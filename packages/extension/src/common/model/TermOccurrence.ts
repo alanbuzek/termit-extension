@@ -8,6 +8,9 @@ import Utils from "../util/Utils";
 import VocabularyUtils from "../util/VocabularyUtils";
 import { TermsMap } from "../../content";
 import { AnnotationType } from "../util/Annotation";
+import getCssSelector from "css-selector-generator";
+import { calculateRangeOffset } from "../../content/marker";
+import JsonLdUtils from "../util/JsonLdUtils";
 
 // TODO: move to there when possible
 // import { isAnnotationWithMinimumScore } from "../component/annotator/AnnotationDomHelper";
@@ -22,6 +25,7 @@ export const ANNOTATION_MINIMUM_SCORE_THRESHOLD = 0.65;
 
 const ctx = {
   selectors: VocabularyUtils.NS_TERMIT + "má-selektor",
+  suggestedLemma: VocabularyUtils.HAS_SUGGESTED_LEMMA,
 };
 
 const textQuoteSelectorCtx = {
@@ -87,138 +91,162 @@ export interface TermOccurrenceData extends TermAssignmentData {
   target: OccurrenceTarget;
   score?: number;
   id?: string;
+  suggestedLemma?: string;
 }
 
-export const createTermOccurrences = (
-  results: any[],
-  websiteIri: string,
-  terms: TermsMap,
-  annotationType: string,
-  extraTypes?: string[]
-): TermOccurrence[][] => {
-  return results.map(({ cssSelectors, termOccurrences }) => {
-    return termOccurrences
-      .filter((termOccurrence) =>
-        isAnnotationWithMinimumScore(
-          termOccurrence.score,
-          ANNOTATION_MINIMUM_SCORE_THRESHOLD
-        )
-      )
-      .map((termOccurrence) => {
-        const {
-          about,
-          resource,
-          typeof: typeOf,
-          score,
-          startOffset,
-          originalTerm,
-        } = termOccurrence;
+export const TermOccurrenceFactory = {
+  createFromTextAnalysisResults(
+    results: any[],
+    websiteIri: string,
+    termsMap: TermsMap
+  ): TermOccurrence[] {
+    return results
+      .map(({ cssSelectors, termOccurrences: termOccurrencesRecords }) => {
+        return termOccurrencesRecords
+          .filter((textAnalysisRecord) =>
+            isAnnotationWithMinimumScore(
+              textAnalysisRecord.score,
+              ANNOTATION_MINIMUM_SCORE_THRESHOLD
+            )
+          )
+          .map((textAnalysisRecord) =>
+            this.mapTextAnalysisRecord(
+              textAnalysisRecord,
+              cssSelectors,
+              websiteIri,
+              [VocabularyUtils.SUGGESTED_TERM_OCCURRENCE]
+            )
+          )
+          .map((data) => this.create(data, termsMap));
+      })
+      .flat();
+  },
+  mapTextAnalysisRecord(
+    textAnalysisRecord,
+    cssSelectors,
+    websiteIri,
+    extraTypes: string[] = []
+  ) {
+    const { about, resource, startOffset, originalTerm, content } =
+      textAnalysisRecord as any;
 
-        const termOccurrenceData = {
-          id: about,
-          // iri: VocabularyUtils.WEBSITE_TERM_OCCURRENCE + `/${about}`,
-          types:
-            annotationType === AnnotationType.DEFINITION
-              ? [VocabularyUtils.TERM_DEFINITION_SOURCE]
-              : [VocabularyUtils.WEBSITE_TERM_OCCURRENCE],
-          score,
-          term: resource ? terms[resource] : undefined,
-          target: {
-            // iri: VocabularyUtils.WEBSITE_OCCURRENCE_TARGET + "/instance1749321978",
-            types: [
-              // VocabularyUtils.OCCURRENCE_TARGET,
-              VocabularyUtils.HAS_WEBSITE_OCCURRENCE_TARGET,
-            ],
-            selectors: [
-              {
-                // iri: VocabularyUtils.TEXT_QUOTE_SELECTOR + "/instance-1673666643",
-                types: [
-                  VocabularyUtils.TEXT_QUOTE_SELECTOR,
-                  // VocabularyUtils.SELECTOR,
-                ],
-                exactMatch: originalTerm,
-              },
-              {
-                // iri: VocabularyUtils.TEXT_POSITION_SELECTOR + "/instance1202492151",
-                types: [
-                  // VocabularyUtils.SELECTOR,
-                  VocabularyUtils.TEXT_POSITION_SELECTOR,
-                ],
-                // TODO; maybe remove this?
-                end: -1,
-                // TODO: adjust for just storing length, in annotace service
-                start: startOffset,
-              },
-              {
-                // iri: VocabularyUtils.CSS_SELECTOR + "/instance455547086",
-                types: [
-                  // VocabularyUtils.SELECTOR,
-                  VocabularyUtils.CSS_SELECTOR,
-                ],
-                // TODO: this should be changed to an array later?
-                value: cssSelectors[0],
-              },
-            ],
-            source: {
-              iri: websiteIri,
-            },
+    return {
+      id: about,
+      termIri: resource,
+      suggestedLemma: content,
+      originalText: originalTerm,
+      cssSelector: { startOffset, cssSelector: cssSelectors[0] },
+      annotationType: AnnotationType.OCCURRENCE,
+      sourceIri: websiteIri,
+      extraTypes,
+    };
+  },
+  createFromRange(
+    range: Range,
+    annotationType: string,
+    websiteIri: string | undefined,
+    termsMap: TermsMap | null
+  ) {
+    const { offset, parentElement } = calculateRangeOffset(range);
+    const generatedCssSelector = getCssSelector(parentElement);
+    const selectionContent = range.toString();
+
+    const termOccurrence = TermOccurrenceFactory.create(
+      {
+        annotationType,
+        cssSelector: {
+          cssSelector: generatedCssSelector,
+          startOffset: offset,
+        },
+        id: JsonLdUtils.generateBlankNodeId(),
+        originalText: selectionContent,
+        sourceIri: websiteIri!,
+      },
+      termsMap!
+    );
+
+    return termOccurrence;
+  },
+  create(
+    data: {
+      id: string;
+      termIri?: string;
+      suggestedLemma?: string;
+      originalText: string;
+      cssSelector: {
+        startOffset: number;
+        cssSelector: string;
+      };
+      annotationType: string;
+      sourceIri: string;
+      extraTypes?: string[];
+    },
+    termsMap: TermsMap
+  ): TermOccurrence {
+    const {
+      id,
+      termIri,
+      suggestedLemma,
+      originalText,
+      cssSelector: { startOffset, cssSelector },
+      annotationType,
+      sourceIri,
+      extraTypes,
+    } = data;
+
+    console.log('calling create with data: ', data, ', extraTypes: ', extraTypes)
+    const termOccurrenceData: any = {
+      id,
+      types:
+        annotationType === AnnotationType.DEFINITION
+          ? [VocabularyUtils.TERM_DEFINITION_SOURCE]
+          : [VocabularyUtils.WEBSITE_TERM_OCCURRENCE],
+      term: termIri ? termsMap[termIri] : undefined,
+      target: {
+        types: [VocabularyUtils.HAS_WEBSITE_OCCURRENCE_TARGET],
+        selectors: [
+          {
+            types: [VocabularyUtils.TEXT_QUOTE_SELECTOR],
+            exactMatch: originalText,
           },
-        };
+          {
+            types: [VocabularyUtils.TEXT_POSITION_SELECTOR],
+            end: -1,
+            start: startOffset,
+          },
+          {
+            types: [VocabularyUtils.CSS_SELECTOR],
+            value: cssSelector,
+          },
+        ],
+        source: {
+          iri: sourceIri,
+        },
+      },
+    };
 
-        if (extraTypes) {
-          termOccurrenceData.types.push(...extraTypes);
-        }
+    if (extraTypes) {
+      console.log('pushed extraTYpes: ', extraTypes)
+      termOccurrenceData.types.push(...extraTypes);
+    }
 
-        return new TermOccurrence(termOccurrenceData);
-      });
-  });
+    if (
+      termOccurrenceData.types.includes(
+        VocabularyUtils.SUGGESTED_TERM_OCCURRENCE
+      )
+    ) {
+      termOccurrenceData.suggestedLemma = suggestedLemma;
+    }
+
+    return new TermOccurrence(termOccurrenceData);
+  },
 };
-
-// TODO: remove example
-// const example = {
-//   iri: VocabularyUtils.WEBSITE_TERM_OCCURRENCE + "/instance-205549560",
-//   target: {
-//     iri: VocabularyUtils.WEBSITE_OCCURRENCE_TARGET + "/instance1749321978",
-//     types: [
-//       VocabularyUtils.TERM_OCCURRENCE_TARGET,
-//       VocabularyUtils.WEBSITE_OCCURRENCE_TARGET,
-//       VocabularyUtils.SUGGESTED_TERM_OCCURRENCE,
-//     ],
-//     selectors: [
-//       {
-//         iri: VocabularyUtils.TEXT_QUOTE_SELECTOR + "/instance-1673666643",
-//         types: [VocabularyUtils.TEXT_QUOTE_SELECTOR, VocabularyUtils.SELECTOR],
-//         exactMatch: "example match",
-//       },
-//       {
-//         iri: VocabularyUtils.TEXT_POSITION_SELECTOR + "/instance1202492151",
-//         types: [
-//           VocabularyUtils.SELECTOR,
-//           VocabularyUtils.TEXT_POSITION_SELECTOR,
-//         ],
-//         end: 10,
-//         start: 5,
-//       },
-//       {
-//         iri: VocabularyUtils.CSS_SELECTOR + "/instance455547086",
-//         types: [VocabularyUtils.SELECTOR, VocabularyUtils.CSS_SELECTOR],
-//         value: "div > .example",
-//       },
-//     ],
-//     source: {
-//       iri: "http://onto.fel.cvut.cz/ontologies/slovnik/http:--skauti.lubina.cz-subdom-skauti-2022-01-27-jarni-prazdniny-3-",
-//     },
-//   },
-//   types: [
-//     VocabularyUtils.TERM_OCCURRENCE,
-//     VocabularyUtils.WEBSITE_TERM_OCCURRENCE,
-//   ],
-// };
 
 export default class TermOccurrence extends TermAssignment {
   public target: OccurrenceTarget;
   public id: string;
   public score?: number;
+  public suggestedLemma?: string;
 
   constructor(data: TermOccurrenceData) {
     super(data);
@@ -233,6 +261,9 @@ export default class TermOccurrence extends TermAssignment {
     }
     if (typeof data.score === "number") {
       this.score = data.score;
+    }
+    if (data.suggestedLemma) {
+      this.suggestedLemma = data.suggestedLemma;
     }
   }
 
@@ -274,6 +305,7 @@ export default class TermOccurrence extends TermAssignment {
   }
 
   public getSanitizedExactMatch() {
+    // remove new line characters
     return this.getTextQuoteSelector().exactMatch.replace(
       /(\r\n|\n|\r)/gm,
       " "

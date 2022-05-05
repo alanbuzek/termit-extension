@@ -23,13 +23,6 @@ export const AnnotationType = {
   DEFINITION: VocabularyUtils.TERM_DEFINITION_SOURCE,
 };
 
-// TODO: remove
-export enum AnnotationStatus {
-  SUCCESS,
-  FAILURE,
-  PENDING,
-}
-
 export const AnnotationFocusTime = {
   SHORT: 4000,
   MEDIUM: 8000,
@@ -44,24 +37,10 @@ export function isDefinitionAnnotation(types: string[]) {
 export class Annotation {
   public termOccurrence: TermOccurrence;
   public term: Term | null = null;
-  private annotatationStatus: AnnotationStatus = AnnotationStatus.PENDING;
   private elements: HTMLElement[] = [];
   private hoveredElements = new Set<HTMLElement>();
   private containerElement: HTMLElement;
   private focusTimeout;
-  // methods:
-  // markAnnotation(); (called by contructor)
-  // remove(); (will hide the annotation)
-  // getStatus() - successful/unsuccessful, get some sort of summary
-  // getState();
-  // updateState();
-  // focusAnnotation() - brings focus to the current annotation
-
-  // state:
-  // - create + term state
-  // - status success/unsuccess
-  // - reference to the node where it has been rendered
-  // - term itself (if application)
 
   constructor(termOccurrence, containerElement, term = null) {
     this.termOccurrence = termOccurrence;
@@ -70,13 +49,7 @@ export class Annotation {
   }
 
   public getTermState() {
-    // TODO: check if we need the loading state, probably not?
-    // if (!this.state.termFetchFinished) {
-    //   return AnnotationClass.LOADING;
-    // }
-
     if (this.term === null) {
-      // this.termOccurrence.typeof maybe be subject to change
       return this.isDefinition()
         ? AnnotationTypeClass.PENDING_DEFINITION
         : AnnotationTypeClass.SUGGESTED_OCCURRENCE;
@@ -133,14 +106,6 @@ export class Annotation {
     });
   }
 
-  public set status(newStaus) {
-    this.annotatationStatus = newStaus;
-  }
-
-  public get status() {
-    return this.annotatationStatus;
-  }
-
   public addElement(newElement: HTMLElement) {
     newElement.addEventListener("mouseover", (e) => {
       e.stopPropagation();
@@ -175,7 +140,6 @@ export class Annotation {
   }
 
   public updateAppearance() {
-    // TODO: debounce
     const standardClassName = this.getClassName();
     const hoveredClassName = this.isHovered() ? " termit-h-hovered" : "";
     this.elements.forEach((element) => {

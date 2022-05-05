@@ -1,17 +1,12 @@
 import React from "react";
 import Button from "../Button";
-import Toggle from "react-toggle";
 import { useState } from "react";
 import Vocabulary from "../../../common/model/Vocabulary";
 import { Annotation } from "../../../common/util/Annotation";
-import AssetLink from "../../../common/component/misc/AssetLink";
-import VocabularyUtils from "../../../common/util/VocabularyUtils";
-import FiltersPanel, { DropdownComponent } from "./FiltersPanel";
 import { FaBook, FaHighlighter } from "react-icons/fa";
 import { GoPencil } from "react-icons/go";
 import { IntelligentTreeSelect } from "intelligent-tree-select";
-import { getLocalized } from "../../../common/model/MultilingualString";
-import { getShortLocale } from "../../../common/util/IntlUtil";
+import { overlay } from "../../helper/overlay";
 
 export const getUrlInfo = (url) => {
   const urlObject = new URL(url);
@@ -76,7 +71,7 @@ const SidebarControlPanel = ({
         {/* {allowPanel} */}
         <img
           src={chrome.runtime.getURL("/static/img/annotate.png")}
-          className="w-36 mb-4 mt-8 mx-auto"
+          className="w-36 mb-4 mt-5 mx-auto"
         />
         <p className="font-semibold text-lg text-center">
           Choose a vocabulary to start annotating with.
@@ -120,13 +115,11 @@ const SidebarControlPanel = ({
           className="mx-auto mt-4"
           disabled={!selectedVocabulary}
           onClick={() => {
+            overlay.on();
+
             setAnnotationLoading(true);
 
-            // TODO: remove timeout
-            setTimeout(() => {
-              // TODO: remove this fallback, adjust it to a different, proper default (To be specified)
-              handleAnnotatePage(selectedVocabulary!);
-            }, 200);
+            handleAnnotatePage(selectedVocabulary!);
           }}
           loading={annotationLoading}
           size="big"

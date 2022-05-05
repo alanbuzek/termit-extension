@@ -102,6 +102,7 @@ const VocabularyUtils = {
   HAS_DEFINITION_SOURCE: _NS_TERMIT + "m\u00e1-zdroj-definice-termu",
   HAS_FILE: _NS_POPIS_DAT + "má-soubor",
   HAS_WEBSITE: _NS_POPIS_DAT + "má-webovou-stránku",
+  HAS_SUGGESTED_LEMMA: _NS_POPIS_DAT + "má-navrhované-lemma",
   HAS_AUTHOR: _NS_POPIS_DAT + "má-autora",
   CREATED: _NS_POPIS_DAT + "má-datum-a-čas-vytvoření",
   HAS_LAST_EDITOR: _NS_POPIS_DAT + "má-posledního-editora",

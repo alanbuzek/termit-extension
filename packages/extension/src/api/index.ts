@@ -95,19 +95,13 @@ export async function savePageAnnotationResults(
   vocabularyIri: string
 ) {
   if (termOccurrences.length > 0) {
-    await createTermOccurrences(
+    await saveTermOccurrences(
       termOccurrences,
       website,
       // TODO: make this more versetile
       VocabularyUtils.SUGGESTED_TERM_OCCURRENCE,
       vocabularyIri
     );
-
-    // TODO: not very elegent, maybe we can simply generate iris on the front-end
-    // make sure termOccurrences have iris
-    // termOccurrences.forEach((termOccurrence, i) => {
-    //   termOccurrence.iri = results[i]["@id"];
-    // });
   }
 }
 
@@ -178,11 +172,9 @@ export async function getExistingWebsite(
 export async function getWebsiteTermOccurrences(
   website: Website,
   terms: TermsMap
-): Promise<TermOccurrence[][]> {
-  // TODO: add endpoint
-  const map = {};
+): Promise<TermOccurrence[]> {
   const websiteIRI: IRI = VocabularyUtils.create(website.iri);
-  const existingOccurrences: TermOccurrence[] = await termitApi
+  return termitApi
     .get(
       `/occurrence/resources/${websiteIRI.fragment}?namespace=${websiteIRI.namespace}`,
       params({ namespace: websiteIRI.namespace })
@@ -198,25 +190,6 @@ export async function getWebsiteTermOccurrences(
     .then((data: TermOccurrenceData[]) =>
       data.map((d) => new TermOccurrence(d))
     );
-
-  // group to optimize for mark.js, maybe later removed
-  const selectorMap = {};
-  existingOccurrences.forEach((occurrence) => {
-    if (occurrence?.term?.iri) {
-      occurrence.term = terms[occurrence.term.iri];
-    }
-  });
-
-  existingOccurrences.forEach((occurrence) => {
-    const cssSelector = occurrence.getCssSelector();
-
-    if (!selectorMap[cssSelector.value]) {
-      selectorMap[cssSelector.value] = [];
-    }
-    selectorMap[cssSelector.value].push(occurrence);
-  });
-
-  return Object.values(selectorMap);
 }
 
 /**
@@ -283,11 +256,11 @@ function resolveTermCreationUrl(term: Term, targetVocabularyIri: IRI) {
 }
 
 export function loadTerm(termNormalizedName: string, vocabularyIri: IRI) {
-  return termitApi.get(`/vocabularies/${
-      vocabularyIri.fragment
-    }/terms/${termNormalizedName}`,
-    param("namespace", vocabularyIri.namespace)
-  )
+  return termitApi
+    .get(
+      `/vocabularies/${vocabularyIri.fragment}/terms/${termNormalizedName}`,
+      param("namespace", vocabularyIri.namespace)
+    )
     .then((data: object) =>
       JsonLdUtils.compactAndResolveReferences<TermData>(data, TERM_CONTEXT)
     )
@@ -379,7 +352,7 @@ export async function updateTermOccurrence(termOccurrence: TermOccurrence) {
   );
 }
 
-export async function createTermOccurrences(
+export async function saveTermOccurrences(
   termOccurrences: TermOccurrence[],
   website: Website,
   occurrenceType: string,
@@ -477,7 +450,7 @@ export default {
   runPageAnnotationAnalysis,
   loadAllTerms,
   getLabel,
-  createTermOccurrences,
+  saveTermOccurrences,
   loadTypes,
   createTerm,
   removeOccurrence,

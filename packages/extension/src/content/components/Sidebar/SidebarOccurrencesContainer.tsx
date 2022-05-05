@@ -1,5 +1,4 @@
 import React from "react";
-import { useState } from "react";
 import SidebarControlPanel from "./SidebarControlPanel";
 import TermOccurrencesFeed from "./TermOccurrencesFeed";
 

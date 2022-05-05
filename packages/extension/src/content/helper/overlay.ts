@@ -14,8 +14,8 @@ export const overlay = {
   },
   on() {
     this.init();
-    this.previousOverflowValue = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
+    // this.previousOverflowValue = document.body.style.overflow;
+    // document.body.style.overflow = "hidden";
     document.getElementById("termit-overlay")!.style.display = "block";
     this.isActive = true;
   },
@@ -23,7 +23,7 @@ export const overlay = {
     if (!this.isInitiated){
       return;
     }
-    document.body.style.overflow = this.previousOverflowValue;
+    // document.body.style.overflow = this.previousOverflowValue;
     document.getElementById("termit-overlay")!.style.display = "none";
     this.isActive = false;
   },

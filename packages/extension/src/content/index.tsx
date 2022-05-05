@@ -11,15 +11,16 @@ import {
 import api from "../api";
 import VocabularyUtils, { IRI } from "../common/util/VocabularyUtils";
 import Term from "../common/model/Term";
-import { occurrenceFromRange, markTerms } from "./marker";
 import backgroundApi from "../shared/backgroundApi";
 import Website from "../common/model/Website";
 import TermOccurrence, {
-  createTermOccurrences,
+  TermOccurrenceFactory,
 } from "../common/model/TermOccurrence";
 import BrowserApi from "../shared/BrowserApi";
 import User from "../common/model/User";
 import Constants from "../common/util/Constants";
+import { markTerm } from "./marker";
+import { overlay } from './helper/overlay';
 
 // TODO: this should be dynamic when language selection is implemented
 const language = "cs";
@@ -34,6 +35,7 @@ export type ContentState = {
   // api data
   vocabulary: Vocabulary | null;
   annotations: Annotation[] | null;
+  notFoundTermOccurrences: TermOccurrence[] | null;
   terms: TermsMap | null;
   website: Website | null;
   // local state data
@@ -46,6 +48,7 @@ export type ContentState = {
 
 const resetContentState = async () => {
   contentState.annotations = null;
+  contentState.notFoundTermOccurrences = null;
   contentState.vocabulary = null;
   contentState.terms = null;
   contentState.website = null;
@@ -138,7 +141,7 @@ const internals = {
     );
     return document.URL.replace(/[?&]?termit-focus-annotation=.*$/, "");
   },
-  parseAnnotationToFocus() {
+  parseQueryParamAnnotationToFocus() {
     const match = document.URL.match(/termit-focus-annotation=(.+)$/);
     if (!match) {
       return;
@@ -170,31 +173,31 @@ export const ContentActions = {
 
     contentState.terms = vocabularyTerms;
     contentState.vocabulary = vocabulary;
-    // TODO: make this call only once (not from inside of sidebar)
 
-    const termOccurrencesGrouped: TermOccurrence[][] = createTermOccurrences(
+    const termOccurrences = TermOccurrenceFactory.createFromTextAnalysisResults(
       textAnalysisResult,
       contentState.website.iri,
-      contentState.terms!,
-      AnnotationType.OCCURRENCE,
-      [VocabularyUtils.SUGGESTED_TERM_OCCURRENCE]
+      contentState.terms!
     );
 
+    await annotator!.annotatePage(termOccurrences, true);
+    contentState.annotations = annotator!.getAnnotations();
+    contentState.notFoundTermOccurrences =
+      annotator!.getNotFoundTermOccurrences();
+
     await api.savePageAnnotationResults(
-      termOccurrencesGrouped.flatMap((occGroup) => occGroup),
+      annotator!.getFoundTermOccurrences(),
       contentState.website,
       vocabulary.iri
     );
-
-    await annotator!.annotatePage(vocabulary, termOccurrencesGrouped);
-    contentState.annotations = annotator!.getAnnotations();
 
     contentState.vocabulary.document?.websites.push(contentState.website);
 
     // update vocabulary cache
     await BrowserApi.storage.set("vocabularies", contentState.vocabularies);
 
-    contentState.globalLoading = true;
+    overlay.off();
+    contentState.globalLoading = false;
     // this makes sure to re-render sidebar on data update
     internals.updateSidebar();
 
@@ -218,21 +221,26 @@ export const ContentActions = {
       return;
     }
 
-    internals.activatePage();
 
     const { website, vocabulary } = foundExistingWebsite;
 
     contentState.terms = await api.loadAllTerms(
       VocabularyUtils.create(vocabulary.iri)
     );
-    const termOccurrencesGroups: TermOccurrence[][] =
-      await api.getWebsiteTermOccurrences(website, contentState.terms!);
-    await annotator!.annotatePage(vocabulary, termOccurrencesGroups);
+    const termOccurrences = await api.getWebsiteTermOccurrences(
+      website,
+      contentState.terms!
+    );
+    internals.activatePage();
+
+    await annotator!.annotatePage(termOccurrences);
     contentState.annotations = annotator!.getAnnotations();
+    contentState.notFoundTermOccurrences =
+      annotator!.getNotFoundTermOccurrences();
     contentState.vocabulary = vocabulary;
     contentState.website = website;
 
-    const occurrenceToFocusIri = internals.parseAnnotationToFocus();
+    const occurrenceToFocusIri = internals.parseQueryParamAnnotationToFocus();
 
     if (occurrenceToFocusIri) {
       const foundAnnotation = contentState.annotations.find(
@@ -247,7 +255,7 @@ export const ContentActions = {
 
     contentState.globalLoading = false;
     internals.updateSidebar();
-    // TODO: fix bug where this opens on the wrong side
+
     setTimeout(() => {
       sidebar!.open();
     }, 200);
@@ -258,6 +266,7 @@ export const ContentActions = {
     annotationType: string,
     isDuringTermCreation: boolean = false
   ) {
+    console.log('term, annotation, annotationType: ', term, annotation, annotationType);
     const originalTerm = annotation.term;
     annotation.assignTerm(term);
     annotator!.hidePopup();
@@ -324,7 +333,7 @@ export const ContentActions = {
     } else if (hasBeenPersisted) {
       await api.updateTermOccurrence(annotation.termOccurrence);
     } else {
-      await api.createTermOccurrences(
+      await api.saveTermOccurrences(
         [annotation.termOccurrence],
         contentState.website!,
         annotationType,
@@ -338,22 +347,18 @@ export const ContentActions = {
     selectionRange: Range,
     annotationType: string
   ) {
-    const newTermOccurrence = occurrenceFromRange(
+    const newTermOccurrence = TermOccurrenceFactory.createFromRange(
       selectionRange,
       annotationType,
       contentState.website?.iri,
       contentState.terms
     );
 
-    const [newAnnotation] = await markTerms(
-      [newTermOccurrence],
-      contentState.terms
+    const newAnnotation = await annotator!.annotateTermOccurrence(
+      newTermOccurrence
     );
 
-    newAnnotation.updateRelatedAnnotationElements();
-
-    contentState.annotations!.push(newAnnotation);
-    ContentActions.showPopup(newAnnotation);
+    console.log('new annotation created: ', newAnnotation);
 
     internals.updateSidebar();
     return newAnnotation;

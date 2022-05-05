@@ -626,8 +626,8 @@ class Mark {
           dict,
           start,
           end,
-          (node, offsetInCurrNode, totalOffset) => {
-            return filterCb(match[matchIdx], node, offsetInCurrNode, totalOffset);
+          (node, offsetInCurrNode) => {
+            return filterCb(match[matchIdx], node, offsetInCurrNode);
           },
           (node, lastIndex) => {
             regex.lastIndex = lastIndex;
@@ -883,8 +883,8 @@ class Mark {
         this[fn](
           regex,
           1,
-          (term, node, offsetInCurrNode, totalOffset) => {
-            return this.opt.filter(node, kw, offsetInCurrNode, totalOffset, totalMatches, matches);
+          (term, node, offsetInCurrNode) => {
+            return this.opt.filter(node, kw, offsetInCurrNode, totalMatches, matches);
           },
           (element) => {
             matches++;
