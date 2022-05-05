@@ -237,8 +237,8 @@ export class ContentPopupContainer {
 
   /** Hide the adder */
   public hide() {
-    // overlay.off();
     this.isVisible = false;
+    overlay.off();
     this.render();
     // Reposition the outerContainer because it affects the responsiveness of host page
     // https://github.com/hypothesis/client/issues/3193

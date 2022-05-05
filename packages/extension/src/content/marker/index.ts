@@ -139,7 +139,7 @@ export const markTerm = (
       },
       element: "termit-h", // termit-highlight element
       diacritcs: false,
-      exclude: [],
+      exclude: ['style', 'script', 'iframe', 'title'],
       caseSensitive: true,
       separateWordSearch: false,
       acrossElements: true,

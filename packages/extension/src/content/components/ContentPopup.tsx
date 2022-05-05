@@ -95,11 +95,9 @@ function ContentPopup({
             show
             onClose={() => {
               closePopup();
-              overlay.off();
             }}
             onSave={() => {
               // TODO: do we still need this callback?
-              overlay.off();
             }}
             // TODO: all this should either be deleted if not needed or use real, not hard-coded values
             onMinimize={() => {

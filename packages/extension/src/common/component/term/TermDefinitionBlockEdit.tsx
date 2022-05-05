@@ -39,7 +39,7 @@ export const TermDefinitionBlockEdit: React.FC<TermDefinitionBlockEditProps> = (
         <Col xs={12}>
           <div className="flex justify-between items-center">
             <Label className="attribute-label definition">
-              {i18n("term.metadata.definition.text")}
+              {i18n("term.metadata.definition")}
             </Label>
             <Button
               className="mb-2"

@@ -167,14 +167,14 @@ export class TermMetadataCreateForm extends React.Component<
           </Col>
         </Row>
 
-        <AttributeSectionContainer label={i18n("term.metadata.definition")}>
+        <div className="form-section">
           <TermDefinitionBlockEdit
             term={termData}
             onChange={this.props.onChange}
             language={language}
             definitionSelector={this.props.definitionSelector}
           />
-        </AttributeSectionContainer>
+        </div>
 
         <ShowAdvancedAssetFields>
           <Row>
