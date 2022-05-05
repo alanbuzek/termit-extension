@@ -1,6 +1,10 @@
 import React from "react";
+import { useState } from "react";
+import { FaTrashAlt } from "react-icons/fa";
+import BadgeButton from "../../../common/component/misc/BadgeButton";
 import TermLink from "../../../common/component/term/TermLink";
 import { Annotation } from "../../../common/util/Annotation";
+import Spinner from "../Spinner";
 
 export const ExternalLinkIcon = ({ className = "h-3 w-3 ml-2" }) => {
   return (
@@ -22,25 +26,56 @@ export const ExternalLinkIcon = ({ className = "h-3 w-3 ml-2" }) => {
   );
 };
 
-const TermOccurrencesList = ({ annotations }) => {
+const TermOccurrencesList = ({ annotations, onDeleteAnnotation }) => {
+  const [deletingAnnotation, setDeletingAnnotation] = useState<Annotation>();
+
   return (
-    <div className='px-2.5'>
+    <div className="px-2.5">
       {(annotations as Annotation[]).map((annotation) => {
         return (
           <div
-            className="rounded-md p-3 border border-gray-400 mb-2.5 cursor-pointer bg-white hover:bg-gray-300 relative"
+            className="rounded-md p-3 border border-gray-400 mb-2.5 cursor-pointer transition-all duration-300 hover:bg-gray-100 relative bg-white term-occurrence-card"
             onClick={() => annotation.focusAnnotation()}
           >
-            <div className="mb-0 text-lg font-semibold">
-              {annotation.termOccurrence.getTextContent()}
-            </div>
-            {annotation.term && (
-              <div className="flex items-center mt-1.5">
-                <span className="font-semibold mr-2">Term:</span>
-                <TermLink term={annotation.term} />
-                {/* <ExternalLinkIcon /> */}
+            <div className="flex justify-between items-end">
+              <div>
+                <div className="mb-0 text-lg font-semibold">
+                  {annotation.termOccurrence.getTextContent()}
+                </div>
+                {annotation.term && (
+                  <div className="flex items-center mt-1.5">
+                    <span className="font-semibold mr-2">Term:</span>
+                    <TermLink term={annotation.term} />
+                    {/* <ExternalLinkIcon /> */}
+                  </div>
+                )}
               </div>
-            )}
+              <div>
+                <BadgeButton
+                  disabled={!!deletingAnnotation}
+                  color="danger"
+                  className="ml-3 mt-2 border-none"
+                  outline
+                  onClick={async (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (deletingAnnotation) {
+                      return;
+                    }
+                    setDeletingAnnotation(annotation);
+                    await onDeleteAnnotation(annotation);
+                    setDeletingAnnotation(undefined);
+                  }}
+                >
+                  {deletingAnnotation === annotation ? (
+                    <Spinner />
+                  ) : (
+                    <FaTrashAlt className="text-sm" />
+                  )}
+                </BadgeButton>
+              </div>
+            </div>
+
             <span
               className={`absolute top-1 right-1 inline-flex items-center justify-center px-2 py-1 md:px-2 md:py-2 text-xs font-medium leading-none text-gray-500 transform translate-x-2 -translate-y-1/2 rounded-md ${annotation.getClassName()}`}
             >

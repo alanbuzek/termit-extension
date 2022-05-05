@@ -22,16 +22,18 @@ import SidebarApp from "./SidebarApp";
 export default class SidebarContainer {
   _container: any;
   _state: ContentState;
-  private handleAnnotatePage: any;
+  private handleAnnotatePage;
+  private handleDeleteAnnotation;
   _loadedStyles: boolean;
   /**
    * @param {HTMLElement} container - Element into which the toolbar is rendered
    * @param {ToolbarOptions} options
    */
-  constructor(container, state, handleAnnotatePage) {
+  constructor(container, state, handleAnnotatePage, handleDeleteAnnotation) {
     this._container = container;
     this._state = state;
     this.handleAnnotatePage = handleAnnotatePage;
+    this.handleDeleteAnnotation = handleDeleteAnnotation;
     this._loadedStyles = false;
     this.render();
   }
@@ -49,6 +51,7 @@ export default class SidebarContainer {
     ReactDOM.render(
       <IntlProvider locale="cs-CZ" defaultLocale="en" messages={cs}>
         <SidebarApp
+          handleDeleteAnnotation={this.handleDeleteAnnotation}
           handleAnnotatePage={this.handleAnnotatePage}
           handleDeletePage={ContentActions.removeWebsiteAnnotations}
           state={this._state}

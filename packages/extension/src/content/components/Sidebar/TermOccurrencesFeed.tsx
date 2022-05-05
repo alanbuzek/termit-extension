@@ -9,7 +9,9 @@ const language = "cs";
 
 const TermOccurrencesFeed = ({
   annotations,
+  onDeleteAnnotation,
 }: {
+  onDeleteAnnotation: (annotation: Annotation) => Promise<void>;
   annotations: Annotation[];
 }) => {
   const [occurrenceTypeFilter, setOccurrenceTypeFilter] = useState<any>();
@@ -48,7 +50,10 @@ const TermOccurrencesFeed = ({
         setOccurrenceTextFilter={setOccurrenceTextFilter}
       />
       <hr className="my-2" />
-      <TermOccurrencesList annotations={filteredAnnotations} />
+      <TermOccurrencesList
+        annotations={filteredAnnotations}
+        onDeleteAnnotation={onDeleteAnnotation}
+      />
     </div>
   );
 };

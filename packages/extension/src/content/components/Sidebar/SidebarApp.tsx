@@ -3,6 +3,7 @@ import React from "react";
 import { useState } from "react";
 import { ContentState } from "../..";
 import Vocabulary from "../../../common/model/Vocabulary";
+import { Annotation } from '../../../common/util/Annotation';
 import Button from "../Button";
 import ExtensionOffMessage from "./ExtensionOffMessage";
 import LoginPrompt from "./LoginPrompt";
@@ -17,10 +18,12 @@ const SidebarApp = ({
   state,
   handleAnnotatePage,
   handleDeletePage,
+  handleDeleteAnnotation
 }: {
   state: ContentState;
   handleAnnotatePage: (vocabulary: Vocabulary) => void;
   handleDeletePage: () => void;
+  handleDeleteAnnotation: (annotation: Annotation) => void;
 }) => {
   const [extensionActive, setExtensionActive] = useState(true);
 
@@ -49,6 +52,7 @@ const SidebarApp = ({
             state={state}
             handleAnnotatePage={handleAnnotatePage}
             handleDeletePage={handleDeletePage}
+            onDeleteAnnotation={handleDeleteAnnotation}
           />
         ) : null}
         <SidebarFooter />

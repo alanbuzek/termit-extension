@@ -7,6 +7,7 @@ const SidebarOccurrencesContainer = ({
   state,
   handleAnnotatePage,
   handleDeletePage,
+  onDeleteAnnotation,
 }) => {
   return (
     <>
@@ -18,7 +19,10 @@ const SidebarOccurrencesContainer = ({
         handlePageDelete={handleDeletePage}
       />
       {state.annotations && (
-        <TermOccurrencesFeed annotations={state.annotations} />
+        <TermOccurrencesFeed
+          annotations={state.annotations}
+          onDeleteAnnotation={onDeleteAnnotation}
+        />
       )}
       {state.annotations && <hr className="my-2"></hr>}
     </>

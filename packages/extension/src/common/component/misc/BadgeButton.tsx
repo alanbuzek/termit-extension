@@ -7,7 +7,12 @@ export const BadgeButton: React.FC<ButtonProps> = (props) => {
   const { children, className, ...propsToPass } = props;
   const cls = classNames(className, "badge-button");
   return (
-    <Button size="sm" className={cls} {...propsToPass}>
+    <Button
+      size="sm"
+      className={cls}
+      {...propsToPass}
+      style={{ border: "none" }}
+    >
       {children}
     </Button>
   );

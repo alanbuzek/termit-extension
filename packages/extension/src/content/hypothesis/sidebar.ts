@@ -8,6 +8,7 @@ import SidebarContainer from "../components/sidebar/SidebarContainer";
 import { ToolbarController } from "./toolbar";
 import { ContentState } from "..";
 import { BucketBar } from "./BucketBar";
+import { Annotation } from "../../common/util/Annotation";
 
 // Minimum width to which the iframeContainer can be resized.
 export const MIN_RESIZE = 280;
@@ -38,6 +39,7 @@ export class Sidebar {
     element: HTMLElement,
     state: ContentState,
     handleAnnotatePage: (vocabulary: Vocabulary) => void,
+    handleDeleteAnnotation: (annotation: Annotation) => void,
     config: Record<string, any> = {}
   ) {
     this.config = config;
@@ -73,7 +75,8 @@ export class Sidebar {
     this.sidebarComponent = new SidebarContainer(
       sidebarContainer,
       state,
-      handleAnnotatePage
+      handleAnnotatePage,
+      handleDeleteAnnotation
     );
     this.listeners = new ListenerCollection();
 
@@ -201,7 +204,7 @@ export class Sidebar {
     this.sidebarComponent.render();
   }
 
-  public getShadowRoot(){
+  public getShadowRoot() {
     return this.shadowRoot;
   }
 }

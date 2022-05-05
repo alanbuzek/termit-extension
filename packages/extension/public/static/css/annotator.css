@@ -1,3 +1,11 @@
+.term-occurrence-card {
+  background-color: white;
+}
+
+.term-occurrence-card:hover {
+  background-color: #f3f4f6 !important;
+}
+
 /* termit-h.termit-h-hovered {
   background-color: rgb(126, 241, 32) !important;
 } */
