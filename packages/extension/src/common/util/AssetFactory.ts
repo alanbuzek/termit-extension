@@ -87,7 +87,7 @@ const AssetFactory = {
    *
    * @param lang Language to use for multilingual attribute default values (optional)
    */
-  createEmptyTermData(lang?: string): TermData {
+  createEmptyTermData(lang?: string,): TermData {
     return {
       iri: "",
       label: langString("", lang),

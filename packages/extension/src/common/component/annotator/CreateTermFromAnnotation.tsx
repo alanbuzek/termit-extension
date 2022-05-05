@@ -10,6 +10,8 @@ import { langString } from "../../model/MultilingualString";
 import { isTermValid, LabelExists } from "../term/TermValidationUtils";
 import { ContentState } from "../../../content";
 import { Annotation } from "../../util/Annotation";
+import TermOccurrence from "../../model/TermOccurrence";
+import { getPageUrl } from '../../../content/helper/url';
 
 interface CreateTermFromAnnotationProps extends HasI18n {
   show: boolean;
@@ -21,6 +23,7 @@ interface CreateTermFromAnnotationProps extends HasI18n {
   contentState: ContentState;
   createTerm: (term: Term) => Promise<any>;
   definitionAnnotation?: Annotation;
+  termOccurrence: TermOccurrence;
 }
 
 interface CreateTermFromAnnotationState extends TermData {
@@ -33,24 +36,31 @@ export class CreateTermFromAnnotation extends React.Component<
 > {
   constructor(props: CreateTermFromAnnotationProps) {
     super(props);
+
+    const { termOccurrence } = props;
+    const initialLabel =
+      termOccurrence.isSuggested() && termOccurrence.suggestedLemma
+        ? termOccurrence.suggestedLemma
+        : termOccurrence.getSanitizedExactMatch();
+
     this.state = Object.assign(
       {},
       AssetFactory.createEmptyTermData(props.language),
-      { labelExists: {} }
+      {
+        labelExists: {},
+        label: langString(initialLabel || "", this.props.language),
+        sources: [getPageUrl()],
+      }
     );
   }
 
-  componentDidUpdate(prevProps, prevState) {
+  componentDidUpdate(prevProps) {
     if (
       this.props.definitionAnnotation &&
       this.props.definitionAnnotation !== prevProps.definitionAnnotation
     ) {
       this.setDefinition(
-        this.props.definitionAnnotation.termOccurrence
-          .getTextQuoteSelector()
-          // replace new line characters
-          // TODO: abstract into helper method, or right into Annotation
-          .exactMatch.replace(/(\r\n|\n|\r)/gm, " ")
+        this.props.definitionAnnotation.termOccurrence.getSanitizedExactMatch()
       );
     }
   }
@@ -106,10 +116,7 @@ export class CreateTermFromAnnotation extends React.Component<
           className="modal-header"
           style={{ paddingTop: 1, paddingRight: 0, paddingLeft: 0 }}
         >
-          <h5>Vytvořit nový pojem</h5>
-          {
-            // i18n("glossary.form.header")
-          }
+          <h3 className='text-lg font-semibold my-2'>Vytvořit nový pojem</h3>
         </div>
         <div>
           <TermMetadataCreateForm

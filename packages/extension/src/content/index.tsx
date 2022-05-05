@@ -21,6 +21,7 @@ import User from "../common/model/User";
 import Constants from "../common/util/Constants";
 import { markTerm } from "./marker";
 import { overlay } from "./helper/overlay";
+import { getPageUrl } from "./helper/url";
 
 // TODO: this should be dynamic when language selection is implemented
 const language = "cs";
@@ -134,13 +135,6 @@ const internals = {
       ContentActions.removeOccurrence
     );
   },
-  getPageUrl() {
-    console.log(
-      "shortened url: ",
-      document.URL.replace(/[?&]?termit-focus-annotation=.*$/, "")
-    );
-    return document.URL.replace(/[?&]?termit-focus-annotation=.*$/, "");
-  },
   parseQueryParamAnnotationToFocus() {
     const match = document.URL.match(/termit-focus-annotation=(.+)$/);
     if (!match) {
@@ -160,7 +154,7 @@ export const ContentActions = {
     internals.activatePage();
 
     contentState.website = await api.createWebsiteInDocument(
-      internals.getPageUrl(),
+      getPageUrl(),
       VocabularyUtils.create(vocabulary.document!.iri)
     );
     const textAnalysisResult = await backgroundApi.runTextAnalysis(
@@ -209,7 +203,7 @@ export const ContentActions = {
     internals.updateSidebar();
 
     const foundExistingWebsite = await api.getExistingWebsite(
-      internals.getPageUrl(),
+      getPageUrl(),
       contentState.vocabularies
     );
 
@@ -244,10 +238,10 @@ export const ContentActions = {
         (annotation) => annotation.termOccurrence.iri === occurrenceToFocusIri
       );
       if (!foundAnnotation) {
-        throw new Error("Focused annotation not found: ", foundAnnotation);
+        console.warn("Focused annotation not found: ", foundAnnotation);
+      } else {
+        foundAnnotation.focusAnnotation(AnnotationFocusTime.LONG);
       }
-
-      foundAnnotation.focusAnnotation(AnnotationFocusTime.LONG);
     }
 
     contentState.globalLoading = false;
@@ -416,7 +410,7 @@ export const ContentActions = {
     internals.updateSidebar();
   },
   async removeWebsiteAnnotations() {
-    console.log('remove website annotations called')
+    console.log("remove website annotations called");
     contentState.globalLoading = true;
     internals.updateSidebar();
 
@@ -446,7 +440,6 @@ export const ContentActions = {
 
     contentState.globalLoading = false;
     internals.updateSidebar();
-
   },
   async toggleExtensionActive() {
     contentState.globalLoading = true;

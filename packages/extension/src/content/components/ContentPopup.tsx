@@ -14,7 +14,7 @@ import {
 import { overlay } from "../helper/overlay";
 import { ContentState, ContentActions } from "..";
 import Term from "../../common/model/Term";
-import VocabularyUtils, { IRI } from "../../common/util/VocabularyUtils";
+import VocabularyUtils from "../../common/util/VocabularyUtils";
 
 /**
  * Union of possible toolbar commands.
@@ -78,7 +78,8 @@ function ContentPopup({
 }: ContentPopupProps) {
   const [currPopup, setCurrPopup] = useState(initialPopupType);
   const [isMinimized, setIsMinimized] = useState(false);
-  const [definitionAnnotation, setDefinitionAnnotation] = useState<Annotation>();
+  const [definitionAnnotation, setDefinitionAnnotation] =
+    useState<Annotation>();
   const closePopup = () => {
     hide();
   };
@@ -106,7 +107,10 @@ function ContentPopup({
               overlay.off();
               onSelectDefinition((definitionAnnotation: Annotation) => {
                 overlay.on();
-                console.log('in callback definitionAnnotation: ', definitionAnnotation);
+                console.log(
+                  "in callback definitionAnnotation: ",
+                  definitionAnnotation
+                );
                 setIsMinimized(false);
                 setDefinitionAnnotation(definitionAnnotation);
               });
@@ -115,7 +119,12 @@ function ContentPopup({
             // TODO: handle fallback when no vocabulary is selected
             vocabularyIri={vocabularyIri}
             createTerm={(term: Term) => {
-              return ContentActions.createTerm(term, vocabularyIri, annotation, definitionAnnotation);
+              return ContentActions.createTerm(
+                term,
+                vocabularyIri,
+                annotation,
+                definitionAnnotation
+              );
             }}
             i18n={() => ""}
             formatMessag={() => Promise.resolve()}
@@ -125,6 +134,7 @@ function ContentPopup({
             language={"cs"}
             contentState={contentState}
             definitionAnnotation={definitionAnnotation}
+            termOccurrence={annotation.termOccurrence}
           />
         );
       case PopupType.PurposeSelection:
@@ -220,7 +230,7 @@ function ContentPopup({
   };
 
   if (currPopup === PopupType.CreateTermModal) {
-    style = { ...style, width: 800, height: 800, overflowY: "scroll" };
+    style = { ...style, width: 700, height: 500, overflowY: "scroll" };
   }
 
   return (

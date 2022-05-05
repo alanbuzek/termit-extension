@@ -19,7 +19,7 @@ const colorClassnames = {
   alertLight: 'text-red-500 text-red-500 border-2 border-red-500 hover:bg-red-500 hover:text-white',
   light: 'hover:text-gray-300 text-white',
   secondary:
-    'text-green-400 text-white border border-green-400 hover:bg-green-400 hover:text-white',
+    'text-green-600 border border-green-600 hover:bg-green-600 hover:text-white',
 };
 
 export type ButtonProps = DetailedHTMLProps<

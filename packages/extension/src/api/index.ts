@@ -383,7 +383,7 @@ export async function saveTermOccurrences(
   };
 
   const contentBody = termOccurrences.map((termOccurrence) => {
-    const payload = {
+    const payload: any = {
       exactMatch: termOccurrence.getTextQuoteSelector().exactMatch,
       selector: termOccurrence.getCssSelector().value,
       start: termOccurrence.getTextPositionSelector().start,
@@ -395,6 +395,10 @@ export async function saveTermOccurrences(
       const termIRI = VocabularyUtils.create(termOccurrence.term.iri);
       payload.termNamespace = termIRI.namespace;
       payload.termFragment = termIRI.fragment;
+    }
+
+    if (termOccurrence.isSuggested() && termOccurrence.suggestedLemma){
+      payload.suggestedLemma = termOccurrence.suggestedLemma;
     }
 
     return payload;

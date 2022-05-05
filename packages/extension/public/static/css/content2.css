@@ -457,6 +457,6 @@ termit-h.annotation-focused {
   right: 0;
   bottom: 0;
   background-color: rgba(0, 0, 0, 0.35); /* Black background with opacity */
-  z-index: 20000000; /* Specify a stack order in case you're using a different order for other elements */
+  z-index: 1000; /* Specify a stack order in case you're using a different order for other elements */
   cursor: default; /* Add a pointer on hover */
 }

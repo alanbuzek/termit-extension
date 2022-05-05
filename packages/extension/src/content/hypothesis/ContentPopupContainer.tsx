@@ -379,7 +379,6 @@ export class ContentPopupContainer {
     const positionedAncestor = nearestPositionedAncestor(this.outerContainer);
     const parentRect = positionedAncestor.getBoundingClientRect();
 
-    const zIndex = this.findZindex(left, top);
 
     if (isModal) {
       overlay.on();
@@ -388,9 +387,8 @@ export class ContentPopupContainer {
         left: "50%",
         top: "50%",
         position: "fixed",
-        transform: "translate(-400px, -400px)",
-
-        zIndex,
+        transform: "translate(-350px, -250px)",
+        zIndex: 2000
       });
     } else {
       Object.assign(this.outerContainer.style, {
@@ -398,7 +396,7 @@ export class ContentPopupContainer {
         top: toPx(top - parentRect.top),
         position: "absolute",
         transform: "none",
-        zIndex,
+        zIndex: 2000
       });
     }
   }
@@ -458,10 +456,6 @@ export class ContentPopupContainer {
     );
   }
 
-  // TODO: pull back the functionality from hypothesis client if needed
-  private findZindex(left, top) {
-    return 10000;
-  }
 
   public getShadowRoot() {
     return this.shadowRoot;

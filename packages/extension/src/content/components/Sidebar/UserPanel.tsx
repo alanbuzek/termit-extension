@@ -30,36 +30,14 @@ const LoginPrompt = () => {
       >
         <Button>Login</Button>
       </a>
-      <p>After you do so, refresh this page to start annotating.</p>
+      <p className="text-base text-gray-500 font-normal">
+        After you do so, refresh this page to start annotating.
+      </p>
       <p>
         Don't have an account?{" "}
         <a href={`http://localhost:3000/#/register`}>Register here</a>.
       </p>
     </div>
-  );
-};
-
-const CogIcon = () => {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      className="h-6 w-6"
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke="currentColor"
-      strokeWidth={2}
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
-      />
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-      />
-    </svg>
   );
 };
 
@@ -82,7 +60,7 @@ export const MenuIcon = () => {
   );
 };
 
-export const UserInfo = ({ user, loading }) => {
+export const UserInfo = ({ user }) => {
   return (
     <div className={`w-full text-base flex items-center justify-between`}>
       <a
@@ -100,10 +78,10 @@ export const UserInfo = ({ user, loading }) => {
   );
 };
 
-const UserPanel = ({ loading = false, user }) => {
+const UserPanel = ({ user }) => {
   return (
     <div className="flex px-3 pt-2 pb-3 items-center mt-2 border-b border-gray-200">
-      {user ? <UserInfo user={user} loading={loading} /> : <LoginPrompt />}
+      {user ? <UserInfo user={user} /> : <LoginPrompt />}
     </div>
   );
 };

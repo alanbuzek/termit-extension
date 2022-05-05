@@ -11,7 +11,7 @@ import { AnnotationType } from "../util/Annotation";
 import getCssSelector from "css-selector-generator";
 import { calculateRangeOffset } from "../../content/marker";
 import JsonLdUtils from "../util/JsonLdUtils";
-import {finder} from '@medv/finder'
+import { finder } from "@medv/finder";
 
 // TODO: move to there when possible
 // import { isAnnotationWithMinimumScore } from "../component/annotator/AnnotationDomHelper";
@@ -152,7 +152,12 @@ export const TermOccurrenceFactory = {
     const generatedCssSelector = getCssSelector(parentElement);
     const secondCssSelector = finder(parentElement as Element);
 
-    console.log('generatedCssSelector: ', generatedCssSelector, ', second: ', secondCssSelector);
+    console.log(
+      "generatedCssSelector: ",
+      generatedCssSelector,
+      ", second: ",
+      secondCssSelector
+    );
     const selectionContent = range.toString();
 
     const termOccurrence = TermOccurrenceFactory.create(
@@ -198,7 +203,12 @@ export const TermOccurrenceFactory = {
       extraTypes,
     } = data;
 
-    console.log('calling create with data: ', data, ', extraTypes: ', extraTypes)
+    console.log(
+      "calling create with data: ",
+      data,
+      ", extraTypes: ",
+      extraTypes
+    );
     const termOccurrenceData: any = {
       id,
       types:
@@ -230,14 +240,15 @@ export const TermOccurrenceFactory = {
     };
 
     if (extraTypes) {
-      console.log('pushed extraTYpes: ', extraTypes)
+      console.log("pushed extraTYpes: ", extraTypes);
       termOccurrenceData.types.push(...extraTypes);
     }
 
     if (
       termOccurrenceData.types.includes(
         VocabularyUtils.SUGGESTED_TERM_OCCURRENCE
-      )
+      ) &&
+      suggestedLemma
     ) {
       termOccurrenceData.suggestedLemma = suggestedLemma;
     }

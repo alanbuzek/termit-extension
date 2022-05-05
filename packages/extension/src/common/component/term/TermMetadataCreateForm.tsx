@@ -19,7 +19,8 @@ import ShowAdvancedAssetFields from "../asset/ShowAdvancedAssetFields";
 import TermScopeNoteEdit from "./TermScopeNoteEdit";
 import ValidationResult from "../../model/form/ValidationResult";
 import CustomInput from "../misc/CustomInput";
-import { loadIdentifier } from '../../../api';
+import { loadIdentifier } from "../../../api";
+import { getPageUrl } from "../../../content/helper/url";
 
 interface TermMetadataCreateFormProps extends HasI18n {
   onChange: (change: object, callback?: () => void) => void;
@@ -130,8 +131,16 @@ export class TermMetadataCreateForm extends React.Component<
     this.props.onChange({ parentTerms });
   };
 
+  public onSourceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const src = e.currentTarget.value;
+    this.props.onChange({ sources: [src] });
+  };
+
   public render() {
     const { termData, i18n, language } = this.props;
+    const source = termData.sources
+      ? Utils.sanitizeArray(termData.sources!).join()
+      : undefined;
     const label = getLocalizedOrDefault(termData.label, "", language);
     const labelValidation = this.props.labelExist[language]
       ? ValidationResult.blocker(
@@ -157,15 +166,6 @@ export class TermMetadataCreateForm extends React.Component<
             />
           </Col>
         </Row>
-        <Row>
-          <Col xs={12}>
-            <StringListEdit
-              list={getLocalizedPlural(termData.altLabels, language)}
-              onChange={this.onAltLabelsChange}
-              i18nPrefix={"term.metadata.altLabels"}
-            />
-          </Col>
-        </Row>
 
         <AttributeSectionContainer label={i18n("term.metadata.definition")}>
           <TermDefinitionBlockEdit
@@ -176,15 +176,38 @@ export class TermMetadataCreateForm extends React.Component<
           />
         </AttributeSectionContainer>
 
-        <AttributeSectionContainer label={""}>
-          <TermScopeNoteEdit
-            term={termData}
-            language={language}
-            onChange={this.props.onChange}
-          />
-        </AttributeSectionContainer>
-
         <ShowAdvancedAssetFields>
+          <Row>
+            <Col xs={12}>
+              <CustomInput
+                name="edit-term-source"
+                value={source}
+                onChange={this.onSourceChange}
+                label={i18n("term.metadata.source")}
+                labelClass="definition"
+                readOnly={false}
+                help={i18n("term.source.help")}
+              />
+            </Col>
+          </Row>
+          <Row>
+            <Col xs={12}>
+              <StringListEdit
+                list={getLocalizedPlural(termData.altLabels, language)}
+                onChange={this.onAltLabelsChange}
+                i18nPrefix={"term.metadata.altLabels"}
+              />
+            </Col>
+          </Row>
+
+          <AttributeSectionContainer label={""}>
+            <TermScopeNoteEdit
+              term={termData}
+              language={language}
+              onChange={this.props.onChange}
+            />
+          </AttributeSectionContainer>
+
           <Row>
             <Col xs={12}>
               <TermTypesEdit
