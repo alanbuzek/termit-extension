@@ -180,6 +180,7 @@ export const ContentActions = {
   },
   async annotateNewWebsite(vocabulary: Vocabulary) {
     contentState.globalLoading = true;
+    internals.updateSidebar();
     internals.activatePage();
 
     contentState.website = await api.createWebsiteInDocument(
