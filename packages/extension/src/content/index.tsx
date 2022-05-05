@@ -19,9 +19,9 @@ import TermOccurrence, {
 import BrowserApi from "../shared/BrowserApi";
 import User from "../common/model/User";
 import Constants from "../common/util/Constants";
-import { markTerm } from "./marker";
 import { overlay } from "./helper/overlay";
 import { getPageUrl } from "./helper/url";
+import { isPagePDFViewer } from "./helper/domHelpers";
 
 // TODO: this should be dynamic when language selection is implemented
 const language = "cs";
@@ -79,9 +79,14 @@ const internals = {
     if (hasBeenPageInited) {
       return;
     }
-    contentState.pageUrl = getPageUrl();
 
     hasBeenPageInited = true;
+    contentState.pageUrl = getPageUrl();
+
+    // we don't support pdf pages yet
+    if (isPagePDFViewer()) {
+      return;
+    }
 
     await resetContentState();
     contentState.user = await api.getUser();
@@ -230,7 +235,6 @@ export const ContentActions = {
       contentState.pageUrl,
       contentState.vocabularies
     );
-
 
     if (!foundExistingWebsite) {
       contentState.globalLoading = false;
