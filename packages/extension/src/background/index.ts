@@ -118,10 +118,6 @@ chrome.action.onClicked.addListener((tab) => {
   chrome.tabs.sendMessage(tab.id, { type: MessageType.OpenToolbar });
 });
 
-// if (SecurityUtils.isLoggedIn()){
-//   api.loadVocabularies(SKIP_CACHE);
-// }
-
 type LoginEventPayload = {
   userData: UserData;
   authToken: string;
@@ -130,3 +126,13 @@ type LoginEventPayload = {
 chrome.runtime.onMessageExternal.addListener(
   (message, sender, sendResponse) => {}
 );
+
+const optionsUrl = chrome.runtime.getURL("options.html");
+
+chrome.tabs.query({ url: optionsUrl }, (tabs) => {
+  if (tabs.length) {
+    chrome.tabs.update(tabs[0].id!, { active: true });
+  } else {
+    chrome.tabs.create({ url: optionsUrl });
+  }
+});

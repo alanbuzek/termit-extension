@@ -39,7 +39,8 @@
     "extension_pages": "script-src 'self'; object-src 'self'"
   },
   "options_ui": {
-    "page": "options.html"
+    "page": "options.html",
+    "open_in_tab": false
   },
   "permissions": ["tabs", "storage"],
   "host_permissions": [
