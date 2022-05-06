@@ -1,7 +1,7 @@
 import { ContentActions, TermsMap } from "..";
 import TermOccurrence from "../../common/model/TermOccurrence";
 import { Annotation } from "../../common/util/Annotation";
-import Mark from "../../markjs";
+import Mark from "mark.js";
 
 const handleElementClick = (annotation) => (event) => {
   event.stopPropagation();
@@ -112,7 +112,7 @@ export const markTerm = (
       },
       element: "termit-h", // termit-highlight element
       diacritcs: false,
-      exclude: ['style', 'script', 'iframe', 'title'],
+      exclude: ["style", "script", "iframe", "title"],
       caseSensitive: true,
       separateWordSearch: false,
       acrossElements: true,
