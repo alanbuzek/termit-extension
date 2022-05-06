@@ -71,9 +71,6 @@ const resetContentState = async () => {
 };
 
 let contentState = {} as ContentState;
-
-// TODO: on some of these actions, sidebar (or event annotator) will need to be updated to show the most up to date data (e.g., rerender the whole tree through reactDOM, roll out redux, or solve in another way, to be determined)
-// TODO: re-evaluate how things are done with respect to annotator, maybe can move all things there instead?
 /**
  * all important global content script calls should be done here
  */
@@ -89,7 +86,7 @@ const internals = {
     hasBeenPageInited = true;
     contentState.pageUrl = getPageUrl();
 
-    // we don't support pdf pages yet
+    // we don't support pdf pages so far
     if (isPagePDFViewer()) {
       return;
     }
@@ -193,7 +190,7 @@ export const ContentActions = {
       contentState.pageUrl,
       VocabularyUtils.create(vocabulary.document!.iri)
     );
-    const textAnalysisResult = await backgroundApi.runTextAnalysis(
+    const textAnalysisResult = await backgroundApi.runPageTextAnalysis(
       vocabulary.iri,
       document.body.outerHTML
     );
@@ -208,6 +205,18 @@ export const ContentActions = {
       textAnalysisResult,
       contentState.website.iri,
       contentState.terms!
+    );
+
+    console.log(
+      "selecteors: ",
+      termOccurrences.forEach((to) => {
+        console.log(
+          to.getCssSelector().value.split("|"),
+          to.getXPathSelector,
+          to.getTextQuoteSelector().exactMatch,
+          to.getTextPositionSelector().start
+        );
+      })
     );
 
     await annotator!.annotatePage(termOccurrences, false);

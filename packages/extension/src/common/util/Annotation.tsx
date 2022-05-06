@@ -100,8 +100,8 @@ export class Annotation {
     }
 
     elementsToFocus.forEach((element) => {
-      element.scrollIntoView({ block: "center", inline: "nearest" });
-      element.classList.add("termit-annotation-focused");
+      element?.scrollIntoView({ block: "center", inline: "nearest" });
+      element?.classList.add("termit-annotation-focused");
     });
     clearTimeout(this.focusTimeout);
     if (focusTime !== AnnotationFocusTime.INFINITE) {

@@ -1,7 +1,7 @@
 import { MessageType } from "../types/messageTypes";
 import browserApi from "./BrowserApi";
 
-const runTextAnalysis = async (vocabulary: string, pageHtml: string) => {
+const runPageTextAnalysis = async (vocabulary: string, pageHtml: string) => {
   const { termOccurrencesSelectors } = (await browserApi.sendMessage({
     type: MessageType.RunPageTextAnalysis,
     payload: {
@@ -13,5 +13,5 @@ const runTextAnalysis = async (vocabulary: string, pageHtml: string) => {
 };
 
 export default {
-  runTextAnalysis,
+  runPageTextAnalysis,
 };

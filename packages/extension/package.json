@@ -30,6 +30,7 @@
     "jsonld": "^5.2.0",
     "lodash": "^4.17.21",
     "mark.js": "https://github.com/alanbuzek/mark.js",
+    "optimal-select": "^4.0.1",
     "postcss-flexbugs-fixes": "^4.2.1",
     "preact": "^10.6.5",
     "prettier": "^2.3.1",

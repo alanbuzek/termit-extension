@@ -2,24 +2,12 @@ import { ContentActions, TermsMap } from "..";
 import TermOccurrence from "../../common/model/TermOccurrence";
 import { Annotation } from "../../common/util/Annotation";
 import Mark from "mark.js";
+import { nodeFromXPath, xpathFromNode } from "../helper/xpath";
 
 const handleElementClick = (annotation) => (event) => {
   event.stopPropagation();
   event.preventDefault();
   ContentActions.showPopup(annotation);
-};
-
-const results = {
-  highlights: {
-    failures: 0,
-    successes: 0,
-    overselectedFailures: 0,
-  },
-  selectors: {
-    successes: 0,
-    failures: 0,
-    overselectedFailures: 0,
-  },
 };
 
 export const unmarkTerm = (element: HTMLElement) => {
@@ -36,6 +24,34 @@ export const unmarkTerm = (element: HTMLElement) => {
 
 const markJsInstancesCache = {};
 
+const selectAnnotationContainer = (termOccurrence: TermOccurrence) => {
+  const cssSelector = termOccurrence.getCssSelector().value;
+  const xPathSelector = termOccurrence.getXPathSelector()?.value;
+
+  const cachedResult =
+    markJsInstancesCache[cssSelector] || markJsInstancesCache[xPathSelector];
+
+  if (cachedResult && cachedResult.element.isConnected) {
+    return cachedResult.element;
+  }
+
+  // not found in cache
+  const cssSelectors = termOccurrence.getCssSelector().value.split("|");
+
+  for (let selector of cssSelectors) {
+    const selectedElements = Array.from(document.querySelectorAll(selector));
+    if (selectedElements.length === 1) {
+      console.log("found element with selector: ", selector);
+      return selectedElements[0];
+    }
+    console.log("NOT found element with selector: ", selector);
+  }
+
+  if (xPathSelector) {
+    return nodeFromXPath(xPathSelector);
+  }
+};
+
 export const markTerm = (
   termOccurrence: TermOccurrence,
   termsMap
@@ -44,41 +60,21 @@ export const markTerm = (
   const term = termOccurrence.term?.iri && termsMap[termOccurrence.term.iri];
 
   return new Promise((resolve) => {
-    let markInstance = markJsInstancesCache[cssSelector.value]?.markInstance;
-    let selectedElement =
-      markJsInstancesCache[cssSelector.value]?.selectedElement;
+    const selectedElement = selectAnnotationContainer(termOccurrence);
 
-    // element may no longer exists within the dom (e.g., navigated to a different page and then back) -> don't use cache
-    const isConnectedToDom = (selectedElement as Node)?.isConnected;
-
-    if (!markInstance || !isConnectedToDom) {
-      const selectedElements = Array.from(
-        document.querySelectorAll(cssSelector.value)
-      );
-
-      if (selectedElements.length === 1) {
-        results.selectors.successes += 1;
-      } else {
-        console.error(
-          `Failure: Selector "${cssSelector.value}" selected ${selectedElements.length} elements instead of 1!`
-        );
-        resolve(new Annotation(termOccurrence, null, term));
-        return;
-      }
-      selectedElement = selectedElements[0];
-      markInstance = new Mark(selectedElement);
-      markJsInstancesCache[cssSelector.value] = {
-        markInstance,
-        selectedElement,
-      };
-    } else {
-      console.log("using cache: ", markInstance, selectedElement);
+    if (!selectedElement) {
+      console.log("Couldn't select element");
+      resolve(new Annotation(termOccurrence, null, term));
+      return;
     }
+
+    const markJs = new Mark(selectedElement);
 
     const annotation = new Annotation(termOccurrence, selectedElement, term);
     const textPositionSelector = termOccurrence.getTextPositionSelector();
     const textQuoteSelector = termOccurrence.getTextQuoteSelector();
-    markInstance.mark(textQuoteSelector.exactMatch, {
+
+    markJs.mark(textQuoteSelector.exactMatch, {
       // NOTE: partially is safer, as we may not have an exhaustive list of limiters, and since we know the exact position
       // of the word, there's no reason not to use it (even though it might not be used very often)
       accuracy: "partially",

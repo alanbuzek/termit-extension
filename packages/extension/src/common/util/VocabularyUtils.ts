@@ -99,6 +99,7 @@ const VocabularyUtils = {
   TEXT_QUOTE_SELECTOR: _NS_TERMIT + "selektor-text-quote",
   TEXT_POSITION_SELECTOR: _NS_TERMIT + "selektor-pozici-v-textu",
   CSS_SELECTOR: _NS_TERMIT + "selektor-css",
+  XPATH_SELECTOR: _NS_TERMIT + "selektor-xpath",
   HAS_DEFINITION_SOURCE: _NS_TERMIT + "m\u00e1-zdroj-definice-termu",
   HAS_SUGGESTED_LEMMA: _NS_TERMIT  + "má-navrhované-lemma",
   HAS_FILE: _NS_POPIS_DAT + "má-soubor",

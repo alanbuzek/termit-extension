@@ -8,10 +8,10 @@ import Utils from "../util/Utils";
 import VocabularyUtils from "../util/VocabularyUtils";
 import { TermsMap } from "../../content";
 import { AnnotationType } from "../util/Annotation";
-import getCssSelector from "css-selector-generator";
 import { calculateRangeOffset } from "../../content/marker";
 import JsonLdUtils from "../util/JsonLdUtils";
-import { finder } from "@medv/finder";
+import { generateNewCssSelector } from "../../content/helper/selectors";
+import { xpathFromNode } from "../../content/helper/xpath";
 
 // TODO: move to there when possible
 // import { isAnnotationWithMinimumScore } from "../component/annotator/AnnotationDomHelper";
@@ -44,6 +44,10 @@ const cssSelectorCtx = {
   value: VocabularyUtils.RDF_VALUE,
 };
 
+const xpathSelectorCtx = {
+  value: VocabularyUtils.RDF_VALUE,
+};
+
 /**
  * Context of the assignment itself, without term or resource context.
  */
@@ -62,7 +66,6 @@ export const CONTEXT = Object.assign(
   textPositionSelectorCtx,
   cssSelectorCtx
 );
-
 
 export interface Selector {
   iri?: string;
@@ -84,6 +87,10 @@ export interface CssSelector extends Selector {
   value: string;
 }
 
+export interface XPathSelector extends Selector {
+  value: string;
+}
+
 export interface OccurrenceTarget extends Target {
   selectors: Selector[];
   iri?: string;
@@ -102,30 +109,66 @@ export const TermOccurrenceFactory = {
     websiteIri: string,
     termsMap: TermsMap
   ): TermOccurrence[] {
-    return results
-      .map(({ cssSelectors, termOccurrences: termOccurrencesRecords }) => {
-        return termOccurrencesRecords
-          .filter((textAnalysisRecord) =>
-            isAnnotationWithMinimumScore(
-              textAnalysisRecord.score,
-              ANNOTATION_MINIMUM_SCORE_THRESHOLD
+    return (
+      results
+        .map(({ cssSelectors, termOccurrences: termOccurrencesRecords }) => {
+          let foundElement: Element | null = null;
+
+          const elements = Array.from(document.querySelectorAll(cssSelectors[0]));
+          if (elements.length === 1) {
+            foundElement = elements[0];
+          }
+
+          return { cssSelectors, termOccurrencesRecords, foundElement };
+        })
+        // just drop all occurrences that have not been initially found on page
+        .filter((res) => {
+          if (!res.foundElement) {
+            console.warn(
+              `Lost ${res.termOccurrencesRecords.length} annotations in initial selection`
+            );
+          }
+
+          return !!res.foundElement;
+        })
+        .map(({ termOccurrencesRecords, cssSelectors, foundElement }) => {
+          // selector from back-end was successful -> add more to make really robust
+
+          const genereratedCssSelectors = generateNewCssSelector(foundElement!);
+          const xPathSelector = xpathFromNode(foundElement, document.body);
+
+          return {
+            termOccurrencesRecords,
+            selectors: {
+              xPathSelector,
+              cssSelector: [cssSelectors[0], genereratedCssSelectors].join("|"), // join into 1 string to later parse
+            },
+          };
+        })
+        .map(({ selectors, termOccurrencesRecords }) => {
+          return termOccurrencesRecords
+            .filter((textAnalysisRecord) =>
+              isAnnotationWithMinimumScore(
+                textAnalysisRecord.score,
+                ANNOTATION_MINIMUM_SCORE_THRESHOLD
+              )
             )
-          )
-          .map((textAnalysisRecord) =>
-            this.mapTextAnalysisRecord(
-              textAnalysisRecord,
-              cssSelectors,
-              websiteIri,
-              [VocabularyUtils.SUGGESTED_TERM_OCCURRENCE]
+            .map((textAnalysisRecord) =>
+              this.mapTextAnalysisRecord(
+                textAnalysisRecord,
+                selectors,
+                websiteIri,
+                [VocabularyUtils.SUGGESTED_TERM_OCCURRENCE]
+              )
             )
-          )
-          .map((data) => this.create(data, termsMap));
-      })
-      .flat();
+            .map((data) => this.create(data, termsMap));
+        })
+        .flat()
+    );
   },
   mapTextAnalysisRecord(
     textAnalysisRecord,
-    cssSelectors,
+    selectors,
     websiteIri,
     extraTypes: string[] = []
   ) {
@@ -139,7 +182,11 @@ export const TermOccurrenceFactory = {
         : "",
       suggestedLemma: content,
       originalText: originalTerm,
-      cssSelector: { startOffset, cssSelector: cssSelectors[0] },
+      selectors: {
+        startOffset,
+        cssSelector: selectors.cssSelector,
+        xPathSelector: selectors.xPathSelector,
+      },
       annotationType: AnnotationType.OCCURRENCE,
       sourceIri: websiteIri,
       extraTypes,
@@ -152,23 +199,16 @@ export const TermOccurrenceFactory = {
     termsMap: TermsMap | null
   ) {
     const { offset, parentElement } = calculateRangeOffset(range);
-    const generatedCssSelector = getCssSelector(parentElement);
-    const secondCssSelector = finder(parentElement as Element);
-
-    console.log(
-      "generatedCssSelector: ",
-      generatedCssSelector,
-      ", second: ",
-      secondCssSelector
-    );
+    const cssSelector = generateNewCssSelector(parentElement as Element);
+    const xPathSelector = xpathFromNode(parentElement, document.body);
     const selectionContent = range.toString();
-
     const termOccurrence = TermOccurrenceFactory.create(
       {
         annotationType,
-        cssSelector: {
-          cssSelector: secondCssSelector,
+        selectors: {
+          cssSelector,
           startOffset: offset,
+          xPathSelector,
         },
         id: JsonLdUtils.generateBlankNodeId(),
         originalText: selectionContent,
@@ -185,9 +225,10 @@ export const TermOccurrenceFactory = {
       termIri?: string;
       suggestedLemma?: string;
       originalText: string;
-      cssSelector: {
+      selectors: {
         startOffset: number;
         cssSelector: string;
+        xPathSelector: string;
       };
       annotationType: string;
       sourceIri: string;
@@ -200,20 +241,19 @@ export const TermOccurrenceFactory = {
       termIri,
       suggestedLemma,
       originalText,
-      cssSelector: { startOffset, cssSelector },
+      selectors: { startOffset, cssSelector, xPathSelector },
       annotationType,
       sourceIri,
       extraTypes,
     } = data;
 
-   
     const termOccurrenceData: any = {
       id,
       types:
         annotationType === AnnotationType.DEFINITION
           ? [VocabularyUtils.TERM_DEFINITION_SOURCE]
           : [VocabularyUtils.WEBSITE_TERM_OCCURRENCE],
-      term: (termIri && termsMap[termIri]) ? termsMap[termIri] : undefined,
+      term: termIri && termsMap[termIri] ? termsMap[termIri] : undefined,
       target: {
         types: [VocabularyUtils.HAS_WEBSITE_OCCURRENCE_TARGET],
         selectors: [
@@ -229,6 +269,10 @@ export const TermOccurrenceFactory = {
           {
             types: [VocabularyUtils.CSS_SELECTOR],
             value: cssSelector,
+          },
+          {
+            types: [VocabularyUtils.XPATH_SELECTOR],
+            value: xPathSelector,
           },
         ],
         source: {
@@ -311,6 +355,12 @@ export default class TermOccurrence extends TermAssignment {
     return this.target.selectors.find((selector) =>
       selector.types.includes(VocabularyUtils.TEXT_POSITION_SELECTOR)
     ) as TextPositionSelector;
+  }
+
+  public getXPathSelector() {
+    return this.target.selectors.find((selector) =>
+      selector.types.includes(VocabularyUtils.XPATH_SELECTOR)
+    ) as XPathSelector;
   }
 
   public getTextContent() {

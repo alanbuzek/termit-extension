@@ -70,24 +70,6 @@ export function loadAllTerms(
     });
 }
 
-export function runPageAnnotationAnalysis(
-  vocabulary: string,
-  pageHtml: string
-) {
-  return annotaceApi.post(
-    "/annotate-to-occurrences",
-    content({
-      content: pageHtml,
-      // vocabularyRepository: vocabulary,
-      vocabularyContexts: [],
-      language: "cs",
-    })
-      .param("enableKeywordExtraction", "true")
-      .accept(Constants.JSON_MIME_TYPE)
-      .contentType(Constants.JSON_MIME_TYPE)
-  );
-}
-
 export async function savePageAnnotationResults(
   termOccurrences: TermOccurrence[],
   website: Website,
@@ -385,6 +367,7 @@ export async function saveTermOccurrences(
     const payload: any = {
       exactMatch: termOccurrence.getTextQuoteSelector().exactMatch,
       cssSelector: termOccurrence.getCssSelector().value,
+      xPathSelector: termOccurrence.getXPathSelector().value,
       start: termOccurrence.getTextPositionSelector().start,
       extraTypes: [occurrenceType],
       id: termOccurrence.id,
@@ -396,7 +379,7 @@ export async function saveTermOccurrences(
       payload.termFragment = termIRI.fragment;
     }
 
-    if (termOccurrence.isSuggested() && termOccurrence.suggestedLemma){
+    if (termOccurrence.isSuggested() && termOccurrence.suggestedLemma) {
       payload.suggestedLemma = termOccurrence.suggestedLemma;
     }
 
@@ -408,8 +391,6 @@ export async function saveTermOccurrences(
       `/occurrence`,
       content(contentBody)
         .params(paramsPayload)
-        // TODO: add back in, maybe not?
-        // .content(termOccurrence.toJsonLd())
         .contentType(Constants.JSON_MIME_TYPE)
     )
     .then((termOccurrencesResult) => {
@@ -462,7 +443,6 @@ export async function getUser() {
 
 export default {
   loadVocabularies,
-  runPageAnnotationAnalysis,
   loadAllTerms,
   getLabel,
   saveTermOccurrences,

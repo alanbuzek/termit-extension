@@ -60,7 +60,7 @@ export const occurrenceTypes = [
     name: "occurrence.suggested.new.term",
   },
   {
-    value: "assigned-term-occurrence suggested-term-occurrence",
+    value: "assigned-term-occurrence proposed-occurrence",
     name: "occurrence.suggested.existing.term",
   },
 ];

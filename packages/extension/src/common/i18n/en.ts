@@ -698,7 +698,7 @@ const en = {
     "extension.about": "About",
     "extension.annotate.page": "Annotate Page",
     "extension.annotated.with": "Page annotated with: ",
-    "extension.annotated.notfound": "annotations weren't found",
+    "extension.annotated.notfound": "Not found annotations",
     "extension.notfound.annotations": "Not found annotations:",
     "extension.found.annotations": "annotations found",
     "extension.page.annotations": "Page annotations:",
