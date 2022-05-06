@@ -95,8 +95,8 @@ export const TermDefinitionAnnotation: React.FC<TermDefinitionAnnotationProps> =
         )}
         title={
           editing
-            ? "Přiřaďte pojem k definici"
-            : i18n("annotation.definition.title")
+            ? i18n("extension.definition.prompt")
+            : i18n("extension.assigned.definition")
         }
       />
     );

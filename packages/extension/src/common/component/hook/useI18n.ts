@@ -1,29 +1,13 @@
 import { useCallback } from "react";
-import { FormatDateOptions, useIntl } from "react-intl";
-
-interface HasI18n {
-  i18n(id?: string): string;
-
-  formatMessage(msgId: string, values: {} | undefined): string;
-
-  formatDate(
-    value: string | number | Date,
-    options?: FormatDateOptions
-  ): string;
-  
-  formatTime(
-    value: string | number | Date,
-    options?: FormatDateOptions
-  ): string;
-
-  locale: string;
-}
+import { useIntl } from "react-intl";
+import { HasI18n } from "../hoc/withI18n";
 
 /**
  * React Hook providing basic i18n functions.
  */
 export function useI18n(): HasI18n {
   const intl = useIntl();
+
   const i18n = useCallback(
     (msgId: string) => (intl.messages[msgId] as string) || "{" + msgId + "}",
     [intl]
@@ -39,5 +23,6 @@ export function useI18n(): HasI18n {
     formatDate: intl.formatDate,
     formatTime: intl.formatTime,
     locale: intl.locale,
+    intl,
   };
 }

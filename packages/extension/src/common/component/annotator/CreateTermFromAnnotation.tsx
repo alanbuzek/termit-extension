@@ -12,6 +12,7 @@ import { ContentState } from "../../../content";
 import { Annotation } from "../../util/Annotation";
 import TermOccurrence from "../../model/TermOccurrence";
 import { getPageUrl } from "../../../content/helper/url";
+import { useI18n } from "../hook/useI18n";
 
 interface CreateTermFromAnnotationProps {
   onClose: () => void;
@@ -22,6 +23,8 @@ interface CreateTermFromAnnotationProps {
   createTerm: (term: Term) => Promise<any>;
   definitionAnnotation?: Annotation;
   termOccurrence: TermOccurrence;
+  i18n: any;
+  intl: any;
 }
 
 interface CreateTermFromAnnotationState extends TermData {
@@ -98,7 +101,7 @@ export class CreateTermFromAnnotation extends React.Component<
   };
 
   public render() {
-    const i18n = this.props.i18n;
+    const { i18n, intl } = this.props;
     const invalid = !isTermValid(this.state, this.state.labelExists);
 
     return (
@@ -107,7 +110,9 @@ export class CreateTermFromAnnotation extends React.Component<
           className="modal-header"
           style={{ paddingTop: 1, paddingRight: 0, paddingLeft: 0 }}
         >
-          <h3 className="text-lg font-semibold my-2">Vytvořit nový pojem</h3>
+          <h3 className="text-lg font-semibold my-2">
+            {i18n("glossary.form.header")}
+          </h3>
         </div>
         <div>
           <TermMetadataCreateForm
@@ -120,7 +125,8 @@ export class CreateTermFromAnnotation extends React.Component<
               this.props.vocabularyIri.fragment
             }
             labelExist={this.state.labelExists}
-            definitionAnnotation={this.props.definitionAnnotation}
+            i18n={i18n}
+            intl={intl}
           />
           <Row>
             <Col xs={12}>
@@ -132,8 +138,7 @@ export class CreateTermFromAnnotation extends React.Component<
                   disabled={invalid}
                   size="sm"
                 >
-                  Vytvořit
-                  {/* {i18n("glossary.form.button.submit")} */}
+                  {i18n("glossary.form.button.submit")}
                 </Button>
                 <Button
                   id="create-term-cancel"
@@ -141,8 +146,7 @@ export class CreateTermFromAnnotation extends React.Component<
                   size="sm"
                   onClick={this.onCancel}
                 >
-                  Zrušit
-                  {/* {i18n("glossary.form.button.cancel")} */}
+                  {i18n("glossary.form.button.cancel")}
                 </Button>
               </ButtonToolbar>
             </Col>
@@ -153,4 +157,4 @@ export class CreateTermFromAnnotation extends React.Component<
   }
 }
 
-export default injectIntl(withI18n(CreateTermFromAnnotation)) as any;
+export default CreateTermFromAnnotation;

@@ -7,6 +7,7 @@ import { FaBook, FaHighlighter } from "react-icons/fa";
 import { IntelligentTreeSelect } from "intelligent-tree-select";
 import { overlay } from "../../helper/overlay";
 import VocabularyEditDropdown from "../dropdown/VocabularyEditDropdown";
+import { useI18n } from "../../../common/component/hook/useI18n";
 
 const SidebarControlPanel = ({
   annotations,
@@ -24,7 +25,7 @@ const SidebarControlPanel = ({
   handleDeleteSuggestions: () => void;
 }) => {
   const [selectedVocabulary, setSelectedVocabulary] = useState<Vocabulary>();
-
+  const { i18n } = useI18n();
   const handlePageDeleteClick = () => {
     handlePageDelete();
   };
@@ -37,7 +38,7 @@ const SidebarControlPanel = ({
           className="w-36 mb-4 mt-5 mx-auto"
         />
         <p className="font-semibold text-lg text-center">
-          Choose a vocabulary to start annotating with.
+          {i18n("extension.choose.vocabulary")}
         </p>
         <IntelligentTreeSelect
           onChange={(value) => {
@@ -84,7 +85,7 @@ const SidebarControlPanel = ({
           }}
           size="big"
         >
-          Annotate Page
+          {i18n("extension.annotate.page")}
           <FaHighlighter className="ml-2 text-lg" />
         </Button>
       </div>
@@ -96,7 +97,8 @@ const SidebarControlPanel = ({
       <div className="flex justify-between items-end">
         <div>
           <div className="text-gray-600 text-base mb-2">
-            Page annotated with:
+            
+            {i18n("extension.annotated.with")}
           </div>
           <div className="flex text-xl font-semibold text-gray-700 items-center">
             <FaBook id={"props.id"} className={"block mr-2"} />
@@ -111,7 +113,6 @@ const SidebarControlPanel = ({
           />
         </div>
       </div>
-
     </div>
   );
 };

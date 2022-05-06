@@ -138,7 +138,9 @@ export const TermOccurrenceAnnotation: React.FC<TermOccurrenceAnnotationProps> =
           () => setEditing(!editing)
         )}
         title={
-          editing ? i18n("annotation.occurrence.title") : "Přiřazený pojem"
+          editing
+            ? i18n("extension.assign.prompt")
+            : i18n("extension.assigned.term")
         }
       />
     );

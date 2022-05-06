@@ -5,12 +5,15 @@ import DropdownContainer from "./DropdownContainer";
 import DropdownButton from "./DropdownButton";
 import { GoPencil } from "react-icons/go";
 import VocabularyUtils from "../../../common/util/VocabularyUtils";
+import { useI18n } from "../../../common/component/hook/useI18n";
 
 const VocabularyEditDropdown = ({
   handleDeleteSuggestedAnnotations,
   handleDeleteAllAnnotations,
   vocabulary,
 }) => {
+  const { i18n } = useI18n();
+
   const { dropdownRef, isOpen, handleMenuClick, handleItemClick } = useDropdown(
     (id) => {
       if (id === "delete-suggestions") {
@@ -18,26 +21,30 @@ const VocabularyEditDropdown = ({
       } else if (id === "delete-all") {
         handleDeleteAllAnnotations();
       } else {
-        throw new Error("Uknown action!");
+        throw new Error("Unknown action!");
       }
     }
   );
 
   const options = [
     {
-      name: <span>See&nbsp;vocabulary&nbsp;in&nbsp;TermIt</span>,
+      name: i18n("sidebar.vocabulary.link"),
       link: `http://localhost:3000/#/vocabularies/${
         VocabularyUtils.create(vocabulary.iri).fragment
       }`,
     },
     {
-      name: <span className="text-red-600">Delete&nbsp;suggestions</span>,
+      name: (
+        <span className="text-red-600">
+          {i18n("occurrence.delete.suggestions")}
+        </span>
+      ),
       id: "delete-suggestions",
     },
     {
       name: (
         <span className="text-red-600 font-semibold">
-          Delete&nbsp;all&nbsp;annotations
+          {i18n("occurrence.delete.all")}
         </span>
       ),
       id: "delete-all",

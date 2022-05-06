@@ -1,6 +1,7 @@
 import React from "react";
 import { IntelligentTreeSelect } from "intelligent-tree-select";
 import { Input } from "reactstrap";
+import { useI18n } from "../../../common/component/hook/useI18n";
 
 export const DropdownComponent = ({
   id,
@@ -40,29 +41,28 @@ export const DropdownComponent = ({
 export const occurrenceTypes = [
   {
     value: "suggested-term-occurrence selected-occurrence",
-    name: "Unknown term",
+    name: "occurrence.unknown.term",
   },
   {
     value: "assigned-term-occurrence selected-occurrence",
-    name: "Existing term",
+    name: "occurrence.existing.term",
   },
   {
     value: "term-definition selected-occurrence",
-    name: "Term definition",
+    name: "occurrence.known.definition",
   },
   {
     value: "pending-term-definition selected-occurrence",
-    name: "Unknown term defintion",
+    name: "occurrence.unknown.definition",
   },
   {
     value: "suggested-term-occurrence proposed-occurrence",
-    name: "Proposed new term",
+    name: "occurrence.suggested.new.term",
   },
-  // TODO: put back in
-  // {
-  //   value: "assigned-term-occurrence suggested-term-occurrence",
-  //   name: "Proposed existing term",
-  // },
+  {
+    value: "assigned-term-occurrence suggested-term-occurrence",
+    name: "occurrence.suggested.existing.term",
+  },
 ];
 
 const FiltersPanel = ({
@@ -72,6 +72,8 @@ const FiltersPanel = ({
   setOccurrenceTextFilter,
   annotationsCount,
 }) => {
+  const { i18n } = useI18n();
+
   return (
     <>
       <div className="flex px-2.5">
@@ -80,7 +82,7 @@ const FiltersPanel = ({
           value={occurrenceTextFilter}
           onChange={(e) => setOccurrenceTextFilter(e.target.value)}
           bsSize="sm"
-          placeholder={"Filter by text"}
+          placeholder={i18n("extension.occurrences.filter.placeholder")}
           className="flex-1"
         />
         <div style={{ flex: 2 }}>
@@ -96,13 +98,12 @@ const FiltersPanel = ({
             options={occurrenceTypes}
             valueKey="value"
             optionRenderer={({ option, selectValue }) => {
-              console.log("option className: ", option.value);
               return (
                 <div
                   className={`${option.value} py-0.5 px-2 cursor-pointer`}
                   onClick={() => selectValue(option)}
                 >
-                  {option.name}
+                  {i18n(option.name)}
                 </div>
               );
             }}
@@ -112,15 +113,15 @@ const FiltersPanel = ({
             displayInfoOnHover={false}
             expanded={true}
             renderAsTree={false}
-            placeholder="All occurrences"
+            placeholder={i18n("extension.occurrences.all")}
             valueRenderer={(option) => {
-              return option.name;
+              return i18n(option.name);
             }}
           />
         </div>
       </div>
       <div className="text-gray-600 text-sm px-3 mt-2 mb-1">
-        {annotationsCount} annotations found.
+        {annotationsCount} {i18n("extension.found.annotations")}.
       </div>
     </>
   );

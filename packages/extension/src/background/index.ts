@@ -32,6 +32,7 @@ export function runPageAnnotationAnalysis(
 export enum ExtensionMessage {
   LoginEvent,
   LogoutEvent,
+  ConfigurationLoadedEvent,
 }
 
 // handles request from content scripts
@@ -54,9 +55,9 @@ function handleMessages(message, sender, sendResponse) {
     // TODO: why not just call it directly from content script?
     case MessageType.RunPageTextAnalysis: {
       runPageAnnotationAnalysis(
-          message.payload.vocabulary,
-          message.payload.pageHtml
-        )
+        message.payload.vocabulary,
+        message.payload.pageHtml
+      )
         .then((res) => {
           sendResponse({ data: res });
         })
@@ -86,7 +87,19 @@ async function handleExternalMessages(message, sender, sendResponse) {
     }
     case ExtensionMessage.LogoutEvent: {
       SecurityUtils.clearToken();
-      BrowserApi.storage.remove(Constants.STORAGE.USER);
+      await BrowserApi.storage.remove(Constants.STORAGE.USER);
+      sendResponse({ success: true });
+      break;
+    }
+    case ExtensionMessage.ConfigurationLoadedEvent: {
+      const { language, locale } = message.payload;
+      if (language) {
+        await BrowserApi.storage.set(Constants.STORAGE.LANGUAGE, language);
+      }
+      if (locale) {
+        await BrowserApi.storage.set(Constants.STORAGE.LOCALE, locale);
+      }
+      sendResponse({ success: true });
       break;
     }
     default: {

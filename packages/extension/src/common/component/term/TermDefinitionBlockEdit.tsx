@@ -22,16 +22,19 @@ export const TermDefinitionBlockEdit: React.FC<TermDefinitionBlockEditProps> = (
   props
 ) => {
   const { term, language, getValidationResults, onChange, readOnly } = props;
-  const { i18n, locale } = useI18n();
+  const {
+    i18n,
+    // locale
+  } = useI18n();
   const onDefinitionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.currentTarget.value;
     const change = {};
     change[language] = value;
     onChange({ definition: Object.assign({}, term.definition, change) });
   };
-  const validationDefinition = getValidationResults!(
-    VocabularyUtils.DEFINITION
-  );
+  // const validationDefinition = getValidationResults!(
+  //   VocabularyUtils.DEFINITION
+  // );
 
   return (
     <>
@@ -57,9 +60,9 @@ export const TermDefinitionBlockEdit: React.FC<TermDefinitionBlockEditProps> = (
             name="edit-term-definition"
             value={getLocalizedOrDefault(term.definition, "", language)}
             readOnly={readOnly}
-            validation={validationDefinition.map((v) =>
-              FormValidationResult.fromOntoValidationResult(v, locale)
-            )}
+            // validation={validationDefinition.map((v) =>
+            //   FormValidationResult.fromOntoValidationResult(v, locale)
+            // )}
             onChange={onDefinitionChange}
             rows={4}
             help={i18n("term.definition.help")}

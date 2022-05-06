@@ -1,8 +1,8 @@
 import Term, { TermData, TermInfo } from "../../model/Term";
-import Utils from '../../util/Utils';
-import IntlUtil from '../../util/IntlUtil';
-import { getLocalized } from '../../model/MultilingualString';
-import { HasI18n } from '../hoc/withI18n';
+import Utils from "../../util/Utils";
+import IntlUtil from "../../util/IntlUtil";
+import { getLocalized } from "../../model/MultilingualString";
+import { HasI18n } from "../hoc/withI18n";
 
 /**
  * Common properties for a tree selector containing terms
@@ -71,9 +71,7 @@ function vocabularyMatches(
   term: Term | TermInfo,
   vocabularies: string[] | undefined
 ) {
-  // TODO: put this back when data stops being hardcoded
-  return true;
-  // return !vocabularies || vocabularies.indexOf(term.vocabulary!.iri!) !== -1;
+  return !vocabularies || vocabularies.indexOf(term.vocabulary!.iri!) !== -1;
 }
 
 /**

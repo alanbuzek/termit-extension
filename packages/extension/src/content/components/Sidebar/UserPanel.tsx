@@ -1,5 +1,6 @@
 import React from "react";
 import { Button } from "reactstrap";
+import { useI18n } from "../../../common/component/hook/useI18n";
 import UserDropdown from "../dropdown/UserDropdown";
 
 const UserIcon = () => {
@@ -20,22 +21,26 @@ const UserIcon = () => {
 };
 
 const LoginPrompt = () => {
+  const { i18n } = useI18n();
   return (
     <div>
-      <p className="font-semibold">You need to login start using TermIt.</p>
+      <p className="font-semibold">{i18n("extension.login.prompt")}</p>
       <a
         href={`http://localhost:3000/#/login`}
         target="_blank"
         className="mx-auto block my-2"
       >
-        <Button>Login</Button>
+        <Button>{i18n("login.title")}</Button>
       </a>
       <p className="text-base text-gray-500 font-normal">
-        After you do so, refresh this page to start annotating.
+        {i18n("extension.login.description")}
       </p>
       <p>
-        Don't have an account?{" "}
-        <a href={`http://localhost:3000/#/register`}>Register here</a>.
+        {i18n("extension.login.noaccount")}{" "}
+        <a href={`http://localhost:3000/#/register`}>
+          {i18n("extension.login.registerhere")}
+        </a>
+        .
       </p>
     </div>
   );

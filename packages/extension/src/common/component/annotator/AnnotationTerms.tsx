@@ -15,7 +15,6 @@ import {
   createTermValueRenderer,
 } from "../misc/treeselect/Renderers";
 import { HasI18n } from "../hoc/withI18n";
-import { useI18n } from "../hook/useI18n";
 import { TermsMap } from "../../../content";
 import Button from "../../../content/components/Button";
 
@@ -113,7 +112,7 @@ export class AnnotationTerms extends React.Component<AnnotationTermsProps> {
                 this.props.vocabulary!.iri
               )}
               {...commonTermTreeSelectProps(this.props)}
-              placeholder="Select term to assign"
+              placeholder={i18n("terms.select.assignment.placeholder")}
             />
           </div>
           {this.props.canCreateTerm && (

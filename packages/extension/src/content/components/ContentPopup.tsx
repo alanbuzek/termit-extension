@@ -15,6 +15,7 @@ import { overlay } from "../helper/overlay";
 import { ContentState, ContentActions } from "..";
 import Term from "../../common/model/Term";
 import VocabularyUtils from "../../common/util/VocabularyUtils";
+import { useI18n } from "../../common/component/hook/useI18n";
 
 /**
  * Union of possible toolbar commands.
@@ -43,7 +44,6 @@ type ContentPopupProps = {
 };
 
 function ContentPopup({
-  isVisible,
   initialPopupType,
   showAt,
   hide,
@@ -61,6 +61,7 @@ function ContentPopup({
     hide();
   };
   const vocabularyIri = VocabularyUtils.create(contentState.vocabulary!.iri);
+  const { i18n, intl } = useI18n();
 
   const renderContentPopup = () => {
     switch (currPopup) {
@@ -68,6 +69,8 @@ function ContentPopup({
         // 4. create term annotation
         return (
           <CreateTermFromAnnotation
+            intl={intl}
+            i18n={i18n}
             onClose={() => {
               closePopup();
               overlay.off();
@@ -77,10 +80,6 @@ function ContentPopup({
               overlay.off();
               onSelectDefinition((definitionAnnotation: Annotation) => {
                 overlay.on();
-                console.log(
-                  "in callback definitionAnnotation: ",
-                  definitionAnnotation
-                );
                 setIsMinimized(false);
                 setDefinitionAnnotation(definitionAnnotation);
               });
@@ -96,8 +95,6 @@ function ContentPopup({
                 definitionAnnotation
               );
             }}
-            // i18n={() => ""}
-            // locale="cs-CZ"
             language={"cs"}
             contentState={contentState}
             definitionAnnotation={definitionAnnotation}

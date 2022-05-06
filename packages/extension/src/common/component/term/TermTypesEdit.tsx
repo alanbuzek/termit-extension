@@ -1,7 +1,4 @@
 import * as React from "react";
-import { injectIntl } from "react-intl";
-import withI18n, { HasI18n } from "../hoc/withI18n";
-// @ts-ignore
 import { IntelligentTreeSelect } from "intelligent-tree-select";
 import "intelligent-tree-select/lib/styles.css";
 import Term, { TermData } from "../../model/Term";
@@ -14,11 +11,12 @@ import _ from "lodash";
 import api from "../../../api";
 import HelpIcon from "../misc/HelpIcon";
 
-interface TermTypesEditProps extends HasI18n {
+interface TermTypesEditProps {
   termTypes: string[];
   onChange: (types: string[]) => void;
   validationMessage?: string | JSX.Element;
   intl: IntlData;
+  i18n: any;
 }
 
 const getTypesForSelector = _.memoize(
@@ -34,7 +32,6 @@ const getTypesForSelector = _.memoize(
     const types = Object.keys(typesMap).map((k) => typesMap[k]);
     types.forEach((t) => {
       if (t.subTerms) {
-
         // The tree-select needs parent for proper function
         // @ts-ignore
         t.subTerms.forEach((st) => {
@@ -117,4 +114,4 @@ export class TermTypesEdit extends React.Component<TermTypesEditProps> {
   }
 }
 
-export default injectIntl(withI18n(TermTypesEdit)) as any;
+export default TermTypesEdit;

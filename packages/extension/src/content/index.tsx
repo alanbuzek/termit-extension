@@ -46,6 +46,8 @@ export type ContentState = {
   extensionActive: boolean;
   globalLoading: boolean;
   pageUrl: string;
+  language: string;
+  locale: string;
 };
 
 const resetContentState = async () => {
@@ -62,6 +64,10 @@ const resetContentState = async () => {
   contentState.extensionActive = await BrowserApi.storage.get(
     Constants.STORAGE.EXTENSION_ACTIVE
   );
+  contentState.language =
+    (await BrowserApi.storage.get(Constants.STORAGE.LANGUAGE)) || "en"; // fallback to English for now
+  contentState.locale =
+    (await BrowserApi.storage.get(Constants.STORAGE.LOCALE)) || "en"; // fallback to English for now
 };
 
 let contentState = {} as ContentState;

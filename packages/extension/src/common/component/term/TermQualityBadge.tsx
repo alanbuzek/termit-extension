@@ -1,19 +1,14 @@
 import * as React from "react";
-import { injectIntl } from "react-intl";
-// import withI18n, { HasI18n } from "../hoc/withI18n";
 import Term from "../../model/Term";
-// import TermItState from "../model/TermItState";
 import { Badge } from "reactstrap";
 import Utils from "../../util/Utils";
 import ValidationResult from "../../model/ValidationResult";
-// import Routing from "../util/Routing";
 import { ConsolidatedResults } from "../../model/ConsolidatedResults";
 import Validation from "../../util/Validation";
-import withI18n, { HasI18n } from "../hoc/withI18n";
+import { HasI18n } from "../hoc/withI18n";
 
 interface TermQualityBadgeProps extends HasI18n {
   term: Term | null;
-  // TODO: add this later if needed
   validationResults?: ConsolidatedResults;
 }
 
@@ -47,20 +42,6 @@ export class TermQualityBadge extends React.Component<TermQualityBadgeProps> {
     }
   }
 
-  public onBadgeClick = () => {
-    // TODO: implement of drop this if not neeeded
-    // const namespace = Utils.extractQueryParam(
-    //   this.props.location.search,
-    //   "namespace"
-    // );
-    // const query = new Map();
-    // if (namespace) {
-    //   query.set("namespace", namespace);
-    // }
-    // query.set("activeTab", "term.metadata.validation.title");
-    // Routing.transitionToAsset(this.props.term!, { query });
-  };
-
   public render() {
     let score: number | undefined;
     if (this.props.validationResults) {
@@ -86,5 +67,4 @@ export class TermQualityBadge extends React.Component<TermQualityBadgeProps> {
   }
 }
 
-// export default injectIntl(withI18n(TermQualityBadge));
-export default injectIntl(withI18n(TermQualityBadge)) as any;
+export default TermQualityBadge;

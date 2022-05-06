@@ -2,14 +2,14 @@ import ContentPopup, { PopupType } from "../components/ContentPopup";
 import React from "react";
 import ReactDOM from "react-dom";
 import { IntlProvider } from "react-intl";
-import cs from "../../cs.locale";
 import { overlay } from "../helper/overlay";
 import {
   Annotation,
   isDefinitionAnnotation,
 } from "../../common/util/Annotation";
 import { ContentState } from "..";
-
+import en from '../../common/i18n/en';
+import cs from '../../common/i18n/cs';
 
 // TODO: this can be moved a different file
 /**
@@ -153,10 +153,7 @@ export class ContentPopupContainer {
     annotation: Annotation | null = null
   ) {
     this.currentAnnotation = annotation;
-    const { left, top } = this.calculateTarget(
-      selectionRect,
-      !annotation
-    );
+    const { left, top } = this.calculateTarget(selectionRect, !annotation);
     this.showAt(left, top, false);
     this.isVisible = true;
     this.render(selectionRange);
@@ -187,10 +184,7 @@ export class ContentPopupContainer {
       left = selectionRect.left - (adderWidth - selectionRect.width) / 2;
     }
 
-    top =
-      selectionRect.top +
-      selectionRect.height +
-      ARROW_HEIGHT;
+    top = selectionRect.top + selectionRect.height + ARROW_HEIGHT;
 
     const sidebarClosed = document
       .querySelector("termit-sidebar-container")
@@ -251,7 +245,11 @@ export class ContentPopupContainer {
     this.unmount();
 
     ReactDOM.render(
-      <IntlProvider locale="cs-CZ" defaultLocale="en" messages={cs}>
+      <IntlProvider
+        locale={this.contentState.locale}
+        defaultLocale="en"
+        messages={this.contentState.locale === "en" ? en.messages : cs.messages}
+      >
         <ContentPopup
           isVisible={this.isVisible}
           showAt={this.showAt.bind(this)}

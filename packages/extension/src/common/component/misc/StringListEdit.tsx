@@ -17,13 +17,14 @@ import MultilingualIcon from "./MultilingualIcon";
 import BadgeButton from "./BadgeButton";
 // import "./StringListEdit.scss";
 
-interface StringListEditProps extends HasI18n {
+interface StringListEditProps {
   list?: string[];
   onChange: (list: string[]) => void;
   i18nPrefix: string;
   invalid?: boolean;
   invalidMessage?: JSX.Element;
   validationMessage?: string | JSX.Element;
+  i18n: any;
 }
 
 interface StringListEditState {
@@ -92,18 +93,18 @@ export class StringListEdit extends React.Component<
             placeholder={this.getText("placeholder")}
           />
           {/* <InputGroupAddon addonType="append"> */}
-            <Button
-              key="add-string-submit"
-              color="primary"
-              size="sm"
-              onClick={this.onAdd}
-              className="term-edit-source-add-button"
-              disabled={this.state.inputValue.trim().length === 0}
-              title={this.getText("addButton.title")}
-            >
-              <GoPlus />
-              &nbsp;{this.getText("addButton.text")}
-            </Button>
+          <Button
+            key="add-string-submit"
+            color="primary"
+            size="sm"
+            onClick={this.onAdd}
+            className="term-edit-source-add-button"
+            disabled={this.state.inputValue.trim().length === 0}
+            title={this.getText("addButton.title")}
+          >
+            <GoPlus />
+            &nbsp;{this.getText("addButton.text")}
+          </Button>
           {/* </InputGroupAddon> */}
           {this.props.invalid && (
             <FormFeedback>{this.props.invalidMessage}</FormFeedback>
@@ -156,4 +157,4 @@ export class StringListEdit extends React.Component<
   }
 }
 
-export default injectIntl(withI18n(StringListEdit)) as any;
+export default StringListEdit;

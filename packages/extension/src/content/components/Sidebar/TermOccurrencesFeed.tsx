@@ -3,6 +3,7 @@ import React from "react";
 import TermOccurrencesList from "./TermOccurrencesList";
 import { useState } from "react";
 import { Annotation } from "../../../common/util/Annotation";
+import { useI18n } from "../../../common/component/hook/useI18n";
 
 const CancelIcon = () => (
   <svg
@@ -81,6 +82,8 @@ const TermOccurrencesFeed = ({
   const showAnnotationsNotFoundBanner =
     hasFailedAnnotations && !failedAnnotationsDismissed;
 
+  const { i18n } = useI18n();
+
   return (
     <div className="">
       {showAnnotationsNotFoundBanner && (
@@ -88,7 +91,9 @@ const TermOccurrencesFeed = ({
           className={`px-3 py-1.5 text-gray-50 font-semibold text-base cursor-pointer flex justify-between items-center transition-all duration-300 hover:bg-red-500 bg-red-400`}
           onClick={() => setShowFailedAnnotations(!showFailedAnnotations)}
         >
-          <div>{failedAnnotations.length} annotations weren't found</div>
+          <div>
+            {failedAnnotations.length} {i18n("extension.annotated.notfound")}
+          </div>
 
           <div
             onClick={(e) => {
@@ -106,9 +111,11 @@ const TermOccurrencesFeed = ({
       )}
       <div className="flex text-lg px-2.5 py-2 my-2.5 font-semibold text-gray-700">
         {showAnnotationsNotFoundSection ? (
-          <span className="text-red-600">Not found annotations:</span>
+          <span className="text-red-600">
+            {i18n("extension.annotated.notfound")}
+          </span>
         ) : (
-          "Page annotations:"
+          i18n("extension.page.annotations")
         )}
       </div>
       <>

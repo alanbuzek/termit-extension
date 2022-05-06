@@ -206,12 +206,7 @@ export const TermOccurrenceFactory = {
       extraTypes,
     } = data;
 
-    console.log(
-      "calling create with data: ",
-      data,
-      ", extraTypes: ",
-      extraTypes
-    );
+   
     const termOccurrenceData: any = {
       id,
       types:

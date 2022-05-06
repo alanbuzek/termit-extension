@@ -17,6 +17,8 @@ export interface HasI18n {
   ): string;
 
   locale: string;
+
+  intl: any
 }
 
 export type WithIntlProps<P> = Pick<P, Exclude<keyof P, keyof HasI18n>> & {

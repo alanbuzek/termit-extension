@@ -20,21 +20,20 @@ import TermScopeNoteEdit from "./TermScopeNoteEdit";
 import ValidationResult from "../../model/form/ValidationResult";
 import CustomInput from "../misc/CustomInput";
 import { loadIdentifier } from "../../../api";
-import { getPageUrl } from "../../../content/helper/url";
 
-interface TermMetadataCreateFormProps extends HasI18n {
+interface TermMetadataCreateFormProps {
   onChange: (change: object, callback?: () => void) => void;
-  definitionSelector?: () => void;
+  definitionSelector: () => void;
   termData: TermData;
   vocabularyIri: string;
   labelExist: { [lang: string]: boolean };
   language: string;
+  intl: any;
+  i18n: any;
 }
-
 interface TermMetadataCreateFormState {
   generateUri: boolean;
 }
-
 export class TermMetadataCreateForm extends React.Component<
   TermMetadataCreateFormProps,
   TermMetadataCreateFormState
@@ -137,7 +136,7 @@ export class TermMetadataCreateForm extends React.Component<
   };
 
   public render() {
-    const { termData, i18n, language } = this.props;
+    const { termData, i18n, intl, language } = this.props;
     const source = termData.sources
       ? Utils.sanitizeArray(termData.sources!).join()
       : undefined;
@@ -193,6 +192,7 @@ export class TermMetadataCreateForm extends React.Component<
           <Row>
             <Col xs={12}>
               <StringListEdit
+                i18n={i18n}
                 list={getLocalizedPlural(termData.altLabels, language)}
                 onChange={this.onAltLabelsChange}
                 i18nPrefix={"term.metadata.altLabels"}
@@ -211,6 +211,8 @@ export class TermMetadataCreateForm extends React.Component<
           <Row>
             <Col xs={12}>
               <TermTypesEdit
+                i18n={i18n}
+                intl={intl}
                 termTypes={Utils.sanitizeArray(termData.types)}
                 onChange={this.onTypeSelect}
               />
@@ -223,6 +225,7 @@ export class TermMetadataCreateForm extends React.Component<
                 list={getLocalizedPlural(termData.hiddenLabels, language)}
                 onChange={this.onHiddenLabelsChange}
                 i18nPrefix={"term.metadata.hiddenLabels"}
+                i18n={i18n}
               />
             </Col>
           </Row>
@@ -232,7 +235,7 @@ export class TermMetadataCreateForm extends React.Component<
               <CustomInput
                 name="create-term-iri"
                 label={i18n("asset.iri")}
-                help={this.props.i18n("term.iri.help")}
+                help={i18n("term.iri.help")}
                 onChange={this.onIdentifierChange}
                 value={termData.iri}
               />
@@ -244,4 +247,4 @@ export class TermMetadataCreateForm extends React.Component<
   }
 }
 
-export default injectIntl(withI18n(TermMetadataCreateForm)) as any;
+export default TermMetadataCreateForm;

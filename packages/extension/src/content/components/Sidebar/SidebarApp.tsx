@@ -2,6 +2,7 @@ import { userInfo } from "os";
 import React from "react";
 import { useState } from "react";
 import { ContentActions, ContentState } from "../..";
+import { useI18n } from "../../../common/component/hook/useI18n";
 import Vocabulary from "../../../common/model/Vocabulary";
 import { Annotation } from "../../../common/util/Annotation";
 import Spinner from "../Spinner";
@@ -31,6 +32,8 @@ const SidebarApp = ({
     await ContentActions.toggleExtensionActive();
   };
 
+  const { i18n } = useI18n();
+
   return (
     <div style={{ height: "100%" }} className="border-l-2 border-gray-200">
       <div className="h-full w-full py-2.5 overflow-x-auto flex flex-column bg-gray-50">
@@ -44,10 +47,9 @@ const SidebarApp = ({
         {state.globalLoading ? (
           <div className="flex flex-col mx-auto mt-6 justify-center items-center">
             <Spinner className="text-green-500" size="12" />
-            <div className="mt-4 font-medium text-xl">Loading...</div>
+            <div className="mt-4 font-medium text-xl">{i18n("extension.loading")}</div>
             <div className="text-gray-500 mt-3 text-base text-center px-3">
-              This operation may take a moment, depending on how many
-              annotations there are on the page.
+              {i18n("extension.loading.message")}
             </div>
           </div>
         ) : (

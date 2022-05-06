@@ -6,7 +6,7 @@ const SidebarFooter = () => {
       className="footer-row mt-auto"
       style={{ background: "transparent" }}
     >
-      <div className="px-sm-3 px-2 col">
+      {/* <div className="px-sm-3 px-2 col">
         <a
           href="https://kbss.felk.cvut.cz"
           target="_blank"
@@ -15,7 +15,7 @@ const SidebarFooter = () => {
         >
           ©&nbsp;KBSS FEL ČVUT v Praze, 2022
         </a>
-      </div>
+      </div> */}
       <div className="news-viewer-toggle px-sm-2 px-sm-3 px-1 text-right">
         <span id="news-toggler">
           <span className="footer-version">Verze&nbsp;</span>0.0.1

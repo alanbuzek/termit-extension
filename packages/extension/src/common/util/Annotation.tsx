@@ -85,7 +85,7 @@ export class Annotation {
     const className = this.getClassName();
     return (
       occurrenceTypes.find((type) => type.value == className)?.name ||
-      "Uknown annotation type"
+      "Unknown annotation type"
     );
   }
 
