@@ -15,7 +15,7 @@ export function runPageAnnotationAnalysis(
   pageHtml: string
 ) {
   return annotaceApi.post(
-    "/annotate",
+    "/annotate-to-occurrences",
     content({
       content: pageHtml,
       vocabularyRepository: vocabulary,

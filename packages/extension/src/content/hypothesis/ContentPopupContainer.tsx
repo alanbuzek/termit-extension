@@ -261,7 +261,7 @@ export class ContentPopupContainer {
           initialPopupType={initialPopupType}
           contentState={this.contentState}
           onSelectDefinition={this.onSelectDefinition}
-          repositionWithAnnotation={this.repositionWithAnnotation}
+          repositionWithAnnotation={this.repositionWithAnnotation.bind(this)}
         />
       </IntlProvider>,
       this.shadowRoot,

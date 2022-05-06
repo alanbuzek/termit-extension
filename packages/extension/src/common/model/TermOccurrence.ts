@@ -63,7 +63,6 @@ export const CONTEXT = Object.assign(
   cssSelectorCtx
 );
 
-console.log('CONTEXT: ', CONTEXT);
 
 export interface Selector {
   iri?: string;
@@ -135,7 +134,9 @@ export const TermOccurrenceFactory = {
 
     return {
       id: about,
-      termIri: 'http://onto.fel.cvut.cz/ontologies/slovnik/my-new-slovnik/pojem/dfasfasdfasf',
+      termIri: content.startsWith("rus")
+        ? "http://onto.fel.cvut.cz/ontologies/slovnik/novy-lokalni-slovnik/pojem/ruský"
+        : "",
       suggestedLemma: content,
       originalText: originalTerm,
       cssSelector: { startOffset, cssSelector: cssSelectors[0] },
@@ -217,7 +218,7 @@ export const TermOccurrenceFactory = {
         annotationType === AnnotationType.DEFINITION
           ? [VocabularyUtils.TERM_DEFINITION_SOURCE]
           : [VocabularyUtils.WEBSITE_TERM_OCCURRENCE],
-      term: termIri ? termsMap[termIri] : undefined,
+      term: (termIri && termsMap[termIri]) ? termsMap[termIri] : undefined,
       target: {
         types: [VocabularyUtils.HAS_WEBSITE_OCCURRENCE_TARGET],
         selectors: [
@@ -266,7 +267,7 @@ export default class TermOccurrence extends TermAssignment {
 
   constructor(data: TermOccurrenceData) {
     super(data);
-    console.log('data: ', data);
+    console.log("data: ", data);
     this.target = data.target;
     this.target.selectors = Utils.sanitizeArray(this.target.selectors);
     if (data.id) {

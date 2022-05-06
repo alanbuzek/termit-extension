@@ -3,7 +3,6 @@ import * as React from "react";
 import AnnotationTerms from "./AnnotationTerms";
 import { Button } from "reactstrap";
 import { FaCheck } from "react-icons/fa";
-import { TiTimes, TiTrash } from "react-icons/ti";
 import { AnnotationOriginClass } from "../../util/Annotation";
 import TermOccurrenceAnnotationView from "./TermOccurrenceAnnotationView";
 import { GoPencil } from "react-icons/go";
