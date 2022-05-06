@@ -384,7 +384,7 @@ export async function saveTermOccurrences(
   const contentBody = termOccurrences.map((termOccurrence) => {
     const payload: any = {
       exactMatch: termOccurrence.getTextQuoteSelector().exactMatch,
-      selector: termOccurrence.getCssSelector().value,
+      cssSelector: termOccurrence.getCssSelector().value,
       start: termOccurrence.getTextPositionSelector().start,
       extraTypes: [occurrenceType],
       id: termOccurrence.id,
