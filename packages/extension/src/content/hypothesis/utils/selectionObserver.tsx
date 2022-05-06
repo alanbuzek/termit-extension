@@ -3,8 +3,6 @@ import ListenerCollection from "./listenerCollection";
 /**
  * Return the current selection or `null` if there is no selection or it is empty.
  *
- * @param {Document} document
- * @return {Range|null}
  */
 function selectedRange(document) {
   const selection = document.getSelection();
@@ -24,17 +22,12 @@ function selectedRange(document) {
 export default class SelectionObserver {
   private pendingCallback: any;
   private eventHandler: (event: any) => void;
-  private document: Document;
   private listeners: ListenerCollection;
   private events: string[];
 
   /**
    * Start observing changes to the current selection in the document.
    *
-   * @param {(range: Range|null, event: any) => any} callback -
-   *   Callback invoked with the selected region of the document when it has
-   *   changed.
-   * @param {Document} document_ - Test seam
    */
   constructor(callback, document_ = document) {
     let isMouseDown = false;
@@ -66,7 +59,6 @@ export default class SelectionObserver {
       scheduleCallback(delay, event);
     };
 
-    this.document = document_;
     this.listeners = new ListenerCollection();
     this.events = ["mousedown", "mouseup", "selectionchange", "click"];
     for (let event of this.events) {

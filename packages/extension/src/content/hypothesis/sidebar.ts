@@ -1,11 +1,9 @@
 import Vocabulary from "../../common/model/Vocabulary";
 
-import { sendErrorsTo } from "../../shared/frame-error-capture";
-import { ListenerCollection } from "../../shared/listener-collection";
 import { MessageType } from "../../types/messageTypes";
 import { createShadowRoot } from "./ContentPopupContainer";
 import SidebarContainer from "../components/sidebar/SidebarContainer";
-import { ToolbarController } from "./toolbar";
+import { ToolbarContainer } from "./ToolbarContainer";
 import { ContentState } from "..";
 import { Annotation } from "../../common/util/Annotation";
 
@@ -13,19 +11,18 @@ export class Sidebar {
   private sidebarComponent: SidebarContainer;
   private container: HTMLDivElement;
   private hypothesisSidebar: HTMLElement;
-  private listeners: any;
-  private toolbar: ToolbarController;
+  private toolbar: ToolbarContainer;
   private shadowRoot: ShadowRoot;
 
   constructor(
     element: HTMLElement,
     state: ContentState,
     handleAnnotatePage: (vocabulary: Vocabulary) => void,
-    handleDeleteAnnotation: (annotation: Annotation) => void,
+    handleDeleteAnnotation: (annotation: Annotation) => void
   ) {
-
     this.container = document.createElement("div");
-    this.container.className = "annotator-frame annotator-collapsed termit-sidebar-container";
+    this.container.className =
+      "annotator-frame annotator-collapsed termit-sidebar-container";
     this.container.style.marginLeft = "";
 
     // Wrap up the 'container' element into a shadow DOM so it is not affected by host CSS styles
@@ -50,11 +47,10 @@ export class Sidebar {
       handleAnnotatePage,
       handleDeleteAnnotation
     );
-    this.listeners = new ListenerCollection();
 
     // Set up the toolbar on the left edge of the sidebar.
     const toolbarContainer = document.createElement("div");
-    this.toolbar = new ToolbarController(
+    this.toolbar = new ToolbarContainer(
       toolbarContainer,
       (open) => (open ? this.open() : this.close()),
       state
@@ -78,13 +74,10 @@ export class Sidebar {
   }
 
   destroy() {
-    this.listeners.removeAll();
     if (this.hypothesisSidebar) {
       this.hypothesisSidebar.remove();
     }
     this.sidebarComponent?.destroy();
-
-    sendErrorsTo(null);
   }
 
   open() {
@@ -105,7 +98,6 @@ export class Sidebar {
 
     this.toolbar.sidebarOpen = false;
   }
-
 
   render() {
     this.sidebarComponent.render();

@@ -1,8 +1,6 @@
-import ListenerCollection from "./utils/listenerCollection";
 import { ContentPopupContainer } from "./ContentPopupContainer";
 import * as rangeUtil from "./utils/rangeUtils";
 import SelectionObserver from "./utils/SelectionObserver";
-import Vocabulary from "../../common/model/Vocabulary";
 import { markTerm } from "../marker";
 import { Annotation, AnnotationType } from "../../common/util/Annotation";
 import { ContentActions, ContentState } from "..";
@@ -18,29 +16,6 @@ const isDescendantOfTermItElements = (element?: Element) => {
   );
 };
 
-/**
- * `Annotator` is the central class of the annotator that handles anchoring (locating)
- * annotations in the document when they are fetched by the sidebar, rendering
- * highlights for them and handling subsequent interactions with the highlights.
- *
- * It is also responsible for listening to changes in the current selection
- * and triggering the display of controls to create new annotations. When one
- * of these controls is clicked, it creates the new annotation and sends it to
- * the sidebar.
- *
- * Within a browser tab, there is typically one `Annotator` instance per frame that
- * loads Hypothesis (not all frames will be annotation-enabled). In one frame,
- * usually the top-level one, there will also be an instance of the `Sidebar`
- * class that shows the sidebar app and surrounding UI. The `Annotator` instance in
- * each frame connects to the sidebar and host frames as part of its
- * initialization.
- *
- * The anchoring implementation defaults to a generic one for HTML documents and
- * can be overridden to handle different document types.
- *
- * @implements {Annotator}
- * @implements {Destroyable}
- */
 export default class Annotator {
   private rootElement: any;
   private contentPopup: ContentPopupContainer;
@@ -63,10 +38,6 @@ export default class Annotator {
         this.onDefinitionSelected = onDefinitionSelected;
       }
     );
-
-    // TODO: remove hypothesis from name, add more elements (e.g, message panel if needed);
-
-    // TODO: fix up selection observer handling
 
     let ignoreNextSelectionTimeout: any = null;
     this.selectionObserver = new SelectionObserver((range, event?: Event) => {
@@ -117,7 +88,6 @@ export default class Annotator {
    *
    * @param {Range} range
    */
-  // TODO: we get rid of this? unused now...
   private onSelection(range: Range) {
     const selection: Selection = document.getSelection()!;
     const isBackwards = rangeUtil.isSelectionBackwards(selection);

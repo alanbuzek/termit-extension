@@ -6,45 +6,32 @@ import cs from "../../../cs.locale";
 import { loadStyles } from "../../hypothesis/ContentPopupContainer";
 import SidebarApp from "./SidebarApp";
 
-/**
- * @typedef ToolbarOptions
- * @prop {() => any} createAnnotation
- * @prop {(open: boolean) => any} setSidebarOpen
- * @prop {(visible: boolean) => any} setHighlightsVisible
- */
-
-/**
- * Controller for the toolbar on the edge of the sidebar.
- *
- * This toolbar provides controls for opening and closing the sidebar, toggling
- * highlight visibility etc.
- */
 export default class SidebarContainer {
-  _container: any;
-  _state: ContentState;
+  private container: HTMLElement;
+  private state: ContentState;
   private handleAnnotatePage;
   private handleDeleteAnnotation;
-  _loadedStyles: boolean;
+  private loadedStyles: boolean;
   /**
    * @param {HTMLElement} container - Element into which the toolbar is rendered
    * @param {ToolbarOptions} options
    */
   constructor(container, state, handleAnnotatePage, handleDeleteAnnotation) {
-    this._container = container;
-    this._state = state;
+    this.container = container;
+    this.state = state;
     this.handleAnnotatePage = handleAnnotatePage;
     this.handleDeleteAnnotation = handleDeleteAnnotation;
-    this._loadedStyles = false;
+    this.loadedStyles = false;
     this.render();
   }
 
   getWidth() {
-    const content = /** @type {HTMLElement} */ this._container.firstChild;
+    const content: any = this.container.firstChild;
     return content.getBoundingClientRect().width;
   }
 
   destroy() {
-    ReactDOM.unmountComponentAtNode(this._container);
+    ReactDOM.unmountComponentAtNode(this.container);
   }
 
   render() {
@@ -55,16 +42,16 @@ export default class SidebarContainer {
           handleAnnotatePage={this.handleAnnotatePage}
           handleDeletePage={ContentActions.removeWebsiteAnnotations}
           handleDeleteSuggestions={ContentActions.removeSuggestedAnnotations}
-          state={this._state}
+          state={this.state}
         />
       </IntlProvider>,
-      this._container,
+      this.container,
       () => {
-        if (!this._loadedStyles) {
-          loadStyles(this._container, "annotator");
-          loadStyles(this._container, "styles");
-          loadStyles(this._container, "bootstrap-termit");
-          this._loadedStyles = true;
+        if (!this.loadedStyles) {
+          loadStyles(this.container, "annotator");
+          loadStyles(this.container, "styles");
+          loadStyles(this.container, "bootstrap-termit");
+          this.loadedStyles = true;
         }
       }
     );

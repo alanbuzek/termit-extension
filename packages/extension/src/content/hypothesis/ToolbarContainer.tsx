@@ -11,7 +11,7 @@ import { ContentState } from '..';
  *
  * This toolbar provides controls for opening and closing the.
  */
-export class ToolbarController {
+export class ToolbarContainer {
   private container: HTMLElement;
   private sidebarToggleButton;
   private isSidebarOpen: boolean;

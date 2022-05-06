@@ -1,8 +1,6 @@
 import React from "react";
 import { useState } from "react";
-import { FaTrashAlt } from "react-icons/fa";
 import { TrashIcon } from "../../../common/component/annotator/TermOccurrenceAnnotation";
-import BadgeButton from "../../../common/component/misc/BadgeButton";
 import TermLink from "../../../common/component/term/TermLink";
 import { Annotation } from "../../../common/util/Annotation";
 import Spinner from "../Spinner";

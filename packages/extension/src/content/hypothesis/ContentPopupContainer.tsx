@@ -10,17 +10,6 @@ import {
 } from "../../common/util/Annotation";
 import { ContentState } from "..";
 
-// TODO: probably don't need this for now
-/**
- * Returns true when the device is a touch device such
- * as android or iOS.
- * https://developer.mozilla.org/en-US/docs/Web/CSS/@media/pointer#browser_compatibility
- *
- * @param _window {Window} - Test seam
- */
-export const isTouchDevice = (_window = window) => {
-  return _window.matchMedia("(pointer: coarse)").matches;
-};
 
 // TODO: this can be moved a different file
 /**
@@ -63,7 +52,6 @@ function stopEventPropagation(element) {
   });
 }
 
-// TODO: this can be moved a different file
 /**
  * Create the shadow root for an annotator UI component and load the annotator
  * CSS styles into it.
@@ -85,52 +73,12 @@ export function createShadowRoot(container: HTMLElement) {
   return shadowRoot;
 }
 
-// TODO: worry about the arrow positioning later, if needed at all
-/**
- *  @typedef {1} ArrowPointingDown
- * Show the adder above the selection with an arrow pointing down at the
- * selected text.
- */
-export const ARROW_POINTING_DOWN = 1;
-
-/**
- *  @typedef {2} ArrowPointingUp
- * Show the adder above the selection with an arrow pointing up at the
- * selected text.
- */
-export const ARROW_POINTING_UP = 2;
-
-/**
- *  @typedef {ArrowPointingDown|ArrowPointingUp} ArrowDirection
- * Show the adder above the selection with an arrow pointing up at the
- * selected text.
- */
-
-/**
- * @typedef Target
- * @prop {number} left - Offset from left edge of viewport.
- * @prop {number} top - Offset from top edge of viewport.
- * @prop {ArrowDirection} arrowDirection - Direction of the adder's arrow.
- */
-
 function toPx(pixels) {
   return pixels.toString() + "px";
 }
 
 const ARROW_HEIGHT = 10;
 
-// The preferred gap between the end of the text selection and the adder's
-// arrow position.
-const ARROW_H_MARGIN = 20;
-
-/**
- * Return the closest ancestor of el which has been positioned.
- *
- * If no ancestor has been positioned, returns the root element.
- *
- * @param {Element} el
- * @return {Element}
- */
 function nearestPositionedAncestor(el) {
   let parentEl = /** @type {Element} */ el.parentElement;
   while (parentEl.parentElement) {
@@ -142,33 +90,11 @@ function nearestPositionedAncestor(el) {
   return parentEl;
 }
 
-/**
- * @typedef AdderOptions
- * TODO: add other callbacks if needed?
- * @prop {() => void} onAnnotate - Callback invoked when "Annotate" button is clicked
- * @prop {() => void} onHighlight - Callback invoked when "Highlight" button is clicked
- * @prop {(tags: string[]) => void} onShowAnnotations -
- *   Callback invoked when  "Show" button is clicked
- *
- */
-
-/**
- * Container for the 'adder' toolbar which provides controls for the user to
- * annotate and highlight the selected text.
- *
- * The toolbar implementation is split between this class, which is
- * the container for the toolbar that positions it on the page and isolates
- * it from the page's styles using shadow DOM, and the AdderToolbar Preact
- * component which actually renders the toolbar.
- *
- * @implements {Destroyable}
- */
 export class ContentPopupContainer {
   private outerContainer: HTMLElement;
   private shadowRoot: ShadowRoot;
   private view: any;
   private isVisible: boolean;
-  private arrowDirection: string;
   private currentAnnotation: Annotation | null = null;
   private contentState: ContentState;
   private onSelectDefinition: () => any;
@@ -176,17 +102,7 @@ export class ContentPopupContainer {
   private selectionRect;
   private isRTLselection;
   private selectionRange;
-  private lastArrowDirection;
-  annotationsForSelection: never[];
-  /**
-   * Create the toolbar's container and hide it.
-   *
-   * The adder is initially hidden.
-   *
-   * @param {HTMLElement} element - The DOM element into which the adder will be created
-   * @param {AdderOptions} options - Options object specifying onAnnotate and onHighlight
-   *        event handlers.
-   */
+
   constructor(
     element: HTMLElement,
     contentState: ContentState,
@@ -202,47 +118,20 @@ export class ContentPopupContainer {
 
     // Set initial style
     Object.assign(this.outerContainer.style, {
-      // take position out of layout flow initially
       position: "absolute",
       top: 0,
       left: 0,
       "z-index": 1000,
     });
 
-    this.view = /** @type {Window} */ element.ownerDocument.defaultView;
-
-    this.width = () => {
-      console.log("this.shadowRoot: ", this.shadowRoot);
-      const firstChild = this.shadowRoot.firstChild;
-      return firstChild.getBoundingClientRect().width;
-    };
-
-    this.height = () => {
-      const firstChild = this.shadowRoot.firstChild;
-      return firstChild.getBoundingClientRect().height;
-    };
+    this.view = element.ownerDocument.defaultView;
 
     this.isVisible = false;
-
-    /** @type {'up'|'down'} */
-    this.arrowDirection = "up";
-
-    /**
-     * Annotation tags associated with the current selection. If non-empty,
-     * a "Show" button appears in the toolbar. Clicking the button calls the
-     * onShowAnnotations callback with the current value of annotationsForSelection.
-     *
-     * @type {string[]}
-     */
-    this.annotationsForSelection = [];
   }
 
-  /** Hide the adder */
   public hide() {
     this.isVisible = false;
     this.render();
-    // Reposition the outerContainer because it affects the responsiveness of host page
-    // https://github.com/hypothesis/client/issues/3193
     Object.assign(this.outerContainer.style, {
       top: 0,
       left: 0,
@@ -257,39 +146,19 @@ export class ContentPopupContainer {
     this.outerContainer.remove();
   }
 
-  /**
-   * Display the adder in the best position in order to target the
-   * selected text in selectionRect.
-   *
-   * @param {DOMRect} selectionRect - The rect of text to target, in viewport
-   *        coordinates.
-   * @param {boolean} isRTLselection - True if the selection was made
-   *        rigth-to-left, such that the focus point is mosty likely at the
-   *        top-left edge of targetRect.
-   */
   public show(
     selectionRect,
     isRTLselection,
     selectionRange,
-    annotation: Annotation | null = null,
-    isRepositioning = false
+    annotation: Annotation | null = null
   ) {
-    this.selectionRect = selectionRect;
-    this.isRTLselection = isRTLselection;
-    this.selectionRange = selectionRange;
-
     this.currentAnnotation = annotation;
-    const { left, top, arrowDirection } = this.calculateTarget(
+    const { left, top } = this.calculateTarget(
       selectionRect,
-      isRTLselection,
-      !annotation,
-      isRepositioning
+      !annotation
     );
     this.showAt(left, top, false);
-
     this.isVisible = true;
-    this.arrowDirection = arrowDirection === ARROW_POINTING_UP ? "up" : "down";
-
     this.render(selectionRange);
   }
 
@@ -299,56 +168,18 @@ export class ContentPopupContainer {
       this.selectionRect,
       this.isRTLselection,
       this.selectionRange,
-      annotation,
-      true
+      annotation
     );
   }
 
-  /**
-   *  Determine the best position for the Adder and its pointer-arrow.
-   * - Position the pointer-arrow near the end of the selection (where the user's
-   *   cursor/input is most likely to be)
-   * - Position the Adder to center horizontally on the pointer-arrow
-   * - Position the Adder below the selection (arrow pointing up) for LTR selections
-   *   and above (arrow down) for RTL selections
-   *
-   * @param {DOMRect} selectionRect - The rect of text to target, in viewport
-   *        coordinates.
-   * @param {boolean} isRTLselection - True if the selection was made
-   *        rigth-to-left, such that the focus point is mosty likely at the
-   *        top-left edge of targetRect.
-   * @return {Target}
-   */
-  private calculateTarget(
-    selectionRect,
-    isRTLselection,
-    isSelectionPurposeDialog,
-    isRepositioning
-  ) {
-    // Set the initial arrow direction based on whether the selection was made
-    // forwards/upwards or downwards/backwards.
-    /** @type {ArrowDirection} */ let arrowDirection;
-    if (isRTLselection && !isTouchDevice()) {
-      arrowDirection = ARROW_POINTING_DOWN;
-    } else {
-      // Render the adder below the selection for touch devices due to competing
-      // space with the native copy/paste bar that typical (not always) renders above
-      // the selection.
-      arrowDirection = ARROW_POINTING_UP;
-    }
+  private calculateTarget(selectionRect, isSelectionPurposeDialog) {
     let top;
     let left;
 
-    // Position the adder such that the arrow it is above or below the selection
-    // and close to the end.
-    const hMargin = Math.min(ARROW_H_MARGIN, selectionRect.width);
-
     const adderWidth = isSelectionPurposeDialog ? 148 : 298;
-    // const adderHeight = isSelectionPurposeDialog ? 56 : 125.8;
     const adderHeight = isSelectionPurposeDialog ? 56 : 125.8;
     // Render the adder a little lower on touch devices to provide room for the native
     // selection handles so that the interactions with selection don't compete with the adder.
-    const touchScreenOffset = isTouchDevice() ? 10 : 0;
 
     if (selectionRect.width > adderWidth) {
       left = selectionRect.left + selectionRect.width / 2 - adderWidth / 2;
@@ -356,34 +187,10 @@ export class ContentPopupContainer {
       left = selectionRect.left - (adderWidth - selectionRect.width) / 2;
     }
 
-    // Flip arrow direction if adder would appear above the top or below the
-    // bottom of the viewport.
-    // if (
-    //   selectionRect.top - adderHeight < 0 &&
-    //   arrowDirection === ARROW_POINTING_DOWN
-    // ) {
-    //   arrowDirection = ARROW_POINTING_UP;
-    // } else if (selectionRect.top + adderHeight > this.view.innerHeight) {
-    //   arrowDirection = ARROW_POINTING_DOWN;
-    // }
-
-
-    // if (isRepositioning){
-    //   arrowDirection = this.lastArrowDirection;
-    // } else {
-    //   this.lastArrowDirection = arrowDirection;
-    // }
-
-    arrowDirection = ARROW_POINTING_UP;
-    if (arrowDirection === ARROW_POINTING_UP) {
-      top =
-        selectionRect.top +
-        selectionRect.height +
-        ARROW_HEIGHT +
-        touchScreenOffset;
-    } else {
-      top = selectionRect.top - adderHeight - ARROW_HEIGHT;
-    }
+    top =
+      selectionRect.top +
+      selectionRect.height +
+      ARROW_HEIGHT;
 
     const sidebarClosed = document
       .querySelector("termit-sidebar-container")
@@ -391,12 +198,15 @@ export class ContentPopupContainer {
     const sidebarWidth = sidebarClosed ? 0 : 350;
     // Constrain the adder to the viewport.
     left = Math.max(left, 0);
-    left = Math.min(left, this.view.innerWidth - adderWidth - sidebarWidth - 50);
+    left = Math.min(
+      left,
+      this.view.innerWidth - adderWidth - sidebarWidth - 50
+    );
 
     top = Math.max(top, 0);
     top = Math.min(top, this.view.innerHeight - adderHeight);
 
-    return { top, left, arrowDirection };
+    return { top, left };
   }
 
   private showAt(left, top, isModal = false) {
@@ -444,7 +254,6 @@ export class ContentPopupContainer {
       <IntlProvider locale="cs-CZ" defaultLocale="en" messages={cs}>
         <ContentPopup
           isVisible={this.isVisible}
-          arrowDirection={this.arrowDirection}
           showAt={this.showAt.bind(this)}
           hide={this.hide.bind(this)}
           selectionRange={selectionRange}

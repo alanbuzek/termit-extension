@@ -1,34 +1,7 @@
-import { getCssSelector } from "css-selector-generator";
 import { ContentActions, TermsMap } from "..";
-import { getPropertyForAnnotationType } from "../../common/component/annotator/AnnotationDomHelper";
 import TermOccurrence from "../../common/model/TermOccurrence";
 import { Annotation } from "../../common/util/Annotation";
 import Mark from "../../markjs";
-
-// TODO: this most likely will be able to be removed
-const classesMap = {
-  unknownTermOcc: "suggested-term-occurrence selected-occurrence",
-  knownTermOcc: "suggested-term-occurrence selected-occurrence",
-  termDefinition: "term-definition",
-  newTermProposal: "proposed-occurrence suggested-term-occurrence",
-  existingTermProposal: "proposed-occurrence assigned-term-occurrence",
-};
-
-/**
- * Returns true if the start point of a selection occurs after the end point,
- * in document order.
- *
- * @param {Selection} selection
- */
-export function isSelectionBackwards(selection) {
-  if (selection.focusNode === selection.anchorNode) {
-    return selection.focusOffset < selection.anchorOffset;
-  }
-
-  const range = selection.getRangeAt(0);
-
-  return range.startContainer === selection.focusNode;
-}
 
 const handleElementClick = (annotation) => (event) => {
   event.stopPropagation();

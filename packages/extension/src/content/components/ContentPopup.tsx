@@ -31,43 +31,19 @@ export enum PopupType {
 
 type ContentPopupProps = {
   annotation: Annotation;
-  // TODO: replace these any s with real types
-  arrowDirection: any;
   contentState: ContentState;
-  isVisible: any;
-  onCommand: any;
+  isVisible: boolean;
   initialPopupType: PopupType;
-  showAt: any;
+  showAt: (x: number, y: number, isModal: boolean) => void;
   hide: any;
   selectionRange: any;
   isMinimized: boolean;
   onSelectDefinition: any;
+  repositionWithAnnotation: (Annotation) => void;
 };
 
-/**
- * @typedef AdderToolbarProps
- * @prop {'up'|'down'} arrowDirection -
- *   Whether the arrow pointing out of the toolbar towards the selected text
- *   should appear above the toolbar pointing Up or below the toolbar pointing
- *   Down.
- * @prop {boolean} isVisible - Whether to show the toolbar or not.
- * @prop {(c: Command) => any} onCommand - Called when a toolbar button is clicked.
- * @prop {number} [annotationCount] -
- *   Number of annotations associated with the selected text.
- *   If non-zero, a "Show" button is displayed to allow the user to see the
- *   annotations that correspond to the selection.
- */
-
-/**
- * The toolbar that is displayed above selected text in the document providing
- * options to create annotations or highlights.
- *
- * @param {AdderToolbarProps} props
- */
 function ContentPopup({
-  arrowDirection,
   isVisible,
-  onCommand,
   initialPopupType,
   showAt,
   hide,
@@ -226,9 +202,8 @@ function ContentPopup({
         "hyp-u-border hyp-u-bg-color--white",
         "AdderToolbar",
         {
-          "AdderToolbar--down": arrowDirection === "up",
-          "AdderToolbar--up": arrowDirection === "down",
-          "is-active": isVisible,
+          "AdderToolbar--up": true,
+          "is-active": true,
         }
       )}
       style={style}

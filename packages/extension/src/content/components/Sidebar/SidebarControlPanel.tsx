@@ -100,12 +100,6 @@ const SidebarControlPanel = ({
           </div>
           <div className="flex text-xl font-semibold text-gray-700 items-center">
             <FaBook id={"props.id"} className={"block mr-2"} />
-            {/* <AssetLink
-          asset={vocabulary!}
-          path={`http://localhost:3000/#/vocabularies/${
-            VocabularyUtils.create(vocabulary!.iri!).fragment
-          }?namespace=http://onto.fel.cvut.cz/ontologies/slovnik/`}
-        /> */}
             {vocabulary!.label}
           </div>
         </div>
@@ -118,31 +112,6 @@ const SidebarControlPanel = ({
         </div>
       </div>
 
-      {/* <div className="p-3 mb-3 rounded-md">
-        <div className="text-base font-semibold text-gray-800 rounded-md mb-2">
-          Selected vocabulary:{" "}
-          <AssetLink
-            asset={vocabulary!}
-            path={`http://localhost:3000/#/vocabularies/${
-              VocabularyUtils.create(vocabulary!.iri!).fragment
-            }?namespace=http://onto.fel.cvut.cz/ontologies/slovnik/`}
-          />
-        </div>
-        <h3>
-          There are <span className="text-blue-600">{annotations.length}</span>{" "}
-          annotations on this page.
-        </h3>
-      </div>
-      <div className="flex ml-auto mr-2">
-        <Button
-          disabled={deleteLoading}
-          onClick={handlePageDeleteClick}
-          color="alertLight"
-          className="mr-2"
-        >
-          Delete website <TrashIcon />
-        </Button>
-      </div> */}
     </div>
   );
 };

@@ -1,7 +1,5 @@
 import React from 'react';
 
-// TODO: move this to @masterlingo/common package to be able to reuse in web + extension, not copy
-// I'm not doing string interpolation so tailwind can purge the css
 const sizes = {
   '2': 'h-2 w-2',
   '4': 'h-4 w-4',
