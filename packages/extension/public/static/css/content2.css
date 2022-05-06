@@ -397,7 +397,7 @@ termit-h.pending-term-definition.termit-h-hovered {
   background: rgba(26, 0, 157, 0.2);
 }
 
-termit-h.annotation-focused {
+.termit-annotation-focused {
   outline: 4px solid rgb(126, 241, 32) !important;
   /* background-color: rgb(126, 241, 32) !important; */
 }

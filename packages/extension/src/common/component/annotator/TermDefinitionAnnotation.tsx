@@ -10,6 +10,7 @@ import { GoPencil } from "react-icons/go";
 import { useI18n } from "../hook/useI18n";
 import TermDefinitionAnnotationView from "./TermDefinitionAnnotationView";
 import { ContentState } from "../../../content";
+import { TrashIcon } from "./TermOccurrenceAnnotation";
 
 interface TermDefinitionAnnotationProps {
   target: string;
@@ -33,10 +34,6 @@ function createActionButtons(
   const actions: any[] = [];
   if (!editing) {
     actions.push(
-      // <IfUserAuthorized
-      //   renderUnauthorizedAlert={false}
-      //   key="annotation.definition.edit"
-      // >
       <Button
         className="m-annotation-definition-edit"
         color="primary"
@@ -46,37 +43,18 @@ function createActionButtons(
       >
         <GoPencil />
       </Button>
-      // </IfUserAuthorized>
     );
   }
+
   actions.push(
-    // <IfUserAuthorized
-    //   renderUnauthorizedAlert={false}
-    //   key="annotation.definition.remove"
-    // >
-    <Button
-      className="m-annotation-definition-remove"
-      color="primary"
-      title={i18n("remove")}
-      size="sm"
+    <div
+      className="hover:bg-red-200 bg-gray-300 border border-gray-300 rounded-md cursor-pointer transition-all duration-200 text-gray-500 px-2 py-1"
       onClick={props.onRemove}
     >
-      <TiTrash />
-    </Button>
-    // </IfUserAuthorized>
+      <TrashIcon />
+    </div>
   );
-  actions.push(
-    <Button
-      key="annotation.definition.close"
-      className="m-annotation-definition-close"
-      color="primary"
-      title={i18n("annotation.close")}
-      size="sm"
-      onClick={props.onClose}
-    >
-      <TiTimes />
-    </Button>
-  );
+
   return actions;
 }
 
@@ -99,7 +77,7 @@ export const TermDefinitionAnnotation: React.FC<TermDefinitionAnnotationProps> =
         terms={props.contentState.terms!}
         vocabulary={props.contentState.vocabulary!}
         selectVocabularyTerm={(term: Term | null) => {
-          if (!term){
+          if (!term) {
             return;
           }
           return props.onSelectTerm(term);
@@ -122,7 +100,11 @@ export const TermDefinitionAnnotation: React.FC<TermDefinitionAnnotationProps> =
         actions={createActionButtons(props, i18n, editing, () =>
           setEditing(!editing)
         )}
-        title={i18n("annotation.definition.title")}
+        title={
+          editing
+            ? "Přiřaďte pojem k definici"
+            : i18n("annotation.definition.title")
+        }
       />
     );
   };

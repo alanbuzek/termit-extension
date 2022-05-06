@@ -63,6 +63,8 @@ export const CONTEXT = Object.assign(
   cssSelectorCtx
 );
 
+console.log('CONTEXT: ', CONTEXT);
+
 export interface Selector {
   iri?: string;
   types: string[];
@@ -133,7 +135,7 @@ export const TermOccurrenceFactory = {
 
     return {
       id: about,
-      termIri: resource,
+      termIri: 'http://onto.fel.cvut.cz/ontologies/slovnik/my-new-slovnik/pojem/dfasfasdfasf',
       suggestedLemma: content,
       originalText: originalTerm,
       cssSelector: { startOffset, cssSelector: cssSelectors[0] },
@@ -264,6 +266,7 @@ export default class TermOccurrence extends TermAssignment {
 
   constructor(data: TermOccurrenceData) {
     super(data);
+    console.log('data: ', data);
     this.target = data.target;
     this.target.selectors = Utils.sanitizeArray(this.target.selectors);
     if (data.id) {

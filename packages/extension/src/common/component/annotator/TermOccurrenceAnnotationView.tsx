@@ -1,7 +1,7 @@
 import * as React from "react";
-import { useI18n } from '../hook/useI18n';
-import { AnnotationTypeClass } from '../../util/Annotation';
-import TermLink from '../term/TermLink';
+import { useI18n } from "../hook/useI18n";
+import { AnnotationTypeClass } from "../../util/Annotation";
+import TermLink from "../term/TermLink";
 
 interface TermOccurrenceAnnotationViewProps {
   term?: any;
@@ -18,11 +18,7 @@ const TermOccurrenceAnnotationView: React.FC<TermOccurrenceAnnotationViewProps> 
           <table>
             <tbody>
               <tr>
-                <td className={"label"}>
-                  {i18n("annotation.term.assigned-occurrence.termLabel")}
-                </td>
                 <td>
-                  {/* TODO */}
                   <TermLink term={props.term!} />
                 </td>
               </tr>

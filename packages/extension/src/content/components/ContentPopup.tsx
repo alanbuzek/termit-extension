@@ -245,7 +245,7 @@ function ContentPopup({
       style={style}
     >
       <div
-        className="hyp-u-layout-row AdderToolbar__actions p-2"
+        className="hyp-u-layout-row AdderToolbar__actions"
         style={{ width: "100%" }}
       >
         {renderContentPopup()}

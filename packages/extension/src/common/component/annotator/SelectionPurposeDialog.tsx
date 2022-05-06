@@ -28,12 +28,20 @@ export const Popover = ({ children, className = "" }) => {
   return <div className={`popover ${className}`}>{children}</div>;
 };
 
-export const PopoverHeader = ({ children, className = "" }) => {
-  return <div className={`popover-header ${className}`}>{children}</div>;
+export const PopoverHeader = ({ children, className = "", style = {} }) => {
+  return (
+    <div className={`popover-header ${className}`} style={style}>
+      {children}
+    </div>
+  );
 };
 
-export const PopoverBody = ({ children, className = "" }) => {
-  return <div className={`popover-body ${className}`}>{children}</div>;
+export const PopoverBody = ({ children, className = "", style = {} }) => {
+  return (
+    <div className={`popover-body ${className}`} style={style}>
+      {children}
+    </div>
+  );
 };
 
 export const SelectionPurposeDialog: React.FC<SelectionPurposeDialogProps> = (

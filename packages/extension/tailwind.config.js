@@ -23,6 +23,11 @@ module.exports = {
           'sans-serif',
         ],
       },
+      // colors: {
+      //   green: {
+      //     500: '#29ab87',
+      //   },
+      // }
     },
     // override rems with pixels 
     columns: {

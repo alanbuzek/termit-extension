@@ -101,7 +101,7 @@ export class Annotation {
 
     elementsToFocus.forEach((element) => {
       element.scrollIntoView({ block: "center", inline: "nearest" });
-      element.classList.add("annotation-focused");
+      element.classList.add("termit-annotation-focused");
     });
     clearTimeout(this.focusTimeout);
     if (focusTime !== AnnotationFocusTime.INFINITE) {
@@ -117,7 +117,7 @@ export class Annotation {
 
     clearTimeout(this.focusTimeout);
     elementsToFocus.forEach((element) => {
-      element.classList.remove("annotation-focused");
+      element.classList.remove("termit-annotation-focused");
     });
   }
 
@@ -158,8 +158,8 @@ export class Annotation {
     const standardClassName = this.getClassName();
     const hoveredClassName = this.isHovered() ? " termit-h-hovered" : "";
     this.elements.forEach((element) => {
-      const focusedClassName = element.classList.contains("annotation-focused")
-        ? " annotation-focused"
+      const focusedClassName = element.classList.contains("termit-annotation-focused")
+        ? " termit-annotation-focused"
         : "";
       element!.className =
         standardClassName + hoveredClassName + focusedClassName;

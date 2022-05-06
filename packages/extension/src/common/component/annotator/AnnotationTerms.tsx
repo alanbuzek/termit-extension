@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Button, FormGroup, FormText, Label } from "reactstrap";
+import { FormGroup, FormText, Label } from "reactstrap";
 import Vocabulary from "../../model/Vocabulary";
 import { IntelligentTreeSelect } from "intelligent-tree-select";
 import "intelligent-tree-select/lib/styles.css";
@@ -17,6 +17,7 @@ import {
 import { HasI18n } from "../hoc/withI18n";
 import { useI18n } from "../hook/useI18n";
 import { TermsMap } from "../../../content";
+import Button from "../../../content/components/Button";
 
 interface GlossaryTermsProps extends HasI18n {
   vocabulary?: Vocabulary;
@@ -69,7 +70,7 @@ export class AnnotationTerms extends React.Component<AnnotationTermsProps> {
   private handleChange = (term: TermData | null) => {
     if (term === null) {
       this.props.selectVocabularyTerm(term);
-      this.props.onChange(null);
+      // this.props.onChange(null);
     } else {
       // The tree component adds depth and expanded attributes to the options when rendering,
       // We need to get rid of them before working with the term
@@ -97,41 +98,41 @@ export class AnnotationTerms extends React.Component<AnnotationTermsProps> {
 
     return (
       <FormGroup>
-        <div className="align-items-center d-flex mb-2">
-          <div className="flex-grow-1">
-            <Label className="attribute-label mb-0">
-              {i18n("type.term") + ":"}
-            </Label>
+        <div className="flex mb-0">
+          <div className="flex-1">
+            <IntelligentTreeSelect
+              ref={this.treeComponent}
+              className="p-0 w-full"
+              onChange={this.handleChange}
+              value={this.props.selectedTerm}
+              options={terms}
+              isMenuOpen={false}
+              multi={false}
+              optionRenderer={createTermsWithImportsOptionRenderer(
+                this.props.vocabulary!.iri
+              )}
+              valueRenderer={createTermValueRenderer(
+                this.props.vocabulary!.iri
+              )}
+              {...commonTermTreeSelectProps(this.props)}
+              placeholder="Select term to assign"
+            />
           </div>
           {this.props.canCreateTerm && (
-            <Button
-              key="annotator.createTerm"
-              color="primary"
-              title={i18n("glossary.createTerm.tooltip")}
-              size="sm"
-              onClick={this.props.onCreateTerm}
-              className="pull-right"
-            >
-              <GoPlus className="mr-1" />
-              {i18n("annotator.createTerm.button")}
-            </Button>
+            <div className="p-0.5">
+              <Button
+                style={{ flex: 0.15 }}
+                onClick={this.props.onCreateTerm}
+                color="primary"
+                size="icon"
+                className="ml-1 py-1 px-2 h-full w-full"
+              >
+                <GoPlus className="text-base text-gray-700" />
+              </Button>
+            </div>
           )}
         </div>
-        <IntelligentTreeSelect
-          ref={this.treeComponent}
-          className="p-0 mt-1"
-          onChange={this.handleChange}
-          value={this.props.selectedTerm}
-          options={terms}
-          isMenuOpen={false}
-          multi={false}
-          optionRenderer={createTermsWithImportsOptionRenderer(
-            this.props.vocabulary!.iri
-          )}
-          valueRenderer={createTermValueRenderer(this.props.vocabulary!.iri)}
-          {...commonTermTreeSelectProps(this.props)}
-        />
-        <FormText>
+        <FormText className="ml-2 -mb-3">
           {i18n("resource.metadata.terms.edit.select.placeholder")}
         </FormText>
       </FormGroup>

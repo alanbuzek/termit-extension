@@ -17,7 +17,6 @@ const TermDefinitionAnnotationView: React.FC<TermDefinitionAnnotationViewProps> 
         <table>
           <tbody>
             <tr>
-              <td className="label">{i18n("annotation.definition.term")}</td>
               <td>
                 <TermLink term={props.term} />
               </td>

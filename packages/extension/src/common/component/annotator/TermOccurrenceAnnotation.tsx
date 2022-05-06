@@ -7,10 +7,10 @@ import { TiTimes, TiTrash } from "react-icons/ti";
 import { AnnotationOriginClass } from "../../util/Annotation";
 import TermOccurrenceAnnotationView from "./TermOccurrenceAnnotationView";
 import { GoPencil } from "react-icons/go";
-import { useI18n } from '../hook/useI18n';
-import SimplePopupWithActions from './SimplePopupWithActions';
-import Term from '../../model/Term';
-import { ContentState } from '../../../content';
+import { useI18n } from "../hook/useI18n";
+import SimplePopupWithActions from "./SimplePopupWithActions";
+import Term from "../../model/Term";
+import { ContentState } from "../../../content";
 
 interface TermOccurrenceAnnotationProps {
   term?: Term | null;
@@ -28,6 +28,25 @@ interface TermOccurrenceAnnotationProps {
   contentState: ContentState;
 }
 
+export const TrashIcon = () => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      className="h-4 w-4"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      strokeWidth={2}
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+      />
+    </svg>
+  );
+};
+
 function createActionButtons(
   props: TermOccurrenceAnnotationProps,
   i18n: (msgId: string) => string,
@@ -38,58 +57,38 @@ function createActionButtons(
   const t = props.term ? props.term : null;
   if (props.annotationOrigin === AnnotationOriginClass.PROPOSED && t !== null) {
     actions.push(
-      // <IfUserAuthorized
-      //   renderUnauthorizedAlert={false}
-      //   key="annotation.confirm"
-      // >
-        <Button
-          color="primary"
-          title={i18n("annotation.confirm")}
-          size="sm"
-          onClick={() => props.onSelectTerm(t)}
-        >
-          <FaCheck />
-        </Button>
-      // </IfUserAuthorized>
+      <Button
+        color="primary"
+        title={i18n("annotation.confirm")}
+        size="sm"
+        onClick={() => props.onSelectTerm(t)}
+      >
+        <FaCheck />
+      </Button>
     );
   }
   if (!editing) {
     actions.push(
-      // <IfUserAuthorized renderUnauthorizedAlert={false} key="annotation.edit">
-        <Button
-          color="primary"
-          title={i18n("annotation.edit")}
-          size="sm"
-          onClick={onEdit}
-        >
-          <GoPencil />
-        </Button>
-      // </IfUserAuthorized>
-    );
-  }
-  actions.push(
-    // <IfUserAuthorized renderUnauthorizedAlert={false} key="annotation.remove">
       <Button
         color="primary"
-        title={i18n("annotation.remove")}
+        title={i18n("annotation.edit")}
         size="sm"
-        onClick={props.onRemove}
+        onClick={onEdit}
       >
-        <TiTrash />
+        <GoPencil />
       </Button>
-    // </IfUserAuthorized> 
-  );
+    );
+  }
+
   actions.push(
-    <Button
-      key="annotation.close"
-      color="primary"
-      title={i18n("annotation.close")}
-      size="sm"
-      onClick={props.onClose}
+    <div
+      className="hover:bg-red-200 bg-gray-300 border border-gray-300 rounded-md cursor-pointer transition-all duration-200 text-gray-500 px-2 py-1"
+      onClick={props.onRemove}
     >
-      <TiTimes />
-    </Button>
+      <TrashIcon />
+    </div>
   );
+
   return actions;
 }
 
@@ -116,7 +115,9 @@ export const TermOccurrenceAnnotation: React.FC<TermOccurrenceAnnotationProps> =
         vocabulary={props.contentState.vocabulary!}
         terms={props.contentState.terms!}
         canCreateTerm
-        selectVocabularyTerm={(v) => console.log('vocabulary term selected: ', v)}
+        selectVocabularyTerm={(v) =>
+          console.log("vocabulary term selected: ", v)
+        }
       />
     ) : (
       <TermOccurrenceAnnotationView
@@ -140,7 +141,9 @@ export const TermOccurrenceAnnotation: React.FC<TermOccurrenceAnnotationProps> =
           editing,
           () => setEditing(!editing)
         )}
-        title={i18n("annotation.occurrence.title")}
+        title={
+          editing ? i18n("annotation.occurrence.title") : "Přiřazený pojem"
+        }
       />
     );
   };

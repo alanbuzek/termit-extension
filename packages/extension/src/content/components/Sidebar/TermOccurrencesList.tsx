@@ -1,6 +1,7 @@
 import React from "react";
 import { useState } from "react";
 import { FaTrashAlt } from "react-icons/fa";
+import { TrashIcon } from "../../../common/component/annotator/TermOccurrenceAnnotation";
 import BadgeButton from "../../../common/component/misc/BadgeButton";
 import TermLink from "../../../common/component/term/TermLink";
 import { Annotation } from "../../../common/util/Annotation";
@@ -51,15 +52,12 @@ const TermOccurrencesList = ({ annotations, onDeleteAnnotation }) => {
                 )}
               </div>
               <div>
-                <BadgeButton
-                  disabled={!!deletingAnnotation}
-                  color="danger"
-                  className="ml-3 mt-2 border-none"
-                  outline
+                <div
+                  className="hover:bg-red-200 bg-gray-100 border border-gray-300 rounded-md cursor-pointer transition-all duration-200 text-gray-500 hover:text-gray-600 px-2 py-1 ml-3 mt-2"
                   onClick={async (e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    if (deletingAnnotation){
+                    if (deletingAnnotation) {
                       return;
                     }
                     setDeletingAnnotation(annotation);
@@ -70,9 +68,9 @@ const TermOccurrencesList = ({ annotations, onDeleteAnnotation }) => {
                   {deletingAnnotation === annotation ? (
                     <Spinner />
                   ) : (
-                    <FaTrashAlt className="text-sm" />
+                    <TrashIcon />
                   )}
-                </BadgeButton>
+                </div>
               </div>
             </div>
 

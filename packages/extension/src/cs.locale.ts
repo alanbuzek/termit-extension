@@ -553,7 +553,7 @@ const cs = {
   "annotation.edit": "Editovat výskyt pojmu",
   "annotation.remove": "Odebrat výskyt pojmu",
   "annotation.close": "Zavřít",
-  "annotation.occurrence.title": "Výskyt pojmu",
+  "annotation.occurrence.title": "Přiřaďte pojem",
   "annotation.definition.title": "Zdroj definice pojmu",
   "annotation.definition.term": "Pojem:",
   "annotation.definition.definition": "Definice:",
