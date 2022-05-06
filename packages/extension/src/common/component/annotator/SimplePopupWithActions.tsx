@@ -1,26 +1,36 @@
 import * as React from "react";
 import { ButtonToolbar } from "reactstrap";
-import { Popover, PopoverBody, PopoverHeader } from "./SelectionPurposeDialog";
+
+const Popover = ({ children, className = "" }) => {
+  return <div className={`popover ${className}`}>{children}</div>;
+};
+
+const PopoverHeader = ({ children, className = "", style = {} }) => {
+  return (
+    <div className={`popover-header ${className}`} style={style}>
+      {children}
+    </div>
+  );
+};
+
+const PopoverBody = ({ children, className = "", style = {} }) => {
+  return (
+    <div className={`popover-body ${className}`} style={style}>
+      {children}
+    </div>
+  );
+};
 
 interface PopupWithActionsProps {
   title: string;
   actions: JSX.Element[];
   component: JSX.Element;
-  isOpen: boolean;
-  toggle: any;
 }
 
-const handler = (e: any) => {
-  // TODO: just delte?
-};
-
 const SimplePopupWithActions: React.FC<PopupWithActionsProps> = (props) => {
-  if (!props.isOpen) {
-    return null;
-  }
   return (
     <Popover className="border border-gray-400  rounded-md">
-      <div onClick={handler}>
+      <div>
         <PopoverHeader className="d-flex align-items-center px-1 pb-1 pt-1.5 !bg-gray-100 !border !border-gray-300">
           <div className="pwa-popup-title flex-grow-1 px-1 ml-0.5 text-gray-600 font-semibold">
             {props.title}

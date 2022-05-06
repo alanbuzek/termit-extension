@@ -25,7 +25,7 @@ export class Sidebar {
   ) {
 
     this.container = document.createElement("div");
-    this.container.className = "annotator-frame annotator-collapsed";
+    this.container.className = "annotator-frame annotator-collapsed termit-sidebar-container";
     this.container.style.marginLeft = "";
 
     // Wrap up the 'container' element into a shadow DOM so it is not affected by host CSS styles

@@ -11,13 +11,11 @@ import { isTermValid, LabelExists } from "../term/TermValidationUtils";
 import { ContentState } from "../../../content";
 import { Annotation } from "../../util/Annotation";
 import TermOccurrence from "../../model/TermOccurrence";
-import { getPageUrl } from '../../../content/helper/url';
+import { getPageUrl } from "../../../content/helper/url";
 
-interface CreateTermFromAnnotationProps extends HasI18n {
-  show: boolean;
+interface CreateTermFromAnnotationProps {
   onClose: () => void;
   onMinimize: () => void; // Minimize will be used to allow the user to select definition for a term being created
-  onTermCreated: (term: Term) => void;
   vocabularyIri: IRI;
   language: string;
   contentState: ContentState;
@@ -90,7 +88,6 @@ export class CreateTermFromAnnotation extends React.Component<
   public onSave = () => {
     const newTerm = new Term(this.state);
     this.props.createTerm(newTerm).then(() => {
-      this.props.onTermCreated(newTerm);
       this.onCancel();
     });
   };
@@ -103,20 +100,14 @@ export class CreateTermFromAnnotation extends React.Component<
   public render() {
     const i18n = this.props.i18n;
     const invalid = !isTermValid(this.state, this.state.labelExists);
+
     return (
-      <div
-        id="annotator-create-term"
-        isOpen={this.props.show}
-        toggle={this.onCancel}
-        size="lg"
-        style={{ width: "100%" }}
-        className="p-3"
-      >
+      <div style={{ width: "100%" }} className="p-3">
         <div
           className="modal-header"
           style={{ paddingTop: 1, paddingRight: 0, paddingLeft: 0 }}
         >
-          <h3 className='text-lg font-semibold my-2'>Vytvořit nový pojem</h3>
+          <h3 className="text-lg font-semibold my-2">Vytvořit nový pojem</h3>
         </div>
         <div>
           <TermMetadataCreateForm

@@ -75,6 +75,7 @@ function ContentPopup({
   annotation,
   contentState,
   onSelectDefinition,
+  repositionWithAnnotation,
 }: ContentPopupProps) {
   const [currPopup, setCurrPopup] = useState(initialPopupType);
   const [isMinimized, setIsMinimized] = useState(false);
@@ -91,15 +92,10 @@ function ContentPopup({
         // 4. create term annotation
         return (
           <CreateTermFromAnnotation
-            // TODO: do we need 'show' and other props?
-            show
             onClose={() => {
               closePopup();
+              overlay.off();
             }}
-            onSave={() => {
-              // TODO: do we still need this callback?
-            }}
-            // TODO: all this should either be deleted if not needed or use real, not hard-coded values
             onMinimize={() => {
               setIsMinimized(true);
               overlay.off();
@@ -113,10 +109,10 @@ function ContentPopup({
                 setDefinitionAnnotation(definitionAnnotation);
               });
             }}
-            onTermCreated={() => 0}
             // TODO: handle fallback when no vocabulary is selected
             vocabularyIri={vocabularyIri}
             createTerm={(term: Term) => {
+              overlay.off();
               return ContentActions.createTerm(
                 term,
                 vocabularyIri,
@@ -124,11 +120,8 @@ function ContentPopup({
                 definitionAnnotation
               );
             }}
-            i18n={() => ""}
-            formatMessag={() => Promise.resolve()}
-            formatDate={() => ""}
-            formatTime={() => ""}
-            locale="cs-CZ"
+            // i18n={() => ""}
+            // locale="cs-CZ"
             language={"cs"}
             contentState={contentState}
             definitionAnnotation={definitionAnnotation}
@@ -138,18 +131,24 @@ function ContentPopup({
       case PopupType.PurposeSelection:
         return (
           <HighlightedTextAdder
-            onMarkOccurrence={() => {
-              ContentActions.createUnknownOccurrenceFromRange(
-                selectionRange,
-                AnnotationType.OCCURRENCE
-              );
+            onMarkOccurrence={async () => {
+              const annotation =
+                await ContentActions.createUnknownOccurrenceFromRange(
+                  selectionRange,
+                  AnnotationType.OCCURRENCE
+                );
+              repositionWithAnnotation(annotation);
               setCurrPopup(PopupType.TermOccurrence);
             }}
-            onMarkDefinition={() => {
-              ContentActions.createUnknownOccurrenceFromRange(
-                selectionRange,
-                AnnotationType.DEFINITION
-              );
+            onMarkDefinition={async () => {
+              const annotation =
+                await ContentActions.createUnknownOccurrenceFromRange(
+                  selectionRange,
+                  AnnotationType.DEFINITION
+                );
+
+              repositionWithAnnotation(annotation);
+
               setCurrPopup(PopupType.TermDefinition);
             }}
           />
@@ -158,11 +157,6 @@ function ContentPopup({
         return (
           <TermOccurrenceAnnotation
             term={annotation?.term}
-            // TODO: is this needed?
-            // text={
-            //   annotation?.termOccurrence.content || selectionRange?.toString()
-            // }
-            // TODO: tweak these defaults
             annotationClass={
               annotation?.getTermState() ||
               AnnotationTypeClass.SUGGESTED_OCCURRENCE
@@ -171,8 +165,6 @@ function ContentPopup({
               annotation?.getTermCreatorState() ||
               AnnotationOriginClass.PROPOSED
             }
-            // TODO: do we need is open? or will that be fully managed by the above layer (more likely)
-            isOpen={true}
             onRemove={() => {
               closePopup();
               return ContentActions.removeOccurrence(annotation);
@@ -188,7 +180,6 @@ function ContentPopup({
               showAt(0, 0, true);
               setCurrPopup(PopupType.CreateTermModal);
             }}
-            onToggleDetailOpen={() => 0}
             onClose={closePopup}
             contentState={contentState}
           />
@@ -201,7 +192,6 @@ function ContentPopup({
               annotation?.termOccurrence?.getTextContent() ||
               selectionRange.toString()
             }
-            isOpen={true}
             onRemove={() => {
               closePopup();
               return ContentActions.removeOccurrence(annotation);
@@ -213,7 +203,6 @@ function ContentPopup({
                 AnnotationType.DEFINITION
               );
             }}
-            onToggleDetailOpen={() => 0}
             onClose={closePopup}
             contentState={contentState}
           />
@@ -228,7 +217,7 @@ function ContentPopup({
   };
 
   if (currPopup === PopupType.CreateTermModal) {
-    style = { ...style, width: 700, height: 550, overflowY: "scroll" };
+    style = { ...style, width: 700, height: 500, overflowY: "scroll" };
   }
 
   return (

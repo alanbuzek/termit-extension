@@ -13,14 +13,11 @@ import { ContentState } from "../../../content";
 import { TrashIcon } from "./TermOccurrenceAnnotation";
 
 interface TermDefinitionAnnotationProps {
-  target: string;
   term?: Term | null;
   resource?: string;
   text: string;
-  isOpen: boolean;
   onRemove: () => void;
   onSelectTerm: (term: Term) => Promise<void>;
-  onToggleDetailOpen: () => void;
   onClose: () => void;
   contentState: ContentState;
 }
@@ -70,7 +67,6 @@ export const TermDefinitionAnnotation: React.FC<TermDefinitionAnnotationProps> =
     }, [term]);
     const bodyContent = editing ? (
       <AnnotationTerms
-        onChange={() => ({})}
         canCreateTerm={false}
         selectedTerm={term}
         i18n={i18n}
@@ -93,9 +89,6 @@ export const TermDefinitionAnnotation: React.FC<TermDefinitionAnnotationProps> =
 
     return (
       <SimplePopupWithActions
-        isOpen={props.isOpen}
-        target={props.target}
-        toggle={props.onToggleDetailOpen}
         component={bodyContent}
         actions={createActionButtons(props, i18n, editing, () =>
           setEditing(!editing)

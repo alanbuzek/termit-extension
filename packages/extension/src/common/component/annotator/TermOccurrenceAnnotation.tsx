@@ -16,16 +16,13 @@ interface TermOccurrenceAnnotationProps {
   term?: Term | null;
   score?: string;
   resource?: string;
-  text: string;
   annotationClass: string;
   annotationOrigin: string;
-  isOpen: boolean;
-  onRemove: () => void;
   onSelectTerm: (term: Term) => void;
   onCreateTerm: () => void;
-  onToggleDetailOpen: () => void;
   onClose: () => void;
   contentState: ContentState;
+  onRemove: () => void;
 }
 
 export const TrashIcon = () => {
@@ -109,15 +106,17 @@ export const TermOccurrenceAnnotation: React.FC<TermOccurrenceAnnotationProps> =
     const popupBody = editing ? (
       <AnnotationTerms
         selectedTerm={term}
-        onChange={props.onSelectTerm}
         onCreateTerm={props.onCreateTerm}
         i18n={i18n}
         vocabulary={props.contentState.vocabulary!}
         terms={props.contentState.terms!}
         canCreateTerm
-        selectVocabularyTerm={(v) =>
-          console.log("vocabulary term selected: ", v)
-        }
+        selectVocabularyTerm={(term: Term | null) => {
+          if (!term) {
+            return;
+          }
+          return props.onSelectTerm(term);
+        }}
       />
     ) : (
       <TermOccurrenceAnnotationView
@@ -129,8 +128,6 @@ export const TermOccurrenceAnnotation: React.FC<TermOccurrenceAnnotationProps> =
 
     return (
       <SimplePopupWithActions
-        isOpen={props.isOpen}
-        toggle={props.onToggleDetailOpen}
         component={popupBody}
         actions={createActionButtons(
           Object.assign({}, props, {

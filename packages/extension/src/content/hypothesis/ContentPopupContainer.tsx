@@ -167,14 +167,16 @@ export class ContentPopupContainer {
   private outerContainer: HTMLElement;
   private shadowRoot: ShadowRoot;
   private view: any;
-  private width: () => any;
-  private height: () => any;
   private isVisible: boolean;
   private arrowDirection: string;
   private currentAnnotation: Annotation | null = null;
   private contentState: ContentState;
   private onSelectDefinition: () => any;
   private hasBeenRendered: boolean = false;
+  private selectionRect;
+  private isRTLselection;
+  private selectionRange;
+  private lastArrowDirection;
   annotationsForSelection: never[];
   /**
    * Create the toolbar's container and hide it.
@@ -194,9 +196,9 @@ export class ContentPopupContainer {
     this.outerContainer = document.createElement("hypothesis-adder");
     this.onSelectDefinition = onSelectDefinition;
     element.appendChild(this.outerContainer);
-    console.log('this.outerContainer: ', this.outerContainer);
+    console.log("this.outerContainer: ", this.outerContainer);
     this.shadowRoot = createShadowRoot(this.outerContainer);
-    console.log('this.shadowRoot1: ', this.shadowRoot)
+    console.log("this.shadowRoot1: ", this.shadowRoot);
 
     // Set initial style
     Object.assign(this.outerContainer.style, {
@@ -210,7 +212,7 @@ export class ContentPopupContainer {
     this.view = /** @type {Window} */ element.ownerDocument.defaultView;
 
     this.width = () => {
-      console.log('this.shadowRoot: ', this.shadowRoot)
+      console.log("this.shadowRoot: ", this.shadowRoot);
       const firstChild = this.shadowRoot.firstChild;
       return firstChild.getBoundingClientRect().width;
     };
@@ -238,7 +240,6 @@ export class ContentPopupContainer {
   /** Hide the adder */
   public hide() {
     this.isVisible = false;
-    overlay.off();
     this.render();
     // Reposition the outerContainer because it affects the responsiveness of host page
     // https://github.com/hypothesis/client/issues/3193
@@ -270,20 +271,37 @@ export class ContentPopupContainer {
     selectionRect,
     isRTLselection,
     selectionRange,
-    annotation: Annotation | null = null
+    annotation: Annotation | null = null,
+    isRepositioning = false
   ) {
-    console.log("called show with annotation: ", annotation);
+    this.selectionRect = selectionRect;
+    this.isRTLselection = isRTLselection;
+    this.selectionRange = selectionRange;
+
     this.currentAnnotation = annotation;
     const { left, top, arrowDirection } = this.calculateTarget(
       selectionRect,
-      isRTLselection
+      isRTLselection,
+      !annotation,
+      isRepositioning
     );
-    this.showAt(left, top);
+    this.showAt(left, top, false);
 
     this.isVisible = true;
     this.arrowDirection = arrowDirection === ARROW_POINTING_UP ? "up" : "down";
 
     this.render(selectionRange);
+  }
+
+  public repositionWithAnnotation(annotation: Annotation) {
+    this.currentAnnotation = annotation;
+    this.show(
+      this.selectionRect,
+      this.isRTLselection,
+      this.selectionRange,
+      annotation,
+      true
+    );
   }
 
   /**
@@ -301,7 +319,12 @@ export class ContentPopupContainer {
    *        top-left edge of targetRect.
    * @return {Target}
    */
-  private calculateTarget(selectionRect, isRTLselection) {
+  private calculateTarget(
+    selectionRect,
+    isRTLselection,
+    isSelectionPurposeDialog,
+    isRepositioning
+  ) {
     // Set the initial arrow direction based on whether the selection was made
     // forwards/upwards or downwards/backwards.
     /** @type {ArrowDirection} */ let arrowDirection;
@@ -319,29 +342,39 @@ export class ContentPopupContainer {
     // Position the adder such that the arrow it is above or below the selection
     // and close to the end.
     const hMargin = Math.min(ARROW_H_MARGIN, selectionRect.width);
-    const adderWidth = this.width();
+
+    const adderWidth = isSelectionPurposeDialog ? 148 : 298;
+    // const adderHeight = isSelectionPurposeDialog ? 56 : 125.8;
+    const adderHeight = isSelectionPurposeDialog ? 56 : 125.8;
     // Render the adder a little lower on touch devices to provide room for the native
     // selection handles so that the interactions with selection don't compete with the adder.
     const touchScreenOffset = isTouchDevice() ? 10 : 0;
-    const adderHeight = this.height();
-    if (isRTLselection) {
-      left = selectionRect.left - adderWidth / 2 + hMargin;
+
+    if (selectionRect.width > adderWidth) {
+      left = selectionRect.left + selectionRect.width / 2 - adderWidth / 2;
     } else {
-      left =
-        selectionRect.left + selectionRect.width - adderWidth / 2 - hMargin;
+      left = selectionRect.left - (adderWidth - selectionRect.width) / 2;
     }
 
     // Flip arrow direction if adder would appear above the top or below the
     // bottom of the viewport.
-    if (
-      selectionRect.top - adderHeight < 0 &&
-      arrowDirection === ARROW_POINTING_DOWN
-    ) {
-      arrowDirection = ARROW_POINTING_UP;
-    } else if (selectionRect.top + adderHeight > this.view.innerHeight) {
-      arrowDirection = ARROW_POINTING_DOWN;
-    }
+    // if (
+    //   selectionRect.top - adderHeight < 0 &&
+    //   arrowDirection === ARROW_POINTING_DOWN
+    // ) {
+    //   arrowDirection = ARROW_POINTING_UP;
+    // } else if (selectionRect.top + adderHeight > this.view.innerHeight) {
+    //   arrowDirection = ARROW_POINTING_DOWN;
+    // }
 
+
+    // if (isRepositioning){
+    //   arrowDirection = this.lastArrowDirection;
+    // } else {
+    //   this.lastArrowDirection = arrowDirection;
+    // }
+
+    arrowDirection = ARROW_POINTING_UP;
     if (arrowDirection === ARROW_POINTING_UP) {
       top =
         selectionRect.top +
@@ -352,9 +385,13 @@ export class ContentPopupContainer {
       top = selectionRect.top - adderHeight - ARROW_HEIGHT;
     }
 
+    const sidebarClosed = document
+      .querySelector("termit-sidebar-container")
+      ?.classList.contains("annotator-collapsed");
+    const sidebarWidth = sidebarClosed ? 0 : 350;
     // Constrain the adder to the viewport.
     left = Math.max(left, 0);
-    left = Math.min(left, this.view.innerWidth - adderWidth);
+    left = Math.min(left, this.view.innerWidth - adderWidth - sidebarWidth - 50);
 
     top = Math.max(top, 0);
     top = Math.min(top, this.view.innerHeight - adderHeight);
@@ -362,23 +399,9 @@ export class ContentPopupContainer {
     return { top, left, arrowDirection };
   }
 
-  /**
-   * Show the adder at the given position and with the arrow pointing in
-   * arrowDirection.
-   *
-   * @param {number} left - Horizontal offset from left edge of viewport.
-   * @param {number} top - Vertical offset from top edge of viewport.
-   */
   private showAt(left, top, isModal = false) {
-    // Translate the (left, top) viewport coordinates into positions relative to
-    // the adder's nearest positioned ancestor (NPA).
-    //
-    // Typically the adder is a child of the <body> and the NPA is the root
-    // <html> element. However page styling may make the <body> positioned.
-    // See https://github.com/hypothesis/client/issues/487.
     const positionedAncestor = nearestPositionedAncestor(this.outerContainer);
     const parentRect = positionedAncestor.getBoundingClientRect();
-
 
     if (isModal) {
       overlay.on();
@@ -387,8 +410,8 @@ export class ContentPopupContainer {
         left: "50%",
         top: "50%",
         position: "fixed",
-        transform: "translate(-350px, -275px)",
-        zIndex: 2000
+        transform: "translate(-350px, -250px)",
+        zIndex: 2000,
       });
     } else {
       Object.assign(this.outerContainer.style, {
@@ -396,7 +419,7 @@ export class ContentPopupContainer {
         top: toPx(top - parentRect.top),
         position: "absolute",
         transform: "none",
-        zIndex: 2000
+        zIndex: 2000,
       });
     }
   }
@@ -406,17 +429,6 @@ export class ContentPopupContainer {
   }
 
   private render(selectionRange?) {
-    const handleCommand = (command) => {
-      // TODO: figure out if something of this nature is needed?
-      // switch (command) {
-      //   case 'annotate':
-      //     this.onAnnotate();
-      //     this.hide();
-      //     break;
-
-      return false;
-    };
-
     let initialPopupType = PopupType.PurposeSelection;
     if (this.currentAnnotation) {
       if (isDefinitionAnnotation(this.currentAnnotation.termOccurrence.types)) {
@@ -433,7 +445,6 @@ export class ContentPopupContainer {
         <ContentPopup
           isVisible={this.isVisible}
           arrowDirection={this.arrowDirection}
-          onCommand={handleCommand}
           showAt={this.showAt.bind(this)}
           hide={this.hide.bind(this)}
           selectionRange={selectionRange}
@@ -441,12 +452,12 @@ export class ContentPopupContainer {
           initialPopupType={initialPopupType}
           contentState={this.contentState}
           onSelectDefinition={this.onSelectDefinition}
+          repositionWithAnnotation={this.repositionWithAnnotation}
         />
       </IntlProvider>,
       this.shadowRoot,
       () => {
         if (!this.hasBeenRendered) {
-          // TODO: abstract this away
           loadStyles(this.shadowRoot, "annotator");
           loadStyles(this.shadowRoot, "styles");
           loadStyles(this.shadowRoot, "bootstrap-termit");
@@ -456,9 +467,7 @@ export class ContentPopupContainer {
     );
   }
 
-
   public getShadowRoot() {
     return this.shadowRoot;
   }
 }
-

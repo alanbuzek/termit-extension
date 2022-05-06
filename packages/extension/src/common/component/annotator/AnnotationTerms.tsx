@@ -70,7 +70,6 @@ export class AnnotationTerms extends React.Component<AnnotationTermsProps> {
   private handleChange = (term: TermData | null) => {
     if (term === null) {
       this.props.selectVocabularyTerm(term);
-      // this.props.onChange(null);
     } else {
       // The tree component adds depth and expanded attributes to the options when rendering,
       // We need to get rid of them before working with the term
@@ -83,7 +82,6 @@ export class AnnotationTerms extends React.Component<AnnotationTermsProps> {
       delete cloneData.depth;
       const clone = new Term(cloneData);
       this.props.selectVocabularyTerm(clone);
-      this.props.onChange(clone);
     }
   };
 
@@ -119,7 +117,7 @@ export class AnnotationTerms extends React.Component<AnnotationTermsProps> {
             />
           </div>
           {this.props.canCreateTerm && (
-            <div className="p-0.5">
+            <div className='p-0.5'>
               <Button
                 style={{ flex: 0.15 }}
                 onClick={this.props.onCreateTerm}

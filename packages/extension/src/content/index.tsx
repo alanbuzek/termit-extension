@@ -243,7 +243,6 @@ export const ContentActions = {
       // website hasn't been annotated yet, wait for explicit user action
       return;
     }
-
     const { website, vocabulary } = foundExistingWebsite;
 
     contentState.terms = await api.loadAllTerms(
