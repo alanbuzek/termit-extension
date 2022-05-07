@@ -683,7 +683,7 @@ const en = {
     annotations there are on the page.`,
     "extension.choose.vocabulary":
       "Choose a vocabulary to start annotating with.",
-    "extension.off.message": "TermIt Extension is turned off.",
+    "extension.off.message": "TermIt Annotate is turned off.",
     "extension.off.explanation":
       "Annotations won't work on any pages until you turn it on again.",
     "extension.on": "On",
@@ -720,6 +720,42 @@ const en = {
     "occurrence.delete.all": "Delete all annotations",
     "occurrence.delete.suggestions": "Delete suggestions",
     "sidebar.vocabulary.link": "See vocabulary in TermIt",
+    "extension.onboarding.next": "Next",
+    "extension.onboarding.welcome.header": "Welcome to",
+    "extension.onboarding.welcome.text1":
+      "Thank for installing TermIt Annotate. To start off, we've prepared a quick tutorial for you to start using the extension smoothly!",
+    "extension.onboarding.welcome.button": "Start Quick Tutorial",
+    "extension.onboarding.step1.header":
+      "Start page annotation through the sidebar",
+    "extension.onboarding.step1.text1":
+      "On any page you like, just open the extension sidebar to the right, pick a vocabulary to use and begin your annotation journey with TermIt Annotate!",
+    "extension.onboarding.step1.text2":
+      "If you're not logged in to TermIt or don't have an account yet, you can annotate start annotating, but you will need to login (or register) to be able to save any progress you've made.",
+    "extension.onboarding.step2.header":
+      "Confirm suggested annotations and create your own",
+    "extension.onboarding.step2.text1":
+      "After first triggering page annotation, you'll have suggested term occurrences appear on the page, based on the vocabulary you've chosen.",
+    "extension.onboarding.step2.text2":
+      "Confirm, remove or reassign annotation suggestions to terms as well as highlight any text to create your want annotations.",
+    "extension.onboarding.step2.text3":
+      "You can also create new terms in the selected vocabulary by clicking the '+' sign in the show popup.",
+    "extension.onboarding.step3.header": "See you annotations in time",
+    "extension.onboarding.step3.text1":
+      "Anytime you come back to a page you've previously annotated, you're annotations we'll appear again and you'll be able to continue right where you left off.",
+    "extension.onboarding.step4.header": "Use sidebar to keep things in grip",
+    "extension.onboarding.step4.text1":
+      "Through the extension's sidebar, you'll be able to search and manage existing page annotations, delete annotations or access a list of all annotated pages.",
+    "extension.onboarding.step5.header":
+      "Take full advantage of TermIt's semantic vocabulary platform",
+    "extension.onboarding.step5.text1":
+      "TermIt is powered by Semantic Web technologies, providing a robust tool for your vocabulary management needs. You can click through into the web application from the extension any time, visiting terms, definitions or vocabularies and manage everything in further detail.",
+    "extension.onboarding.step6.header":
+      " You're all set! Close this page and start annotating!",
+    "extension.onboarding.step6.text1":
+      "You'll be able to come back to this tutorial through a link in the sidebar, if you need a refresher.",
+    "extension.onboarding.skip": "Skip tutorial",
+    "extension.onboarding.gotostart": "Go back to start",
+    "extension.onboarding.header": "Quick Tutorial",
   },
 };
 

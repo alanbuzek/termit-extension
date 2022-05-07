@@ -1,7 +1,6 @@
 const path = require('path');
 const fs = require('fs');
 const url = require('url');
-const { resolve } = require('path');
 
 // Make sure any symlinks in the project folder are resolved:
 // https://github.com/facebookincubator/create-react-app/issues/637
@@ -42,10 +41,9 @@ module.exports = {
   dotenv: resolveApp('.env'),
   appBuild: resolveApp('build'),
   appPublic: resolveApp('public'),
-  optionsHtml: resolveApp('public/options.html'),
+  tutorialHtml: resolveApp('public/tutorial.html'),
   contentScript: resolveApp('src/content/index.tsx'),
-  optionsIndex: resolveApp('src/options/index.tsx'),
-  popupIndex: resolveApp('src/popup/index.tsx'),
+  tutorialIndex: resolveApp('src/tutorial/index.tsx'),
   backgroundScript: resolveApp('src/background/index.ts'),
   appPackageJson: resolveApp('package.json'),
   appSrc: resolveApp('src'),

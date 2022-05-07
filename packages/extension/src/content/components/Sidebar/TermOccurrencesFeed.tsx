@@ -112,7 +112,7 @@ const TermOccurrencesFeed = ({
       <div className="flex text-lg px-2.5 py-2 my-2.5 font-semibold text-gray-700">
         {showAnnotationsNotFoundSection ? (
           <span className="text-red-600">
-            {i18n("extension.annotated.notfound")}
+            {i18n("extension.notfound.annotations")}
           </span>
         ) : (
           i18n("extension.page.annotations")

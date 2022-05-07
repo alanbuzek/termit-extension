@@ -3,9 +3,7 @@ const path = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const ManifestPlugin = require('webpack-manifest-plugin');
 const InterpolateHtmlPlugin = require('react-dev-utils/InterpolateHtmlPlugin');
-const SWPrecacheWebpackPlugin = require('sw-precache-webpack-plugin');
 const eslintFormatter = require('react-dev-utils/eslintFormatter');
 const ModuleScopePlugin = require('react-dev-utils/ModuleScopePlugin');
 const paths = require('./paths');
@@ -19,7 +17,6 @@ const publicPath = paths.servedPath;
 const shouldUseRelativeAssetPaths = publicPath === './';
 // Source maps are resource heavy and can cause out of memory issue for large source files.
 // const shouldUseSourceMap = process.env.GENERATE_SOURCEMAP !== 'false';
-// TODO (alanb): does this actually work?
 const shouldUseSourceMap = false;
 // `publicUrl` is just like `publicPath`, but we will provide it to our app
 // as %PUBLIC_URL% in `index.html` and `process.env.PUBLIC_URL` in JavaScript.
@@ -59,8 +56,7 @@ module.exports = {
   // In production, we only want to load the polyfills and the app code.
   entry: {
     content: [require.resolve('./polyfills'), paths.contentScript],
-    options: [require.resolve('./polyfills'), paths.optionsIndex],
-    popup: [require.resolve('./polyfills'), paths.popupIndex],
+    tutorial: [require.resolve('./polyfills'), paths.tutorialIndex],
     background: [require.resolve('./polyfills'), paths.backgroundScript],
   },
   optimization: {

@@ -695,12 +695,13 @@ const cs = {
     "extension.loading.message": `Tato operace může chvilku trvat v závislosti na počtu anotací.`,
     "extension.choose.vocabulary":
       "Vyberte si slovník se kterým začnete vytvářet.",
-    "extension.off.message": "TermIt plugin je vypnutý.",
+    "extension.off.message": "TermIt Annotate je vypnutý.",
     "extension.off.explanation":
       "Anotování nebude fungovat na žádných stránkách do opětovného zapnutí.",
     "extension.on": " ",
     "extension.off": " ",
-    "extension.login.prompt": "Musíte se přihlásit abyste mohli začít používat TermIt.",
+    "extension.login.prompt":
+      "Musíte se přihlásit abyste mohli začít používat TermIt.",
     "extension.login.description":
       "Jakmile tak učiníte, načtěte prosím stránku znovu a začněte anotovat.",
     "extension.login.noaccount": "Nemáte účet?",
@@ -732,6 +733,42 @@ const cs = {
     "occurrence.delete.all": "Smazat všechny anotace",
     "occurrence.delete.suggestions": "Smazat návrhy",
     "sidebar.vocabulary.link": "Zobrazit slovník v TermItu",
+    "extension.onboarding.next": "Další",
+    "extension.onboarding.welcome.header": "Vítejte v",
+    "extension.onboarding.welcome.text1":
+      "Děkujeme za instalaci TermIt Annotate. Pro začátek jsme pro Vás připravili rychlý návod, jak plugin začít efektivně používat!",
+    "extension.onboarding.welcome.button": "Začít Tutoriál",
+    "extension.onboarding.step1.header":
+      "Spusťte anotaci stránky přes postraní panel",
+    "extension.onboarding.step1.text1":
+      "Na libovolné stránce, která se vám líbí, otevřete postraní panel pluginu vpravo stránky, vyberte slovník, který chcete použít, a začněte svou anotovat s TermIt Annotate!",
+    "extension.onboarding.step1.text2":
+      "Pokud nejste přihlášeni do TermIt nebo ještě nemáte účet, můžete začít anotovat anotovat, ale budete se muset přihlásit (nebo zaregistrovat), abyste si uložit vytvořené anotace.",
+    "extension.onboarding.step2.header":
+      "Potvrďte navrhované výskytu pojmů a vytvořte si vlastní",
+    "extension.onboarding.step2.text1":
+      "Po prvním spuštění anotace stránky se po načtení zobrazí navrhované výskyty pojmů na základě zvoleného slovníku.",
+    "extension.onboarding.step2.text2":
+      "Potvrďte, odeberte nebo změňte přiřazení návrhů anotací k výrazům a také zvýrazněním libovolného textu vytvořte požadované anotace.",
+    "extension.onboarding.step2.text3":
+      "Můžete také vytvořit nové výrazy ve vybraném slovníku kliknutím na tlačítka '+' ve vyskakovacím okně.",
+    "extension.onboarding.step3.header": "Sledujte anotace v čase",
+    "extension.onboarding.step3.text1":
+      "Kdykoli se vrátíte na stránku, kterou jste dříve anotovali, jako anotace se znovu zobrazíme a budete moci pokračovat tam, kde jste skončili.",
+    "extension.onboarding.step4.header": "Používejte postraní panel k organizaci anotací",
+    "extension.onboarding.step4.text1":
+      "Prostřednictvím postranního panelu rozšíření budete moci vyhledávat a spravovat stávající anotace stránky, mazat anotace nebo přistupovat k seznamu všech anotovaných stránek.",
+    "extension.onboarding.step5.header":
+      "Plně využijte platformu pro sémantické slovníky TermIt",
+    "extension.onboarding.step5.text1":
+      "TermIt je poháněn technologiemi sémantického webu, které poskytují robustní nástroj pro vaše potřeby správy pojmosloví. Z rozšíření se můžete kdykoli proklikout do webové aplikace TermIt, navštívit termíny, definice nebo slovníky a vše do detailu spravovat.",
+    "extension.onboarding.step6.header":
+      "Hotovo! Zavřete tuto stránku a začněte používat TermIt Annotate!",
+    "extension.onboarding.step6.text1":
+      "K tomuto tutoriálu se budete moci kdukoliv vrátit pomocí odkazu v postranním panelu, pokud si budete potřebovat něco zopakovat.",
+    "extension.onboarding.skip": "Přeskočit tutoriál",
+    "extension.onboarding.gotostart": "Zpět na začátek",
+    "extension.onboarding.header": "Rychlý tutoriál",
   },
 };
 

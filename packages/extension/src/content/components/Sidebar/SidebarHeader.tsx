@@ -12,7 +12,7 @@ const SidebarHeader = ({
       <a
         href={`http://localhost:3000/#/`}
         target="_blank"
-        className="ml-sm-3 ml-md-0 brand ml-2 p-0 navbar-brand text-sm    "
+        className="ml-sm-3 ml-md-0 brand ml-2 p-0 navbar-brand text-base    "
       >
         TermIt Annotate
       </a>

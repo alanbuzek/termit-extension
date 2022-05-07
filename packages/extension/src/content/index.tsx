@@ -219,7 +219,7 @@ export const ContentActions = {
       })
     );
 
-    await annotator!.annotatePage(termOccurrences, false);
+    await annotator!.annotatePage(termOccurrences, true);
     contentState.annotations = annotator!.getAnnotations();
     contentState.failedAnnotations = annotator!.getFailedAnnotations();
 
