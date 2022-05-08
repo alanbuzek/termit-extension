@@ -77,7 +77,7 @@ const SidebarApp = ({
           }}
         />
         <UserPanel user={state.user} instance={state.instance} />
-        <div className="overflow-x-auto pb-14 h-full bg-gray-50">
+        <div className="overflow-x-auto mb-14 pb-2 h-full bg-gray-50">
           {state.globalLoading ? (
             <div className="flex flex-col mx-auto mt-6 justify-center items-center">
               <Spinner className="text-green-500" size="12" />
@@ -95,7 +95,7 @@ const SidebarApp = ({
             </>
           )}
 
-          {extensionActive && (
+          {extensionActive && !state.globalLoading && (
             <SidebarFooter
               activeSection={activeSection}
               setActiveSection={setActiveSection}

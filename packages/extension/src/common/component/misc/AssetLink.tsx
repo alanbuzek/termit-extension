@@ -49,6 +49,7 @@ export default class AssetLink<T extends AssetType> extends React.Component<
               title={this.props.tooltip ? this.props.tooltip : undefined}
               href={props.path}
               target="_blank"
+              className='items-center'
               style={{ display: "inline-flex" }}
             >
               {props.asset.label}

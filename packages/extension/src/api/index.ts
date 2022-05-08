@@ -41,8 +41,13 @@ export const loadVocabularies = cachedCall("vocabularies", async () => {
         : [];
     })
     .then((data: VocabularyData[]) => {
-      return data.map((v) => new Vocabulary(v));
+      return data.map((v) => new Vocabulary(v).mapToMinifiedVersion());
     });
+
+  await BrowserApi.storage.set("vocabularies", vocabularies);
+  const gotVocabs = await BrowserApi.storage.get("vocabularies");
+
+  console.log("got vocabs from cache: ", gotVocabs);
 
   return vocabularies;
 });
@@ -453,7 +458,7 @@ export async function createDefaultVocabulary() {
     label,
     iri,
     comment: "This is your default vocabulary",
-  });
+  }).mapToMinifiedVersion();
   vocabulary.addType(VocabularyUtils.DOCUMENT_VOCABULARY);
 
   const document = new Document({

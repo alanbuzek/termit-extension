@@ -46,11 +46,11 @@ export interface VocabularyData extends AssetData {
 export default class Vocabulary extends Asset implements VocabularyData {
   public label: string;
   public comment?: string;
-  public document?: Document;
   public glossary?: AssetData;
   public model?: AssetData;
   public importedVocabularies?: AssetData[];
   public allImportedVocabularies?: string[];
+  public document?: DocumentData;
 
   public termCount?: number;
 
@@ -97,9 +97,22 @@ export default class Vocabulary extends Asset implements VocabularyData {
       MAPPED_PROPERTIES
     );
   }
-}
 
-export const EMPTY_VOCABULARY = new Vocabulary({
-  iri: Constants.EMPTY_ASSET_IRI,
-  label: "",
-});
+  public mapToMinifiedVersion(): Vocabulary {
+    return {
+      label: this.label,
+      iri: this.iri,
+      document: {
+        iri: this.document?.iri,
+        label: this.document?.label,
+        websites: this.document?.websites
+          ? this.document.websites.map((website) => ({
+              iri: website.iri,
+              label: website.label,
+              url: website.url,
+            }))
+          : [],
+      },
+    } as Vocabulary;
+  }
+}

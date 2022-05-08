@@ -38,8 +38,8 @@ const SidebarFooter = ({ activeSection, setActiveSection, isAnonymous }) => {
             } ${
               isDisabled
                 ? "cursor-not-allowed text-gray-300 font-normal"
-                : "cursor-pointer hover:!text-green-600 hover:!bg-gray-200 text-gray-500 font-semibold"
-            }`}
+                : "cursor-pointer hover:!text-green-600 hover:!bg-gray-200  font-semibold"
+            } ${!activeSection && !isDisabled ? "text-gray-400" : ""} `}
           >
             <div className="text-sm">{section.icon}</div>
             <div className="mt-2 text-sm ">{section.label}</div>

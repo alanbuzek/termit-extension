@@ -21,6 +21,7 @@ import { getPageUrl } from "./helper/url";
 import { isPagePDFViewer } from "./helper/domHelpers";
 import { ExtensionMessage } from "../shared/ExtensionMessage";
 import { cleanOnLogout, cleanWholeStorage } from "./helper/storageHelpers";
+import { SKIP_CACHE } from "../api/cache";
 
 // TODO: this should be dynamic when language selection is implemented
 const language = "cs";
@@ -119,10 +120,10 @@ const internals = {
     contentState.user = await api.getUser();
     preloadContentStyles();
 
-    if (contentState.user && !contentState.instance){
+    if (contentState.user && !contentState.instance) {
       // data inconcistency -> cleanup and init page
-      console.log('data inconcistency spotted')
-      await cleanOnLogout()
+      console.log("data inconcistency spotted");
+      await cleanOnLogout();
       internals.initPage();
       return;
     }
@@ -149,17 +150,21 @@ const internals = {
     // TODO: put this into a helper file
     // so that reactboostrap works fine (needs be able to query select elements withing shadow dom)
     document.querySelectorAll = function (str) {
-      const originalResult = originalQuerySelectorAll(str);
-      const contentPopupResult = annotator!
-        .getContentPoup()
-        .getShadowRoot()
-        .querySelectorAll(str);
-      const sidebarResult = sidebar!.getShadowRoot().querySelectorAll(str);
-      return [
-        ...originalResult,
-        ...contentPopupResult,
-        ...sidebarResult,
-      ] as any;
+      try {
+        const originalResult = originalQuerySelectorAll(str);
+        const contentPopupResult = annotator!
+          .getContentPoup()
+          .getShadowRoot()
+          .querySelectorAll(str);
+        const sidebarResult = sidebar!.getShadowRoot().querySelectorAll(str);
+        return [
+          ...originalResult,
+          ...contentPopupResult,
+          ...sidebarResult,
+        ] as any;
+      } catch {
+        return [];
+      }
     };
   },
   async deactivatePage() {
@@ -233,6 +238,9 @@ export const ContentActions = {
     );
 
     if (!internals.isAnonymous()) {
+      // refresh vocabularies cache for later
+      api.loadVocabularies(SKIP_CACHE);
+
       contentState.website = await api.createWebsiteInDocument(
         contentState.pageUrl,
         VocabularyUtils.create(vocabulary!.document!.iri)
@@ -304,6 +312,10 @@ export const ContentActions = {
       // website hasn't been annotated yet, wait for explicit user action
       return;
     }
+
+    // refresh vocabularies cache for later
+    api.loadVocabularies(SKIP_CACHE);
+
     const { website, vocabulary } = foundExistingWebsite;
 
     contentState.terms = await api.loadAllTerms(

@@ -25,11 +25,9 @@ export const OutgoingLink: React.FC<OutgoingLinkProps> = (
         rel="noopener noreferrer"
         title={formatMessage("link.external.title", { url: props.iri })}
       >
-        <span className={props.showLink ? "" : "hidden"}>
+        <span>
           &nbsp;
-          <small>
-            {/* <i className="fas fa-external-link-alt text-primary" /> */}
-          </small>
+          <small></small>
         </span>
       </a>
     </span>
