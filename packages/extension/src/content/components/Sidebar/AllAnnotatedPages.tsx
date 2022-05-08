@@ -20,7 +20,7 @@ export default function AllAnnotatedPagesSection({
       {websites.map((website) => {
         return (
           <div className="py-1 px-2.5">
-            <div className="rounded-md p-2.5 border border-gray-400 mb-0.5 cursor-pointer transition-all duration-300 hover:bg-gray-100 relative bg-white term-occurrence-card">
+            <div className="rounded-md p-2.5 border border-gray-400 mb-0.5 cursor-pointer transition-all duration-300 relative bg-white term-occurrence-card">
               <div className="flex justify-between items-end">
                 <div>
                   <a

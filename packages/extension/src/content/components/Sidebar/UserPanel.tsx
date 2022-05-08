@@ -81,7 +81,7 @@ export const UserInfo = ({ user, instance }) => {
 
 const UserPanel = ({ user, instance }) => {
   return (
-    <div className="flex px-3 pt-0 pb-1 items-center mt-2 border-b border-gray-200">
+    <div className="flex px-3 pt-0 pb-1 items-center mt-1 border-b !border-gray-300">
       <UserInfo user={user} instance={instance} />
     </div>
   );

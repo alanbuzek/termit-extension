@@ -108,7 +108,7 @@ const SidebarControlPanel = ({
   }
 
   return (
-    <div className="px-3 pt-3.5 pb-4 bg-gray-100 border-b border-gray-200">
+    <div className="px-3 pt-3.5 pb-4 border-b border-gray-200">
       <div className="flex justify-between items-end">
         {!isAnonymous && (
           <div>

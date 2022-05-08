@@ -63,7 +63,7 @@ const SidebarApp = ({
       style={{ height: "100%" }}
       className="border-l-2 border-gray-200 relative"
     >
-      <div className="h-full w-full py-2.5 flex flex-column bg-gray-50">
+      <div className="h-full w-full py-2.5 flex flex-column bg-gray-100">
         <SidebarHeader
           hasAnnotations={!!state.annotations}
           user={state.user}
@@ -77,7 +77,7 @@ const SidebarApp = ({
           }}
         />
         <UserPanel user={state.user} instance={state.instance} />
-        <div className="overflow-x-auto pb-14 h-full">
+        <div className="overflow-x-auto pb-14 h-full bg-gray-50">
           {state.globalLoading ? (
             <div className="flex flex-col mx-auto mt-6 justify-center items-center">
               <Spinner className="text-green-500" size="12" />

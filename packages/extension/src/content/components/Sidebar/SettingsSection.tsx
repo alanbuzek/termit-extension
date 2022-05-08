@@ -1,6 +1,4 @@
 import React from "react";
-import { useState } from "react";
-import { ContentState } from "../..";
 import constants from "../../../common/util/Constants";
 import BrowserApi from "../../../shared/BrowserApi";
 import { cleanWholeStorage } from "../../helper/storageHelpers";

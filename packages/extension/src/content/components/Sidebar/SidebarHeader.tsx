@@ -16,7 +16,7 @@ const SidebarHeader = ({
   const { i18n } = useI18n();
 
   return (
-    <div className="flex justify-between items-center mt-2 px-3.5 pb-3 border-b border-gray-200">
+    <div className="flex justify-between items-center mt-2 px-3.5 pb-3 border-b border-gray-300">
       <span className="ml-sm-3 ml-md-0 brand ml-2 p-0 navbar-brand text-base">
         TermIt Annotate
       </span>

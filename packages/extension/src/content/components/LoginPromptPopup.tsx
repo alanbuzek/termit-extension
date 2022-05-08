@@ -81,7 +81,7 @@ export default function LoginPromptPopup({
         <h3 className="text-base text-gray-700 text-left">
           Select a TermIt instance:
         </h3>
-        <div className="m-3 w-full">
+        <div className="my-3 w-full">
           <InstanceSelection
             instanceSelected={instanceSelected}
             setInstanceSelected={setInstanceSelected}
