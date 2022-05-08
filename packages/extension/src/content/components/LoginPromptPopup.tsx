@@ -11,16 +11,27 @@ export const openNewTabLink = (link) => {
   window.open(link, "_blank")?.focus();
 };
 
-export default function LoginPromptPopup() {
+export default function LoginPromptPopup({
+  initialStep = 0,
+  initialAction = "login",
+  initialInstance = null,
+  onInstanceSelected,
+}) {
   const { i18n } = useI18n();
-  const [step, setStep] = useState(0);
-  const [instanceSelected, setInstanceSelected] = useState<any>();
-  const [selectedAction, setSelectedAction] = useState("");
+  const [step, setStep] = useState(initialStep);
+  const [instanceSelected, setInstanceSelected] =
+    useState<any>(initialInstance);
+  const [selectedAction, setSelectedAction] = useState(initialAction);
 
   const handleInstanceSelect = () => {
-    openNewTabLink(`${instanceSelected.termitUi}/${selectedAction}`);
-    ContentActions.handleInstanceSelected(instanceSelected);
-    setStep(2);
+    const link = `${instanceSelected.termitUi}/${selectedAction}`
+    if (onInstanceSelected) {
+      onInstanceSelected(link, instanceSelected);
+    } else {
+      openNewTabLink(link);
+      ContentActions.handleInstanceSelected(instanceSelected);
+      setStep(2);
+    }
   };
 
   const handleActionClicked = async (action) => {
@@ -66,11 +77,11 @@ export default function LoginPromptPopup() {
 
   if (step === 1) {
     return (
-      <div style={{ width: 300 }} className="p-2 flex flex-col items-center">
-        <h3 className="text-base text-gray-700 text-center">
-          Please select a TermIt instance to connect to
+      <div style={{ width: 300 }} className="p-2 flex flex-col items-start">
+        <h3 className="text-base text-gray-700 text-left">
+          Select a TermIt instance:
         </h3>
-        <div className="m-3">
+        <div className="m-3 w-full">
           <InstanceSelection
             instanceSelected={instanceSelected}
             setInstanceSelected={setInstanceSelected}
@@ -78,8 +89,9 @@ export default function LoginPromptPopup() {
         </div>
         <Button
           className="mt-2"
-          disabled={!instanceSelected}
+          disabled={!instanceSelected || initialInstance === instanceSelected}
           onClick={handleInstanceSelect}
+          size={"standard"}
         >
           Confirm
         </Button>

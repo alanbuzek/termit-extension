@@ -1,7 +1,6 @@
 import React from "react";
 import { useI18n } from "../../common/component/hook/useI18n";
 import { IntelligentTreeSelect } from "intelligent-tree-select";
-import { useState } from "react";
 
 export const INSTANCE_LIST = [
   {

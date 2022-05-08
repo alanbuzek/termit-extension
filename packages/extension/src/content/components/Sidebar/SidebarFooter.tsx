@@ -1,27 +1,52 @@
 import React from "react";
+import { FaCog, FaHighlighter, FaListAlt } from "react-icons/fa";
+import { GoChecklist } from "react-icons/go";
 
-const SidebarFooter = () => {
+const SidebarFooter = ({ activeSection, setActiveSection, isAnonymous }) => {
+  const sections = [
+    {
+      icon: <FaHighlighter className="text-lg" />,
+      label: "Current",
+    },
+    {
+      icon: <FaListAlt className="text-lg" />,
+      label: "All Pages",
+    },
+    {
+      icon: <FaCog className="text-lg" />,
+      label: "Settings",
+    },
+  ];
   return (
-    <footer
-      className="footer-row mt-auto"
-      style={{ background: "transparent" }}
-    >
-      {/* <div className="px-sm-3 px-2 col">
-        <a
-          href="https://kbss.felk.cvut.cz"
-          target="_blank"
-          rel="noopener noreferrer"
-          title="KBSS FEL ČVUT v Praze"
-        >
-          ©&nbsp;KBSS FEL ČVUT v Praze, 2022
-        </a>
-      </div> */}
-      <div className="news-viewer-toggle px-sm-2 px-sm-3 px-1 text-right">
-        <span id="news-toggler">
-          <span className="footer-version">Verze&nbsp;</span>0.0.1
-        </span>
-      </div>
-    </footer>
+    <div className="flex border-t border-gray-200 position-absolute right-0 bottom-0 w-full">
+      {sections.map((section, idx) => {
+        const isDisabled = isAnonymous && idx == 1;
+        return (
+          <div
+            onClick={() => {
+              if (isDisabled) {
+                return;
+              }
+              setActiveSection(idx);
+            }}
+            style={{
+              flex: "1 1 0",
+              width: "0",
+            }}
+            className={`py-2 flex flex-col items-center   bg-white transition-all duration-300 ${
+              idx === activeSection ? "text-green-600" : ""
+            } ${
+              isDisabled
+                ? "cursor-not-allowed text-gray-300 font-normal"
+                : "cursor-pointer hover:!text-green-600 hover:!bg-gray-100 text-gray-500 font-semibold"
+            }`}
+          >
+            <div className="text-sm">{section.icon}</div>
+            <div className="mt-2 text-sm ">{section.label}</div>
+          </div>
+        );
+      })}
+    </div>
   );
 };
 

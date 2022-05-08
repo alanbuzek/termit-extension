@@ -20,6 +20,7 @@ import { overlay } from "./helper/overlay";
 import { getPageUrl } from "./helper/url";
 import { isPagePDFViewer } from "./helper/domHelpers";
 import { ExtensionMessage } from "../shared/ExtensionMessage";
+import { cleanOnLogout, cleanWholeStorage } from "./helper/storageHelpers";
 
 // TODO: this should be dynamic when language selection is implemented
 const language = "cs";
@@ -66,13 +67,14 @@ const resetContentState = async () => {
   // NOTE: these two fields, we want to preserve even on content state reset
   // contentState.vocabularies = [];
   // contentState.user = null;
-  contentState.extensionActive = false;
   contentState.globalLoading = false;
   contentState.isVocabPrompt = false;
   contentState.originalPageHtml = "";
-  contentState.extensionActive = await BrowserApi.storage.get(
+  const extensionActive = await BrowserApi.storage.get(
     Constants.STORAGE.EXTENSION_ACTIVE
   );
+  contentState.extensionActive =
+    typeof extensionActive === "boolean" ? extensionActive : true;
   contentState.language =
     (await BrowserApi.storage.get(Constants.STORAGE.LANGUAGE)) || "en"; // fallback to English for now
   contentState.locale =
@@ -82,6 +84,8 @@ const resetContentState = async () => {
   contentState.instance = await BrowserApi.storage.get(
     Constants.STORAGE.TERMIT_INSTANCE
   );
+
+  console.log("contentInstance: ", contentState.instance);
   if (contentState.instance) {
     await api.initApi(contentState.instance.termitServer);
   }
@@ -114,6 +118,14 @@ const internals = {
     await resetContentState();
     contentState.user = await api.getUser();
     preloadContentStyles();
+
+    if (contentState.user && !contentState.instance){
+      // data inconcistency -> cleanup and init page
+      console.log('data inconcistency spotted')
+      await cleanOnLogout()
+      internals.initPage();
+      return;
+    }
 
     if (!contentState.user) {
       internals.initSidebar();
@@ -537,7 +549,13 @@ export const ContentActions = {
     }
   },
   async handleInstanceSelected(currentInstance) {
-    console.log("handleInstanceSelected(currentInstance)");
+    if (contentState.user) {
+      // cleanup
+      await cleanWholeStorage();
+      // internals.deactivatePage();
+      return;
+    }
+
     await BrowserApi.storage.set(
       Constants.STORAGE.TERMIT_INSTANCE,
       currentInstance

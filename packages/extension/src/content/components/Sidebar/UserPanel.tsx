@@ -60,14 +60,14 @@ export const UserInfo = ({ user, instance }) => {
           <span className="text-base">
             <HiUserCircle className="text-3xl" />
           </span>
-          <span className="ml-3 text-base">{user.abbreviatedName}</span>
+          <span className="ml-2 text-base">{user.abbreviatedName}</span>
         </a>
       ) : (
         <div className="flex items-center text-gray-800 text-sm">
           <span className="text-base">
             <FaUserAltSlash className="text-3xl" />
           </span>
-          <span className="ml-3 text-base">
+          <span className="ml-2 text-base">
             {i18n("extension.user.anonymous")}
           </span>
         </div>
@@ -81,7 +81,7 @@ export const UserInfo = ({ user, instance }) => {
 
 const UserPanel = ({ user, instance }) => {
   return (
-    <div className="flex px-3 pt-2 pb-3 items-center mt-2 border-b border-gray-200">
+    <div className="flex px-3 pt-0 pb-1 items-center mt-2 border-b border-gray-200">
       <UserInfo user={user} instance={instance} />
     </div>
   );

@@ -2,6 +2,7 @@ import Constants, { getEnv } from "./Constants";
 import SecurityUtils from "./SecurityUtils";
 import _ from "lodash";
 import BrowserApi from "../../shared/BrowserApi";
+import { cleanOnLogout } from "../../content/helper/storageHelpers";
 
 class RequestConfigBuilder {
   private mContent?: any;
@@ -180,6 +181,7 @@ const callFetch = async (baseURL: string, path: string, config) => {
     if (!response.ok) {
       if (response.status === Constants.STATUS_UNAUTHORIZED) {
         SecurityUtils.clearToken();
+        cleanOnLogout();
         BrowserApi.storage.remove(Constants.STORAGE.USER);
         // TODO: how to handle unauthorized?
       }
@@ -331,7 +333,7 @@ export class Ajax {
       return this.fetchInstance.post(path, formData, conf);
     } else {
       const query: string = config.getParams() ? "?" + par.toString() : "";
-    
+
       return this.fetchInstance.post(
         path + paramsSerializer(config.getParams()),
         config.getContent(),

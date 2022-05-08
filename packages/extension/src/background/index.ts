@@ -3,6 +3,7 @@ import { UserData } from "../common/model/User";
 import Ajax, { content } from "../common/util/Ajax";
 import Constants from "../common/util/Constants";
 import SecurityUtils from "../common/util/SecurityUtils";
+import { cleanOnLogout } from '../content/helper/storageHelpers';
 import BrowserApi from "../shared/BrowserApi";
 import { ExtensionMessage } from "../shared/ExtensionMessage";
 
@@ -122,6 +123,7 @@ async function handleExternalMessages(message, sender, sendResponse) {
     }
     case ExtensionMessage.LogoutEvent: {
       SecurityUtils.clearToken();
+      cleanOnLogout();
       await BrowserApi.storage.remove(Constants.STORAGE.USER);
       sendResponse({ success: true });
       break;

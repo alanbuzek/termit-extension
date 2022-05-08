@@ -63,6 +63,9 @@ const BrowserApi = {
     remove(key: string) {
       return chrome.storage.local.remove(key);
     },
+    clear() {
+      return chrome.storage.local.clear();
+    },
   },
 };
 
