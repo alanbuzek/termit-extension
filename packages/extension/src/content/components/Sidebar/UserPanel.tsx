@@ -1,4 +1,5 @@
 import React from "react";
+import { FaUserAltSlash } from "react-icons/fa";
 import { Button } from "reactstrap";
 import { useI18n } from "../../../common/component/hook/useI18n";
 import UserDropdown from "../dropdown/UserDropdown";
@@ -24,17 +25,14 @@ const LoginPrompt = () => {
   const { i18n } = useI18n();
   return (
     <div>
-      <p className="font-semibold">{i18n("extension.login.prompt")}</p>
+      <p className="font-normal">{i18n("extension.login.prompt")}</p>
       <a
         href={`http://localhost:3000/#/login`}
         target="_blank"
-        className="mx-auto block my-2"
+        className="mx-auto my-1"
       >
-        <Button>{i18n("login.title")}</Button>
+        <Button size="small">{i18n("login.title")}</Button>
       </a>
-      <p className="text-base text-gray-500 font-normal">
-        {i18n("extension.login.description")}
-      </p>
       <p>
         {i18n("extension.login.noaccount")}{" "}
         <a href={`http://localhost:3000/#/register`}>
@@ -66,16 +64,27 @@ export const MenuIcon = () => {
 };
 
 export const UserInfo = ({ user }) => {
+  const { i18n } = useI18n();
+
   return (
     <div className={`w-full text-base flex items-center justify-between`}>
-      <a
-        className="flex items-center text-gray-800 text-sm"
-        href={`http://localhost:3000/#/profile`}
-        target="_blank"
-      >
-        <UserIcon />{" "}
-        <span className="ml-2 text-base">{user.abbreviatedName}</span>
-      </a>
+      {user ? (
+        <a
+          className="flex items-center text-gray-800 text-sm"
+          href={`http://localhost:3000/#/profile`}
+          target="_blank"
+        >
+          <UserIcon />{" "}
+          <span className="ml-2 text-base">{user.abbreviatedName}</span>
+        </a>
+      ) : (
+        <div className="flex items-center text-gray-800 text-sm">
+          <FaUserAltSlash />
+          <span className="ml-2 text-base">
+            {i18n("extension.user.anonymous")}
+          </span>
+        </div>
+      )}
       <div className="relative">
         <UserDropdown />
       </div>
@@ -83,10 +92,11 @@ export const UserInfo = ({ user }) => {
   );
 };
 
-const UserPanel = ({ user }) => {
+const UserPanel = ({ user, isVocabPrompt }) => {
   return (
     <div className="flex px-3 pt-2 pb-3 items-center mt-2 border-b border-gray-200">
-      {user ? <UserInfo user={user} /> : <LoginPrompt />}
+      <UserInfo user={user} />
+      {!user && !isVocabPrompt && <LoginPrompt />}
     </div>
   );
 };

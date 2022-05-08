@@ -28,12 +28,6 @@ const VocabularyEditDropdown = ({
 
   const options = [
     {
-      name: i18n("sidebar.vocabulary.link"),
-      link: `http://localhost:3000/#/vocabularies/${
-        VocabularyUtils.create(vocabulary.iri).fragment
-      }`,
-    },
-    {
       name: (
         <span className="text-red-600">
           {i18n("occurrence.delete.suggestions")}
@@ -50,6 +44,15 @@ const VocabularyEditDropdown = ({
       id: "delete-all",
     },
   ];
+
+  if (vocabulary) {
+    options.unshift({
+      name: i18n("sidebar.vocabulary.link"),
+      link: `http://localhost:3000/#/vocabularies/${
+        VocabularyUtils.create(vocabulary.iri).fragment
+      }`,
+    });
+  }
 
   return (
     <>

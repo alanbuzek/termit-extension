@@ -1,9 +1,9 @@
-import { MessageType } from "../types/messageTypes";
-import browserApi from "./BrowserApi";
+import BrowserApi from "./BrowserApi";
+import { ExtensionMessage } from "./ExtensionMessage";
 
-const runPageTextAnalysis = async (vocabulary: string, pageHtml: string) => {
-  const { termOccurrencesSelectors } = (await browserApi.sendMessage({
-    type: MessageType.RunPageTextAnalysis,
+const runPageTextAnalysis = async (pageHtml: string, vocabulary?: string) => {
+  const { termOccurrencesSelectors } = (await BrowserApi.sendMessage({
+    type: ExtensionMessage.RunPageTextAnalysis,
     payload: {
       pageHtml,
       vocabulary,
@@ -12,6 +12,14 @@ const runPageTextAnalysis = async (vocabulary: string, pageHtml: string) => {
   return termOccurrencesSelectors;
 };
 
+const setWaitingForAuth = async () => {
+  await BrowserApi.sendMessage({
+    type: ExtensionMessage.SetWaitingForAuth,
+    payload: {},
+  });
+};
+
 export default {
   runPageTextAnalysis,
+  setWaitingForAuth,
 };

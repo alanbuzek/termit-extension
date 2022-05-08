@@ -7,26 +7,27 @@ const SidebarOccurrencesContainer = ({
   handleAnnotatePage,
   handleDeletePage,
   onDeleteAnnotation,
-  handleDeleteSuggestions
+  handleDeleteSuggestions,
 }) => {
   return (
     <>
       <SidebarControlPanel
+        isAnonymous={!state.user}
         annotations={state.annotations}
         handleAnnotatePage={handleAnnotatePage}
         vocabulary={state.vocabulary}
         vocabularies={state.vocabularies}
         handlePageDelete={handleDeletePage}
         handleDeleteSuggestions={handleDeleteSuggestions}
+        isVocabPrompt={state.isVocabPrompt}
       />
-      {state.annotations && (
+      {state.annotations && !state.isVocabPrompt && (
         <TermOccurrencesFeed
           failedAnnotations={state.failedAnnotations}
           annotations={state.annotations}
           onDeleteAnnotation={onDeleteAnnotation}
         />
       )}
-      {state.annotations && <hr className="my-2"></hr>}
     </>
   );
 };

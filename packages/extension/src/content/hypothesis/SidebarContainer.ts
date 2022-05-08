@@ -1,11 +1,11 @@
 import Vocabulary from "../../common/model/Vocabulary";
 
-import { MessageType } from "../../types/messageTypes";
 import { createShadowRoot } from "./ContentPopupContainer";
 import SidebarContainer from "../components/sidebar/SidebarContainer";
 import { ToolbarContainer } from "./ToolbarContainer";
 import { ContentState } from "..";
 import { Annotation } from "../../common/util/Annotation";
+import { ExtensionMessage } from '../../shared/ExtensionMessage';
 
 export class Sidebar {
   private sidebarComponent: SidebarContainer;
@@ -57,8 +57,9 @@ export class Sidebar {
     );
 
     chrome.runtime.onMessage.addListener((message) => {
+      console.log('got message in Toolbar: ', 'here')
       switch (message.type) {
-        case MessageType.OpenToolbar: {
+        case ExtensionMessage.OpenToolbar: {
           if (this.toolbar.sidebarOpen) {
             this.close();
           } else {

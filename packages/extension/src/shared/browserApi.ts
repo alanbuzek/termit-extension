@@ -16,6 +16,23 @@ const BrowserApi = {
     // TODO: abstract promisify
     return new Promise((resolve, reject) => {
       chrome.runtime.sendMessage(payload, async (response) => {
+        if (!response) {
+          resolve(null);
+        }
+        const { data, error } = response;
+
+        if (error) {
+          reject("There was an error sending this message: " + error);
+          return;
+        }
+
+        resolve(data);
+      });
+    });
+  },
+  sendMessageToTab(tabId, payload) {
+    return new Promise((resolve, reject) => {
+      chrome.runtime.sendMessage(tabId, payload, async (response) => {
         const { data, error } = response;
 
         if (error) {

@@ -42,12 +42,18 @@ const SidebarApp = ({
           extensionActive={extensionActive}
           setExtensionActive={handleExtensionActiveChange}
           globalLoading={state.globalLoading}
+          isVocabPrompt={state.isVocabPrompt}
         />
-        <UserPanel user={state.user} />
+        <UserPanel
+          user={state.user}
+          isVocabPrompt={state.isVocabPrompt}
+        />
         {state.globalLoading ? (
           <div className="flex flex-col mx-auto mt-6 justify-center items-center">
             <Spinner className="text-green-500" size="12" />
-            <div className="mt-4 font-medium text-xl">{i18n("extension.loading")}</div>
+            <div className="mt-4 font-medium text-xl">
+              {i18n("extension.loading")}
+            </div>
             <div className="text-gray-500 mt-3 text-base text-center px-3">
               {i18n("extension.loading.message")}
             </div>
@@ -55,7 +61,7 @@ const SidebarApp = ({
         ) : (
           <>
             {!extensionActive && <ExtensionOffMessage />}
-            {extensionActive && state.vocabularies?.length ? (
+            {extensionActive ? (
               <SidebarOccurrencesContainer
                 state={state}
                 handleAnnotatePage={handleAnnotatePage}

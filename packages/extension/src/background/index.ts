@@ -1,38 +1,35 @@
 import "regenerator-runtime/runtime.js";
-// import api from "../api";
 import { UserData } from "../common/model/User";
 import Ajax, { content } from "../common/util/Ajax";
 import Constants from "../common/util/Constants";
 import SecurityUtils from "../common/util/SecurityUtils";
 import BrowserApi from "../shared/BrowserApi";
-import { MessageType } from "../types/messageTypes";
-// import { JSDOM } from 'jsdom';
+import { ExtensionMessage } from "../shared/ExtensionMessage";
 
 const annotaceApi = new Ajax({ baseURL: Constants.ANNOTACE_SERVER_URL });
 
 export function runPageAnnotationAnalysis(
-  vocabulary: string,
-  pageHtml: string
+  pageHtml: string,
+  vocabulary?: string
 ) {
+  const payload: any = {
+    content: pageHtml,
+    vocabularyContexts: [],
+    // TODO: language
+    language: "cs",
+  };
+
+  if (vocabulary) {
+    payload.vocabularyRepository = vocabulary;
+  }
+
   return annotaceApi.post(
     "/annotate-to-occurrences",
-    content({
-      content: pageHtml,
-      vocabularyRepository: vocabulary,
-      vocabularyContexts: [],
-      // TODO: language
-      language: "cs",
-    })
+    content(payload)
       .param("enableKeywordExtraction", "true")
       .accept(Constants.JSON_MIME_TYPE)
       .contentType(Constants.JSON_MIME_TYPE)
   );
-}
-
-export enum ExtensionMessage {
-  LoginEvent,
-  LogoutEvent,
-  ConfigurationLoadedEvent,
 }
 
 // handles request from content scripts
@@ -53,10 +50,10 @@ function handleMessages(message, sender, sendResponse) {
 
   switch (message.type) {
     // TODO: why not just call it directly from content script?
-    case MessageType.RunPageTextAnalysis: {
+    case ExtensionMessage.RunPageTextAnalysis: {
       runPageAnnotationAnalysis(
-        message.payload.vocabulary,
-        message.payload.pageHtml
+        message.payload.pageHtml,
+        message.payload.vocabulary
       )
         .then((res) => {
           sendResponse({ data: res });
@@ -65,6 +62,15 @@ function handleMessages(message, sender, sendResponse) {
           (err) => sendResponse({ error: "here" })
           // sendResponse({ error: err || true })
         );
+
+      break;
+    }
+    case ExtensionMessage.SetWaitingForAuth: {
+      BrowserApi.storage
+        .set(Constants.STORAGE.TAB_ID_WAITING_FOR_AUTH, sender.tab.id)
+        .then(() => sendResponse({ data: {} }));
+      console.log("setting tab id: ", sender.tab);
+      break;
     }
   }
 
@@ -81,6 +87,20 @@ async function handleExternalMessages(message, sender, sendResponse) {
       // TODO: handle failure
       await BrowserApi.storage.set(Constants.STORAGE.USER, userData);
       await SecurityUtils.saveToken(authToken);
+
+      const tabIdWaitingForAuth = await BrowserApi.storage.get(
+        Constants.STORAGE.TAB_ID_WAITING_FOR_AUTH
+      );
+      if (typeof tabIdWaitingForAuth === "number") {
+        console.log("sending to tab: ", tabIdWaitingForAuth);
+        // talk to content scripts if relevant
+        chrome.tabs.sendMessage(tabIdWaitingForAuth, {
+          type: ExtensionMessage.LoginEvent,
+        });
+        await BrowserApi.storage.remove(
+          Constants.STORAGE.TAB_ID_WAITING_FOR_AUTH
+        );
+      }
 
       sendResponse({ success: true });
       break;
@@ -111,12 +131,12 @@ async function handleExternalMessages(message, sender, sendResponse) {
   return true;
 }
 
-chrome.action.onClicked.addListener((tab) => {
-  if (!tab || !tab.id) {
-    return;
-  }
-  chrome.tabs.sendMessage(tab.id, { type: MessageType.OpenToolbar });
-});
+// chrome.action.onClicked.addListener((tab) => {
+//   if (!tab || !tab.id) {
+//     return;
+//   }
+//   chrome.tabs.sendMessage(tab.id, { type: ExtensionMessage.OpenToolbar });
+// });
 
 type LoginEventPayload = {
   userData: UserData;

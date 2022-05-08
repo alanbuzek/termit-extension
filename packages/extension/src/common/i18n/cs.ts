@@ -769,6 +769,7 @@ const cs = {
     "extension.onboarding.skip": "Přeskočit tutoriál",
     "extension.onboarding.gotostart": "Zpět na začátek",
     "extension.onboarding.header": "Rychlý tutoriál",
+    "extension.user.anonymous": "Anonymní"
   },
 };
 

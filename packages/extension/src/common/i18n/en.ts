@@ -681,16 +681,22 @@ const en = {
     "extension.loading": "Loading...",
     "extension.loading.message": `This operation may take a moment, depending on how many
     annotations there are on the page.`,
+    "extension.choose.vocabulary.placeholder": "Choose a vocabulary",
     "extension.choose.vocabulary":
       "Choose a vocabulary to start annotating with.",
+    "extension.choose.vocabulary.anonymous":
+      "Please start annotating this page by clicking below",
+    "extension.choose.vocabulary.vocabPrompt":
+      "Please select vocabulary to annotate with",
     "extension.off.message": "TermIt Annotate is turned off.",
     "extension.off.explanation":
       "Annotations won't work on any pages until you turn it on again.",
     "extension.on": "On",
     "extension.off": "Off",
-    "extension.login.prompt": "You need to login start using TermIt.",
-    "extension.login.description":
-      "After you do so, refresh this page to start annotating.",
+    "extension.login.prompt":
+      "Please login or register to TermIt to be able to save your annotations and access other features.",
+    "extension.login.prompt.long":
+      "Please login or register to TermIt to be able to assign terms to occurrences, save annotations and much more!",
     "extension.login.noaccount": "Don't have an account_",
     "extension.login.registerhere": "Register here",
     "extension.webapp": "Web App",
@@ -756,6 +762,7 @@ const en = {
     "extension.onboarding.skip": "Skip tutorial",
     "extension.onboarding.gotostart": "Go back to start",
     "extension.onboarding.header": "Quick Tutorial",
+    "extension.user.anonymous": "Anonymous",
   },
 };
 

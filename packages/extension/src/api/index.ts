@@ -18,7 +18,7 @@ import TermOccurrence, {
 import BrowserApi from "../shared/BrowserApi";
 import User, { UserData } from "../common/model/User";
 import { TermsMap } from "../content";
-import { DocumentData } from "../common/model/Document";
+import Document, { DocumentData } from "../common/model/Document";
 
 // TODO: remove all Promise.resolve() statements and uncomment real back-end calls when ready
 // TODO (optional): use fetch-mock or similar library to mock api server responses, will likely be needed to testing
@@ -441,6 +441,37 @@ export async function getUser() {
   return new User(userData);
 }
 
+export async function createDefaultVocabulary() {
+  const label = "Default vocabulary";
+
+  const iri = await loadIdentifier({ name: label, assetType: "VOCABULARY" });
+
+  const vocabulary = new Vocabulary({
+    label,
+    iri,
+    comment: "This is your default vocabulary",
+  });
+  vocabulary.addType(VocabularyUtils.DOCUMENT_VOCABULARY);
+
+  const document = new Document({
+    label: "Default vocabulary document",
+    iri: iri + "/document",
+    files: [],
+    websites: [],
+  });
+  document.addType(VocabularyUtils.DOCUMENT);
+  vocabulary.document = document;
+
+  await createVocabulary(vocabulary);
+}
+
+export function createVocabulary(vocabulary: Vocabulary) {
+  return termitApi.post(
+    Constants.API_PREFIX + "/vocabularies",
+    content(vocabulary.toJsonLd())
+  );
+}
+
 export default {
   loadVocabularies,
   loadAllTerms,
@@ -463,4 +494,6 @@ export default {
   updateTerm,
   loadTerm,
   removeSuggestedOccurrences,
+  createDefaultVocabulary,
+  createVocabulary,
 };

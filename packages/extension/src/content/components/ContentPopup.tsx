@@ -16,6 +16,7 @@ import { ContentState, ContentActions } from "..";
 import Term from "../../common/model/Term";
 import VocabularyUtils from "../../common/util/VocabularyUtils";
 import { useI18n } from "../../common/component/hook/useI18n";
+import LoginPromptPopup from "./LoginPromptPopup";
 
 /**
  * Union of possible toolbar commands.
@@ -60,10 +61,17 @@ function ContentPopup({
   const closePopup = () => {
     hide();
   };
-  const vocabularyIri = VocabularyUtils.create(contentState.vocabulary!.iri);
+  const vocabularyIri =
+    contentState.vocabulary &&
+    VocabularyUtils.create(contentState.vocabulary.iri);
   const { i18n, intl } = useI18n();
+  const isAnonymous = !contentState.user;
 
   const renderContentPopup = () => {
+    if (isAnonymous && currPopup !== PopupType.PurposeSelection) {
+      return <LoginPromptPopup />;
+    }
+
     switch (currPopup) {
       case PopupType.CreateTermModal:
         // 4. create term annotation

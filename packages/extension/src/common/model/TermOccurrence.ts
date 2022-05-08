@@ -106,15 +106,17 @@ export interface TermOccurrenceData extends TermAssignmentData {
 export const TermOccurrenceFactory = {
   createFromTextAnalysisResults(
     results: any[],
-    websiteIri: string,
-    termsMap: TermsMap
+    websiteIri?: string,
+    termsMap?: TermsMap | null
   ): TermOccurrence[] {
     return (
       results
         .map(({ cssSelectors, termOccurrences: termOccurrencesRecords }) => {
           let foundElement: Element | null = null;
 
-          const elements = Array.from(document.querySelectorAll(cssSelectors[0]));
+          const elements = Array.from(
+            document.querySelectorAll(cssSelectors[0])
+          );
           if (elements.length === 1) {
             foundElement = elements[0];
           }
@@ -177,6 +179,7 @@ export const TermOccurrenceFactory = {
 
     return {
       id: about,
+      // TODO: remove this
       termIri: content.startsWith("rus")
         ? "http://onto.fel.cvut.cz/ontologies/slovnik/novy-lokalni-slovnik/pojem/ruský"
         : "",
@@ -188,7 +191,7 @@ export const TermOccurrenceFactory = {
         xPathSelector: selectors.xPathSelector,
       },
       annotationType: AnnotationType.OCCURRENCE,
-      sourceIri: websiteIri,
+      sourceIri: websiteIri || "",
       extraTypes,
     };
   },
@@ -212,7 +215,7 @@ export const TermOccurrenceFactory = {
         },
         id: JsonLdUtils.generateBlankNodeId(),
         originalText: selectionContent,
-        sourceIri: websiteIri!,
+        sourceIri: websiteIri || '',
       },
       termsMap!
     );
@@ -231,10 +234,10 @@ export const TermOccurrenceFactory = {
         xPathSelector: string;
       };
       annotationType: string;
-      sourceIri: string;
+      sourceIri?: string;
       extraTypes?: string[];
     },
-    termsMap: TermsMap
+    termsMap?: TermsMap | null
   ): TermOccurrence {
     const {
       id,
@@ -253,7 +256,10 @@ export const TermOccurrenceFactory = {
         annotationType === AnnotationType.DEFINITION
           ? [VocabularyUtils.TERM_DEFINITION_SOURCE]
           : [VocabularyUtils.WEBSITE_TERM_OCCURRENCE],
-      term: termIri && termsMap[termIri] ? termsMap[termIri] : undefined,
+      term:
+        termIri && termsMap && termsMap[termIri]
+          ? termsMap[termIri]
+          : undefined,
       target: {
         types: [VocabularyUtils.HAS_WEBSITE_OCCURRENCE_TARGET],
         selectors: [
@@ -306,7 +312,6 @@ export default class TermOccurrence extends TermAssignment {
 
   constructor(data: TermOccurrenceData) {
     super(data);
-    console.log("data: ", data);
     this.target = data.target;
     this.target.selectors = Utils.sanitizeArray(this.target.selectors);
     if (data.id) {

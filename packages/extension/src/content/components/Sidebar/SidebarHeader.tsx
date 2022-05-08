@@ -6,6 +6,7 @@ const SidebarHeader = ({
   setExtensionActive,
   globalLoading,
   user,
+  isVocabPrompt
 }) => {
   return (
     <div className="flex justify-between items-center mt-2 px-3.5 pb-3 border-b border-gray-200">
@@ -16,7 +17,7 @@ const SidebarHeader = ({
       >
         TermIt Annotate
       </a>
-      {user && (
+      {user && !isVocabPrompt && (
         <ExtensionActiveSwitch
           isActive={extensionActive}
           setActive={setExtensionActive}

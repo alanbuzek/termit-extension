@@ -1,27 +1,25 @@
 import Annotator from "./hypothesis/Annotator";
-import { Sidebar } from "./hypothesis/Sidebar";
+import { Sidebar } from "./hypothesis/SidebarContainer";
 import Vocabulary from "../common/model/Vocabulary";
 import { preloadContentStyles } from "./hypothesis/helpers";
 import {
   Annotation,
   AnnotationFocusTime,
   AnnotationType,
-  isDefinitionAnnotation,
 } from "../common/util/Annotation";
 import api from "../api";
 import VocabularyUtils, { IRI } from "../common/util/VocabularyUtils";
 import Term from "../common/model/Term";
 import backgroundApi from "../shared/backgroundApi";
 import Website from "../common/model/Website";
-import TermOccurrence, {
-  TermOccurrenceFactory,
-} from "../common/model/TermOccurrence";
+import { TermOccurrenceFactory } from "../common/model/TermOccurrence";
 import BrowserApi from "../shared/BrowserApi";
 import User from "../common/model/User";
 import Constants from "../common/util/Constants";
 import { overlay } from "./helper/overlay";
 import { getPageUrl } from "./helper/url";
 import { isPagePDFViewer } from "./helper/domHelpers";
+import { ExtensionMessage } from "../shared/ExtensionMessage";
 
 // TODO: this should be dynamic when language selection is implemented
 const language = "cs";
@@ -48,6 +46,9 @@ export type ContentState = {
   pageUrl: string;
   language: string;
   locale: string;
+  waitingForAuth: boolean;
+  isVocabPrompt: boolean;
+  originalPageHtml: string;
 };
 
 const resetContentState = async () => {
@@ -61,6 +62,8 @@ const resetContentState = async () => {
   // contentState.user = null;
   contentState.extensionActive = false;
   contentState.globalLoading = false;
+  contentState.isVocabPrompt = false;
+  contentState.originalPageHtml = "";
   contentState.extensionActive = await BrowserApi.storage.get(
     Constants.STORAGE.EXTENSION_ACTIVE
   );
@@ -78,6 +81,9 @@ let contentState = {} as ContentState;
 const originalQuerySelectorAll = document.querySelectorAll.bind(document);
 
 const internals = {
+  isAnonymous() {
+    return !contentState.user;
+  },
   async initPage() {
     if (hasBeenPageInited) {
       return;
@@ -104,7 +110,7 @@ const internals = {
     internals.initSidebar();
 
     if (contentState.extensionActive) {
-      await ContentActions.tryAnnotatingExistingWebsite();
+      await ContentActions.annotateExistingWebsite();
     }
   },
   updateSidebar() {
@@ -112,7 +118,9 @@ const internals = {
   },
   activatePage() {
     annotator = new Annotator(document.body, contentState);
-
+    // save this in its original form, without annotations, if we want to run annotation multiple times
+    contentState.originalPageHtml = `${document.body.outerHTML}`;
+    // TODO: put this into a helper file
     // so that reactboostrap works fine (needs be able to query select elements withing shadow dom)
     document.querySelectorAll = function (str) {
       const originalResult = originalQuerySelectorAll(str);
@@ -171,7 +179,7 @@ const internals = {
 
       // avoid any possible race condions
       setTimeout(() => {
-        ContentActions.tryAnnotatingExistingWebsite();
+        ContentActions.annotateExistingWebsite();
       }, 100);
     }
   },
@@ -181,58 +189,53 @@ export const ContentActions = {
   showPopup(annotation: Annotation) {
     annotator!.showPopup(annotation);
   },
-  async annotateNewWebsite(vocabulary: Vocabulary) {
+  async annotateNewWebsite(vocabulary?: Vocabulary) {
     contentState.globalLoading = true;
     internals.updateSidebar();
     internals.activatePage();
 
-    contentState.website = await api.createWebsiteInDocument(
-      contentState.pageUrl,
-      VocabularyUtils.create(vocabulary.document!.iri)
-    );
     const textAnalysisResult = await backgroundApi.runPageTextAnalysis(
-      vocabulary.iri,
-      document.body.outerHTML
+      // maybe cache this outerHTML as a string?
+      contentState.originalPageHtml,
+      vocabulary?.iri
     );
-    const vocabularyTerms = await api.loadAllTerms(
-      VocabularyUtils.create(vocabulary.iri)
-    );
-
-    contentState.terms = vocabularyTerms;
-    contentState.vocabulary = vocabulary;
 
     const termOccurrences = TermOccurrenceFactory.createFromTextAnalysisResults(
       textAnalysisResult,
-      contentState.website.iri,
-      contentState.terms!
+      contentState.website?.iri,
+      contentState.terms
     );
 
-    console.log(
-      "selecteors: ",
-      termOccurrences.forEach((to) => {
-        console.log(
-          to.getCssSelector().value.split("|"),
-          to.getXPathSelector,
-          to.getTextQuoteSelector().exactMatch,
-          to.getTextPositionSelector().start
-        );
-      })
-    );
+    if (!internals.isAnonymous()) {
+      contentState.website = await api.createWebsiteInDocument(
+        contentState.pageUrl,
+        VocabularyUtils.create(vocabulary!.document!.iri)
+      );
+
+      const vocabularyTerms = await api.loadAllTerms(
+        VocabularyUtils.create(vocabulary!.iri)
+      );
+
+      contentState.terms = vocabularyTerms;
+      contentState.vocabulary = vocabulary!;
+    }
 
     await annotator!.annotatePage(termOccurrences, true);
     contentState.annotations = annotator!.getAnnotations();
     contentState.failedAnnotations = annotator!.getFailedAnnotations();
 
-    await api.savePageAnnotationResults(
-      annotator!.getFoundTermOccurrences(),
-      contentState.website,
-      vocabulary.iri
-    );
+    if (!internals.isAnonymous()) {
+      await api.savePageAnnotationResults(
+        annotator!.getFoundTermOccurrences(),
+        contentState.website!,
+        vocabulary!.iri
+      );
 
-    contentState.vocabulary.document?.websites.push(contentState.website);
+      contentState.vocabulary!.document?.websites.push(contentState.website!);
 
-    // update vocabulary cache
-    await BrowserApi.storage.set("vocabularies", contentState.vocabularies);
+      // update vocabulary cache
+      await BrowserApi.storage.set("vocabularies", contentState.vocabularies);
+    }
 
     overlay.off();
     contentState.globalLoading = false;
@@ -242,8 +245,25 @@ export const ContentActions = {
     setTimeout(() => {
       internals.updateSidebar();
     }, 200);
+
+    // TODO: remove or put to a differnt debug file
+    // console.log(
+    //   "selectors: ",
+    //   termOccurrences.forEach((to) => {
+    //     console.log(
+    //       to.getCssSelector().value.split("|"),
+    //       to.getXPathSelector,
+    //       to.getTextQuoteSelector().exactMatch,
+    //       to.getTextPositionSelector().start
+    //     );
+    //   })
+    // );
   },
-  async tryAnnotatingExistingWebsite() {
+  async annotateExistingWebsite() {
+    if (internals.isAnonymous()) {
+      return;
+    }
+
     contentState.globalLoading = true;
     internals.updateSidebar();
 
@@ -307,6 +327,10 @@ export const ContentActions = {
     annotator!.hidePopup();
     const hasBeenPersisted = !!annotation.termOccurrence.iri;
     const isDefinition = annotationType === AnnotationType.DEFINITION;
+
+    if (internals.isAnonymous()) {
+      return;
+    }
 
     if (isDefinition) {
       if (hasBeenPersisted) {
@@ -400,7 +424,7 @@ export const ContentActions = {
     annotation: Annotation,
     definitionAnnotation?: Annotation
   ) {
-    annotator?.hidePopup();
+    annotator!.hidePopup();
     await api.createTerm(term, vocabularyIri);
     contentState.terms![term.iri] = term;
     term.vocabulary = {
@@ -425,7 +449,7 @@ export const ContentActions = {
   },
   async removeOccurrence(annotation: Annotation) {
     await annotation.removeOccurrence();
-    if (annotation.termOccurrence.iri) {
+    if (annotation.termOccurrence.iri && !internals.isAnonymous()) {
       if (annotation.isDefinition()) {
         await api.removeTermDefinitionSource(
           annotation.termOccurrence,
@@ -445,6 +469,11 @@ export const ContentActions = {
     internals.updateSidebar();
   },
   async removeWebsiteAnnotations() {
+    if (internals.isAnonymous()) {
+      internals.deactivatePage();
+      return;
+    }
+
     contentState.globalLoading = true;
     internals.updateSidebar();
 
@@ -467,17 +496,20 @@ export const ContentActions = {
 
     annotator!.removeSuggestedOccurrences();
 
-    await api.removeSuggestedOccurrences(
-      contentState.vocabulary!.document!,
-      contentState.website!
-    );
+    if (!internals.isAnonymous()) {
+      await api.removeSuggestedOccurrences(
+        contentState.vocabulary!.document!,
+        contentState.website!
+      );
+    }
 
     contentState.globalLoading = false;
     internals.updateSidebar();
   },
   async toggleExtensionActive() {
-    contentState.globalLoading = true;
     // if this is ever called, we assume having a logged-in user
+
+    contentState.globalLoading = true;
     contentState.extensionActive = !contentState.extensionActive;
     await BrowserApi.storage.set(
       Constants.STORAGE.EXTENSION_ACTIVE,
@@ -485,10 +517,120 @@ export const ContentActions = {
     );
 
     if (contentState.extensionActive) {
-      await ContentActions.tryAnnotatingExistingWebsite();
+      await ContentActions.annotateExistingWebsite();
     } else {
       await internals.deactivatePage();
     }
+  },
+  async handleInstanceSelected(currentInstance) {
+    console.log("handleInstanceSelected(currentInstance)");
+    await BrowserApi.storage.set(
+      Constants.STORAGE.TERMIT_INSTANCE,
+      currentInstance
+    );
+    await backgroundApi.setWaitingForAuth();
+    // annotator?.hidePopup();
+    internals.updateSidebar();
+    contentState.waitingForAuth = true;
+  },
+  async authenticateUser() {
+    console.log("authenticateUser()");
+    annotator!.hidePopup();
+
+    contentState.waitingForAuth = false;
+    contentState.globalLoading = true;
+    internals.updateSidebar();
+    contentState.user = await api.getUser();
+
+    if (!contentState.user) {
+      console.error("Inconsistent state! Login event but no user!");
+      return;
+    }
+
+    contentState.vocabularies = await api.loadVocabularies();
+
+    if (!contentState.vocabularies.length) {
+      await api.createDefaultVocabulary();
+      contentState.vocabularies = await api.loadVocabularies();
+      // create default vocabulary
+    }
+
+    if (!contentState.vocabularies.length) {
+      throw new Error("Failed to create default vocabulary!!");
+    }
+
+    overlay.on();
+
+    if (contentState.vocabularies.length > 1) {
+      contentState.globalLoading = false;
+      contentState.isVocabPrompt = true;
+      sidebar?.open();
+      internals.updateSidebar();
+      return;
+    }
+    contentState.vocabulary = contentState.vocabularies[0];
+
+    await ContentActions.setupLoggedInUser(contentState.vocabulary);
+  },
+  async setupLoggedInUser(vocabulary: Vocabulary) {
+    contentState.globalLoading = true;
+    internals.updateSidebar();
+    contentState.vocabulary = vocabulary;
+
+    const foundExistingWebsite = await api.getExistingWebsite(
+      contentState.pageUrl,
+      contentState.vocabularies
+    );
+
+    if (foundExistingWebsite) {
+      throw new Error(
+        "Attempting to reannotate an already annotated page. Please refresh the page."
+      );
+    }
+
+    const textAnalysisResult = await backgroundApi.runPageTextAnalysis(
+      contentState.originalPageHtml,
+      contentState.vocabulary!.iri
+    );
+
+    const newTermOccurrences =
+      TermOccurrenceFactory.createFromTextAnalysisResults(
+        textAnalysisResult,
+        contentState.website?.iri,
+        contentState.terms
+
+        // filter out only occurrences suggestions that have a term -> they are vocabulary-specific, as we want to drop all generic suggestions, those have already been annotated!
+      ).filter((termOccurrence) => termOccurrence.term);
+
+    await annotator!.annotatePage(newTermOccurrences, true);
+
+    contentState.website = await api.createWebsiteInDocument(
+      contentState.pageUrl,
+      VocabularyUtils.create(contentState.vocabulary!.document!.iri)
+    );
+
+    const vocabularyTerms = await api.loadAllTerms(
+      VocabularyUtils.create(contentState.vocabulary!.iri)
+    );
+
+    contentState.terms = vocabularyTerms;
+
+    await api.savePageAnnotationResults(
+      annotator!.getFoundTermOccurrences(),
+      contentState.website!,
+      contentState.vocabulary!.iri
+    );
+
+    contentState.vocabulary!.document!.websites.push(contentState.website!);
+
+    // update vocabulary cache
+    await BrowserApi.storage.set("vocabularies", contentState.vocabularies);
+
+    overlay.off();
+    contentState.globalLoading = false;
+    contentState.isVocabPrompt = false;
+    // this makes sure to re-render sidebar on data update
+    internals.updateSidebar();
   },
 };
 
@@ -501,3 +643,22 @@ const listeners = ["click", "popstate", "locationchange"];
 listeners.forEach((listener) =>
   window.addEventListener(listener, internals.handleLocationChange)
 );
+
+console.log("chrome.runtime: ", chrome.runtime);
+chrome.runtime.onMessage.addListener(handleMessages);
+console.log("added listener: ", chrome.runtime.onMessage);
+
+function handleMessages(message, sender, sendResponse) {
+  console.log("got message: ", message);
+  switch (message.type) {
+    case ExtensionMessage.LoginEvent: {
+      console.log("waiting for Auth? : ", contentState.waitingForAuth);
+      if (contentState.waitingForAuth) {
+        ContentActions.authenticateUser();
+      }
+    }
+  }
+
+  sendResponse({ success: true });
+  return true;
+}
