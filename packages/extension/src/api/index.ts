@@ -84,17 +84,9 @@ export async function savePageAnnotationResults(
   vocabularyIri: string
 ) {
   if (termOccurrences.length > 0) {
-    await saveTermOccurrences(
-      termOccurrences,
-      website,
-      // TODO: make this more versetile
-      VocabularyUtils.SUGGESTED_TERM_OCCURRENCE,
-      vocabularyIri
-    );
+    await saveTermOccurrences(termOccurrences, website, vocabularyIri);
   }
 }
-
-// TODO: move interface elsewhere
 
 /**
  * Creates a website file within a resource (vocabulary)
@@ -327,6 +319,37 @@ export function setTermDefinitionSource(
     });
 }
 
+// TODO: should be deleted?
+export function setUknownDefinitionSource(source: TermOccurrence) {
+  source.target.selectors.forEach((selector) => {
+    if (selector.iri) {
+      delete selector.iri;
+    }
+  });
+
+  if (source.target.iri) {
+    delete source.target.iri;
+  }
+
+  if (source.iri) {
+    delete source.iri;
+  }
+
+  if (source.id) {
+    delete source.id;
+  }
+
+  const jsonLd = source.toJsonLd();
+
+  delete jsonLd.term;
+
+  return termitApi
+    .post(`/terms/definition-source`, content(jsonLd))
+    .then((result) => {
+      source.iri = result["@id"];
+    });
+}
+
 export function removeTermDefinitionSource(source: TermOccurrence, term: Term) {
   const termIri = VocabularyUtils.create(term.iri);
 
@@ -356,7 +379,6 @@ export async function updateTermOccurrence(termOccurrence: TermOccurrence) {
 export async function saveTermOccurrences(
   termOccurrences: TermOccurrence[],
   website: Website,
-  occurrenceType: string,
   vocabularyIri: string
 ) {
   const websiteIRI: IRI = VocabularyUtils.create(website.iri);
@@ -377,7 +399,9 @@ export async function saveTermOccurrences(
       cssSelector: termOccurrence.getCssSelector().value,
       xPathSelector: termOccurrence.getXPathSelector().value,
       start: termOccurrence.getTextPositionSelector().start,
-      extraTypes: [occurrenceType],
+      extraTypes: termOccurrence.isSuggested()
+        ? [VocabularyUtils.SUGGESTED_TERM_OCCURRENCE]
+        : [],
       id: termOccurrence.id,
     };
 
@@ -505,4 +529,5 @@ export default {
   createDefaultVocabulary,
   createVocabulary,
   initApi,
+  setUknownDefinitionSource,
 };

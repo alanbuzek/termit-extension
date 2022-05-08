@@ -21,6 +21,7 @@ const SidebarFooter = ({ activeSection, setActiveSection, isAnonymous }) => {
     <div className="flex border-t border-gray-300 position-absolute right-0 bottom-0 w-full">
       {sections.map((section, idx) => {
         const isDisabled = isAnonymous && idx == 1;
+        const isActive = idx === activeSection;
         return (
           <div
             onClick={() => {
@@ -34,12 +35,12 @@ const SidebarFooter = ({ activeSection, setActiveSection, isAnonymous }) => {
               width: "0",
             }}
             className={`py-2 flex flex-col items-center bg-gray-100 transition-all duration-300 ${
-              idx === activeSection ? "text-green-600" : ""
+              isActive ? "text-green-600" : ""
             } ${
               isDisabled
                 ? "cursor-not-allowed text-gray-300 font-normal"
                 : "cursor-pointer hover:!text-green-600 hover:!bg-gray-200  font-semibold"
-            } ${!activeSection && !isDisabled ? "text-gray-400" : ""} `}
+            } ${!isActive && !isDisabled ? "text-gray-400" : ""} `}
           >
             <div className="text-sm">{section.icon}</div>
             <div className="mt-2 text-sm ">{section.label}</div>

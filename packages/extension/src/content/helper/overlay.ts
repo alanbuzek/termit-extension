@@ -10,6 +10,10 @@ export const overlay = {
     const overlay = document.createElement("div");
     overlay.id = "termit-overlay";
     document.body.appendChild(overlay);
+    overlay.addEventListener('click', e => {
+      e.preventDefault();
+      e.stopPropagation();
+    })
     this.isInitiated = true;
   },
   on() {

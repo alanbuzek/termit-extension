@@ -12,7 +12,6 @@ import { ContentState } from "../../../content";
 import { Annotation } from "../../util/Annotation";
 import TermOccurrence from "../../model/TermOccurrence";
 import { getPageUrl } from "../../../content/helper/url";
-import { useI18n } from "../hook/useI18n";
 
 interface CreateTermFromAnnotationProps {
   onClose: () => void;
@@ -29,6 +28,7 @@ interface CreateTermFromAnnotationProps {
 
 interface CreateTermFromAnnotationState extends TermData {
   labelExists: LabelExists;
+  isSavingTerm: boolean;
 }
 
 export class CreateTermFromAnnotation extends React.Component<
@@ -45,7 +45,9 @@ export class CreateTermFromAnnotation extends React.Component<
         : termOccurrence.getSanitizedExactMatch();
 
     this.state = Object.assign(
-      {},
+      {
+        isSavingTerm: false,
+      },
       AssetFactory.createEmptyTermData(props.language),
       {
         labelExists: {},
@@ -89,14 +91,28 @@ export class CreateTermFromAnnotation extends React.Component<
   };
 
   public onSave = () => {
+    this.setState({ isSavingTerm: true });
     const newTerm = new Term(this.state);
-    this.props.createTerm(newTerm).then(() => {
-      this.onCancel();
-    });
+    this.props
+      .createTerm(newTerm)
+      .then(() => {
+        this.onCancel();
+      })
+      .finally(() => {
+        this.setState({ isSavingTerm: true });
+      });
   };
 
   public onCancel = () => {
     this.setState(AssetFactory.createEmptyTermData());
+    // if (
+    //   this.props.definitionAnnotation &&
+    //   !this.props.definitionAnnotation.beingAssignedNow
+    // ) {
+    //   // TODO
+    //   // this.props.definitionAnnotation.removeOccurrence();
+    // }
+
     this.props.onClose();
   };
 
@@ -135,7 +151,7 @@ export class CreateTermFromAnnotation extends React.Component<
                   id="create-term-submit"
                   color="success"
                   onClick={this.onSave}
-                  disabled={invalid}
+                  disabled={invalid || this.state.isSavingTerm}
                   size="sm"
                 >
                   {i18n("glossary.form.button.submit")}

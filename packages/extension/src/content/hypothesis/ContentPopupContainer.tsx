@@ -7,9 +7,9 @@ import {
   Annotation,
   isDefinitionAnnotation,
 } from "../../common/util/Annotation";
-import { ContentState } from "..";
-import en from '../../common/i18n/en';
-import cs from '../../common/i18n/cs';
+import { ContentActions, ContentState } from "..";
+import en from "../../common/i18n/en";
+import cs from "../../common/i18n/cs";
 
 // TODO: this can be moved a different file
 /**
@@ -130,6 +130,10 @@ export class ContentPopupContainer {
   }
 
   public hide() {
+    if (this.currentAnnotation && !this.currentAnnotation.termOccurrence.iri) {
+      // TODO:
+      // ContentActions.saveUnassignedOccurrence(this.currentAnnotation);
+    }
     this.isVisible = false;
     this.render();
     Object.assign(this.outerContainer.style, {

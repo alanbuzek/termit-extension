@@ -6,6 +6,7 @@ import {
   Annotation,
   AnnotationFocusTime,
   AnnotationType,
+  isDefinitionAnnotation,
 } from "../common/util/Annotation";
 import api from "../api";
 import VocabularyUtils, { IRI } from "../common/util/VocabularyUtils";
@@ -373,10 +374,7 @@ export const ContentActions = {
     if (isDefinition) {
       if (hasBeenPersisted) {
         // if we got here, we must be reassigning definition to a new element -> delete old definition source
-        await api.removeTermDefinitionSource(
-          annotation.termOccurrence,
-          originalTerm!
-        );
+        await api.removeOccurrence(annotation.termOccurrence);
       }
 
       if (!isDuringTermCreation) {
@@ -431,7 +429,6 @@ export const ContentActions = {
       await api.saveTermOccurrences(
         [annotation.termOccurrence],
         contentState.website!,
-        annotationType,
         contentState.vocabulary!.iri
       );
     }
@@ -462,7 +459,6 @@ export const ContentActions = {
     annotation: Annotation,
     definitionAnnotation?: Annotation
   ) {
-    annotator!.hidePopup();
     await api.createTerm(term, vocabularyIri);
     contentState.terms![term.iri] = term;
     term.vocabulary = {
@@ -664,7 +660,10 @@ export const ContentActions = {
     contentState.terms = vocabularyTerms;
 
     await api.savePageAnnotationResults(
-      annotator!.getFoundTermOccurrences(),
+      annotator!
+        .getFoundTermOccurrences()
+        // don't save definitions just yet
+        .filter((annotation) => !isDefinitionAnnotation(annotation.types)),
       contentState.website!,
       contentState.vocabulary!.iri
     );
@@ -678,6 +677,20 @@ export const ContentActions = {
     contentState.globalLoading = false;
     contentState.isVocabPrompt = false;
     // this makes sure to re-render sidebar on data update
+    internals.updateSidebar();
+  },
+  // TODO: unused for now
+  async saveUnassignedOccurrence(annotation: Annotation) {
+    if (annotation.isDefinition()) {
+      await api.setUknownDefinitionSource(annotation.termOccurrence);
+    } else {
+      await api.saveTermOccurrences(
+        [annotation.termOccurrence],
+        contentState.website!,
+        contentState.vocabulary!.iri
+      );
+    }
+
     internals.updateSidebar();
   },
 };
