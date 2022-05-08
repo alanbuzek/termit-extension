@@ -43,10 +43,12 @@ const SidebarApp = ({
           setExtensionActive={handleExtensionActiveChange}
           globalLoading={state.globalLoading}
           isVocabPrompt={state.isVocabPrompt}
+          instance={state.instance}
         />
         <UserPanel
           user={state.user}
           isVocabPrompt={state.isVocabPrompt}
+          instance={state.instance}
         />
         {state.globalLoading ? (
           <div className="flex flex-col mx-auto mt-6 justify-center items-center">

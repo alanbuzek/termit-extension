@@ -6,9 +6,7 @@ import SecurityUtils from "../common/util/SecurityUtils";
 import BrowserApi from "../shared/BrowserApi";
 import { ExtensionMessage } from "../shared/ExtensionMessage";
 
-const annotaceApi = new Ajax({ baseURL: Constants.ANNOTACE_SERVER_URL });
-
-export function runPageAnnotationAnalysis(
+export async function runPageAnnotationAnalysis(
   pageHtml: string,
   vocabulary?: string
 ) {
@@ -22,6 +20,14 @@ export function runPageAnnotationAnalysis(
   if (vocabulary) {
     payload.vocabularyRepository = vocabulary;
   }
+
+  const instance = await BrowserApi.storage.get(
+    Constants.STORAGE.TERMIT_INSTANCE
+  );
+
+  const annotaceApi = new Ajax({
+    baseURL: instance?.annotaceService || Constants.ANNOTACE_SERVER_URL,
+  });
 
   return annotaceApi.post(
     "/annotate-to-occurrences",

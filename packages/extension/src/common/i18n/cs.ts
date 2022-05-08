@@ -743,7 +743,7 @@ const cs = {
     "extension.onboarding.step1.text1":
       "Na libovolné stránce, která se vám líbí, otevřete postraní panel pluginu vpravo stránky, vyberte slovník, který chcete použít, a začněte svou anotovat s TermIt Annotate!",
     "extension.onboarding.step1.text2":
-      "Pokud nejste přihlášeni do TermIt nebo ještě nemáte účet, můžete začít anotovat anotovat, ale budete se muset přihlásit (nebo zaregistrovat), abyste si uložit vytvořené anotace.",
+      "Pro uložení anotací a odemknutí všech funkcí budete vyzváni k přihlášení (registraci) do aplikace TermIt",
     "extension.onboarding.step2.header":
       "Potvrďte navrhované výskytu pojmů a vytvořte si vlastní",
     "extension.onboarding.step2.text1":

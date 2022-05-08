@@ -49,6 +49,12 @@ export type ContentState = {
   waitingForAuth: boolean;
   isVocabPrompt: boolean;
   originalPageHtml: string;
+  instance: {
+    termitServer: string;
+    termitUi: string;
+    annotaceService: string;
+    label: string;
+  } | null;
 };
 
 const resetContentState = async () => {
@@ -71,6 +77,14 @@ const resetContentState = async () => {
     (await BrowserApi.storage.get(Constants.STORAGE.LANGUAGE)) || "en"; // fallback to English for now
   contentState.locale =
     (await BrowserApi.storage.get(Constants.STORAGE.LOCALE)) || "en"; // fallback to English for now
+
+  // TODO: make sure to not delete this field on logout
+  contentState.instance = await BrowserApi.storage.get(
+    Constants.STORAGE.TERMIT_INSTANCE
+  );
+  if (contentState.instance) {
+    await api.initApi(contentState.instance.termitServer);
+  }
 };
 
 let contentState = {} as ContentState;
@@ -528,6 +542,8 @@ export const ContentActions = {
       Constants.STORAGE.TERMIT_INSTANCE,
       currentInstance
     );
+    contentState.instance = currentInstance;
+    await api.initApi(contentState.instance!.termitServer);
     await backgroundApi.setWaitingForAuth();
     // annotator?.hidePopup();
     internals.updateSidebar();
@@ -583,9 +599,11 @@ export const ContentActions = {
     );
 
     if (foundExistingWebsite) {
-      throw new Error(
-        "Attempting to reannotate an already annotated page. Please refresh the page."
-      );
+      // throw new Error(
+      //   "Attempting to reannotate an already annotated page. Please refresh the page."
+      // );
+      location.reload();
+      return;
     }
 
     const textAnalysisResult = await backgroundApi.runPageTextAnalysis(

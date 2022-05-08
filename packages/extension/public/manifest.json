@@ -29,7 +29,8 @@
         "/static/css/bootstrap-termit.css",
         "/static/css/annotator.css",
         "/static/css/styles.css",
-        "/static/img/*"
+        "/static/img/*",
+        "/tutorial.html"
       ],
       "matches": ["<all_urls>"],
       "extension_ids": ["fcjdbebldbibeepgebafdghhdcneeaip"]
@@ -39,9 +40,7 @@
     "extension_pages": "script-src 'self'; object-src 'self'"
   },
   "permissions": ["tabs", "storage"],
-  "host_permissions": [
-    "*://*/*"
-  ],
+  "host_permissions": ["*://*/*"],
   "externally_connectable": {
     "matches": ["http://localhost:3000/*"]
   }

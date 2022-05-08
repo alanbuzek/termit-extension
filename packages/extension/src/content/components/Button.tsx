@@ -21,7 +21,7 @@ const colorClassnames = {
     "text-red-500 text-red-500 border-2 border-red-500 hover:bg-red-500 hover:text-white",
   light: "hover:text-gray-300 text-white",
   secondary:
-    "text-green-500 border border-green-500 hover:bg-green-500 hover:text-white",
+    "text-green-500 !border !border-green-500 hover:bg-green-500 hover:text-white",
 };
 
 export type ButtonProps = DetailedHTMLProps<

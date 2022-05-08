@@ -23,8 +23,11 @@ import Document, { DocumentData } from "../common/model/Document";
 // TODO: remove all Promise.resolve() statements and uncomment real back-end calls when ready
 // TODO (optional): use fetch-mock or similar library to mock api server responses, will likely be needed to testing
 
-const termitApi = new Ajax({ baseURL: Constants.TERMIT_SERVER_URL });
-const annotaceApi = new Ajax({ baseURL: Constants.ANNOTACE_SERVER_URL });
+let termitApi: any = null;
+
+export const initApi = (url: string) => {
+  termitApi = new Ajax({ baseURL: url });
+};
 
 export const loadVocabularies = cachedCall("vocabularies", async () => {
   const vocabularies = await termitApi
@@ -496,4 +499,5 @@ export default {
   removeSuggestedOccurrences,
   createDefaultVocabulary,
   createVocabulary,
+  initApi,
 };
