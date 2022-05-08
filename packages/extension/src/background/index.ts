@@ -94,11 +94,20 @@ async function handleExternalMessages(message, sender, sendResponse) {
       if (typeof tabIdWaitingForAuth === "number") {
         console.log("sending to tab: ", tabIdWaitingForAuth);
         // talk to content scripts if relevant
-        chrome.tabs.sendMessage(tabIdWaitingForAuth, {
-          type: ExtensionMessage.LoginEvent,
-        });
-        await BrowserApi.storage.remove(
-          Constants.STORAGE.TAB_ID_WAITING_FOR_AUTH
+        chrome.tabs.sendMessage(
+          tabIdWaitingForAuth,
+          {
+            type: ExtensionMessage.LoginEvent,
+          },
+          async (response) => {
+            if (response?.success) {
+              // focus relevant tab
+              chrome.tabs.update(tabIdWaitingForAuth, { active: true });
+              await BrowserApi.storage.remove(
+                Constants.STORAGE.TAB_ID_WAITING_FOR_AUTH
+              );
+            }
+          }
         );
       }
 
