@@ -692,7 +692,7 @@ const cs = {
       "Tato zpráva reprezentuje výsledek kontroly kvality. Formulář lze uložit i v případě, že kvalita není stoprocentní.",
 
     "extension.loading": "Načítání...",
-    "extension.loading.message": `Tato operace může chvilku trvat v závislosti na počtu anotací.`,
+    "extension.loading.message": `Tato operace může chvilku trvat v závislosti na počtu anotací a velikosti stránky.`,
     "extension.choose.vocabulary":
       "Vyberte si slovník se kterým začnete vytvářet.",
     "extension.off.message": "TermIt Annotate je vypnutý.",
@@ -706,7 +706,7 @@ const cs = {
       "Jakmile tak učiníte, načtěte prosím stránku znovu a začněte anotovat.",
     "extension.login.noaccount": "Nemáte účet?",
     "extension.login.registerhere": "Registrujte se zde",
-    "extension.webapp": "Webová aplikace",
+    "extension.webapp": "aplikace",
     "extension.tutorial": "Tutoriál",
     "extension.about": "O nás",
     "extension.annotate.page": "Anotovat stránku",

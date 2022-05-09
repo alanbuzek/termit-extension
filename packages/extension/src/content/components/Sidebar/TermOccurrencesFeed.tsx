@@ -47,10 +47,12 @@ const TermOccurrencesFeed = ({
   annotations,
   onDeleteAnnotation,
   failedAnnotations,
+  isAnonymous,
 }: {
   onDeleteAnnotation: (annotation: Annotation) => Promise<void>;
   annotations: Annotation[];
   failedAnnotations: Annotation[];
+  isAnonymous: boolean;
 }) => {
   const [occurrenceTypeFilter, setOccurrenceTypeFilter] = useState<any>();
   const [occurrenceTextFilter, setOccurrenceTextFilter] = useState("");
@@ -133,6 +135,7 @@ const TermOccurrencesFeed = ({
         <TermOccurrencesList
           annotations={filteredAnnotations}
           onDeleteAnnotation={onDeleteAnnotation}
+          isAnonymous={isAnonymous}
         />
       </>
     </div>

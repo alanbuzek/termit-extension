@@ -9,6 +9,8 @@ import { overlay } from "../../helper/overlay";
 import VocabularyEditDropdown from "../dropdown/VocabularyEditDropdown";
 import { useI18n } from "../../../common/component/hook/useI18n";
 import { ContentActions } from "../..";
+import VocabularyUtils from "../../../common/util/VocabularyUtils";
+import AssetLink from "../../../common/component/misc/AssetLink";
 
 const SidebarControlPanel = ({
   annotations,
@@ -19,6 +21,7 @@ const SidebarControlPanel = ({
   handleDeleteSuggestions,
   isAnonymous,
   isVocabPrompt,
+  instance,
 }: {
   vocabulary?: Vocabulary;
   vocabularies?: Vocabulary[];
@@ -28,6 +31,7 @@ const SidebarControlPanel = ({
   handleDeleteSuggestions: () => void;
   isAnonymous: boolean;
   isVocabPrompt: boolean;
+  instance;
 }) => {
   const [selectedVocabulary, setSelectedVocabulary] = useState<Vocabulary>();
   const { i18n } = useI18n();
@@ -107,29 +111,37 @@ const SidebarControlPanel = ({
     );
   }
 
-  if (isAnonymous){
+  if (isAnonymous) {
     return null;
   }
+
+  const vocabularyIRI = VocabularyUtils.create(vocabulary!.iri);
 
   return (
     <div className="px-3 pt-3.5 pb-4 border-b border-gray-200">
       <div className="flex justify-between items-end">
-          <div>
-            <div className="text-gray-600 text-base mb-2">
-              {i18n("extension.annotated.with")}
-            </div>
-            <div className="flex text-xl font-semibold text-gray-700 items-center">
+        <div>
+          <div className="text-gray-600 text-base mb-2">
+            {i18n("extension.annotated.with")}
+          </div>
+          <div className="flex text-xl font-normal text-gray-700 items-center">
+            <AssetLink
+              path={`${instance.termitUI}/#/vocabularies/${vocabularyIRI.fragment}?namespace=${vocabularyIRI.namespace}`}
+              asset={vocabulary!}
+              id="selected-vocabulary"
+              tooltip={"asset.link.tooltip"}
+            >
               <FaBook id={"props.id"} className={"block mr-2"} />
               {vocabulary!.label}
-            </div>
+            </AssetLink>
           </div>
-          <div className="relative">
-            <VocabularyEditDropdown
-              handleDeleteAllAnnotations={handlePageDeleteClick}
-              handleDeleteSuggestedAnnotations={handleDeleteSuggestions}
-              vocabulary={vocabulary}
-            />{" "}
-          </div>
+        </div>
+        <div className="relative">
+          <VocabularyEditDropdown
+            handleDeleteAllAnnotations={handlePageDeleteClick}
+            handleDeleteSuggestedAnnotations={handleDeleteSuggestions}
+          />{" "}
+        </div>
       </div>
     </div>
   );

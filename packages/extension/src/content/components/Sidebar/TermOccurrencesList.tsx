@@ -59,7 +59,11 @@ const lengthBasedContainerStyles = (textLength) => {
   return "px-2 pb-1.5 pt-1.5";
 };
 
-const TermOccurrencesList = ({ annotations, onDeleteAnnotation }) => {
+const TermOccurrencesList = ({
+  annotations,
+  onDeleteAnnotation,
+  isAnonymous,
+}) => {
   const [deletingAnnotation, setDeletingAnnotation] = useState<Annotation>();
   const { i18n } = useI18n();
 
@@ -137,7 +141,7 @@ const TermOccurrencesList = ({ annotations, onDeleteAnnotation }) => {
         return (
           <List
             width={width}
-            height={height - 155}
+            height={height - (isAnonymous ? 155 : 255)}
             rowCount={annotations.length}
             rowHeight={100}
             rowRenderer={rowRenderer}

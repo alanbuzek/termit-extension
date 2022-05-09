@@ -20,12 +20,14 @@ const SidebarOccurrencesContainer = ({
         handlePageDelete={handleDeletePage}
         handleDeleteSuggestions={handleDeleteSuggestions}
         isVocabPrompt={state.isVocabPrompt}
+        instance={state.instance}
       />
       {state.annotations && !state.isVocabPrompt && (
         <TermOccurrencesFeed
           failedAnnotations={state.failedAnnotations}
           annotations={state.annotations}
           onDeleteAnnotation={onDeleteAnnotation}
+          isAnonymous={!state.user}
         />
       )}
     </>

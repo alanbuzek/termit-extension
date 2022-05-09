@@ -3,14 +3,13 @@ import useDropdown from "./useDropdown";
 import DropdownItem from "./DropdownItem";
 import DropdownContainer from "./DropdownContainer";
 import DropdownButton from "./DropdownButton";
-import { GoPencil } from "react-icons/go";
+import { GoPencil, GoTrashcan } from "react-icons/go";
 import VocabularyUtils from "../../../common/util/VocabularyUtils";
 import { useI18n } from "../../../common/component/hook/useI18n";
 
 const VocabularyEditDropdown = ({
   handleDeleteSuggestedAnnotations,
   handleDeleteAllAnnotations,
-  vocabulary,
 }) => {
   const { i18n } = useI18n();
 
@@ -45,29 +44,20 @@ const VocabularyEditDropdown = ({
     },
   ];
 
-  if (vocabulary) {
-    options.unshift({
-      name: i18n("sidebar.vocabulary.link"),
-      link: `http://localhost:3000/#/vocabularies/${
-        VocabularyUtils.create(vocabulary.iri).fragment
-      }`,
-    });
-  }
-
   return (
     <>
       <DropdownButton
         handleMenuClick={handleMenuClick}
         icon={
-          <GoPencil className="text-lg text-gray-600 hover:text-gray-800 cursor-pointer" />
+          <GoTrashcan className="text-lg text-gray-600 hover:text-gray-800 cursor-pointer" />
         }
       />
       {isOpen && (
         <DropdownContainer dropdownRef={dropdownRef}>
           {options.map((option) => (
             <DropdownItem
-              option={option}
-              key={option.name}
+              option={option as any}
+              key={option.name as any}
               handleItemClick={handleItemClick}
             >
               {option.name}

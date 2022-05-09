@@ -7,7 +7,7 @@ const Navbar = () => {
         <div className="relative flex items-center justify-between h-16">
           <div className="flex-1 flex items-stretch justify-start">
             <div className="flex justify-between items-center mt-2 px-3.5 pb-3">
-              <div className="ml-sm-3 ml-md-0 brand ml-2 p-0 navbar-brand text-2xl font-semibold text-green-600">
+              <div className="ml-sm-3 ml-md-0 ml-2 p-0 text-2xl font-semibold text-green-600">
                 TermIt Annotate
               </div>
             </div>

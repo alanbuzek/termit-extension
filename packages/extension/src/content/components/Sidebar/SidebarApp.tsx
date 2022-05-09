@@ -77,7 +77,11 @@ const SidebarApp = ({
           }}
         />
         <UserPanel user={state.user} instance={state.instance} />
-        <div className="h-full bg-gray-50">
+        <div
+          className={`h-full bg-gray-50 ${
+            activeSection !== 0 ? "overflow-y-auto mb-16 pb-4" : ""
+          }`}
+        >
           {state.globalLoading ? (
             <div className="flex flex-col mx-auto mt-6 justify-center items-center">
               <Spinner className="text-green-500" size="12" />

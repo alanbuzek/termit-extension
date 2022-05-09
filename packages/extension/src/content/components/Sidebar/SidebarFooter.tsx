@@ -18,7 +18,12 @@ const SidebarFooter = ({ activeSection, setActiveSection, isAnonymous }) => {
     },
   ];
   return (
-    <div className="flex border-t border-gray-300 w-full mt-auto">
+    <div
+      className={`flex border-t border-gray-300 w-full ${
+        activeSection === 0 ? "mt-auto" : "position-absolute right-0 bottom-0"
+      }`}
+      style={{ zIndex: 2000 }}
+    >
       {sections.map((section, idx) => {
         const isDisabled = isAnonymous && idx == 1;
         const isActive = idx === activeSection;

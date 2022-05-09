@@ -17,7 +17,7 @@ const SidebarHeader = ({
 
   return (
     <div className="flex justify-between items-center mt-2 px-3.5 pb-3 border-b border-gray-300">
-      <span className="ml-sm-3 ml-md-0 brand ml-2 p-0 navbar-brand text-base">
+      <span className="ml-sm-3 ml-md-0 brand ml-2 p-0 text-green-500 text-base">
         TermIt Annotate
       </span>
       {user && !isVocabPrompt && (

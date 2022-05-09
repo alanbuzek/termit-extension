@@ -15,7 +15,7 @@ export default function LoginPromptPopup({
   initialStep = 0,
   initialAction = "login",
   initialInstance = null,
-  onInstanceSelected,
+  onInstanceSelectedHandler,
 }) {
   const { i18n } = useI18n();
   const [step, setStep] = useState(initialStep);
@@ -25,9 +25,10 @@ export default function LoginPromptPopup({
 
   const handleInstanceSelect = () => {
     const link = `${instanceSelected.termitUi}/#/${selectedAction}`
-    if (onInstanceSelected) {
-      onInstanceSelected(link, instanceSelected);
+    if (onInstanceSelectedHandler) {
+      onInstanceSelectedHandler(link, instanceSelected);
     } else {
+      // default handler
       openNewTabLink(link);
       ContentActions.handleInstanceSelected(instanceSelected);
       setStep(2);
@@ -40,12 +41,12 @@ export default function LoginPromptPopup({
     );
     setSelectedAction(action);
 
-    // TODO: put back here
-    // if (currentInstance) {
-    //   setInstanceSelected(currentInstance);
-    //   handleInstanceSelect();
-    //   return;
-    // }
+    // we already have an instance -> no need to prompt
+    if (currentInstance) {
+      setInstanceSelected(currentInstance);
+      handleInstanceSelect();
+      return;
+    }
 
     setStep(1);
   };

@@ -12,6 +12,8 @@ import SecurityUtils from "../common/util/SecurityUtils";
 import { cleanOnLogout } from "../content/helper/storageHelpers";
 import BrowserApi from "../shared/BrowserApi";
 import { ExtensionMessage } from "../shared/ExtensionMessage";
+
+// move this into a separte file
 export async function runPageAnnotationAnalysis(
   pageHtml: string,
   vocabulary?: string
@@ -180,13 +182,6 @@ async function handleExternalMessages(message, sender, sendResponse) {
   return true;
 }
 
-// chrome.action.onClicked.addListener((tab) => {
-//   if (!tab || !tab.id) {
-//     return;
-//   }
-//   chrome.tabs.sendMessage(tab.id, { type: ExtensionMessage.OpenToolbar });
-// });
-
 type LoginEventPayload = {
   userData: UserData;
   authToken: string;
@@ -196,12 +191,11 @@ chrome.runtime.onMessageExternal.addListener(
   (message, sender, sendResponse) => {}
 );
 
-// const optionsUrl = chrome.runtime.getURL("options.html");
-
-// chrome.tabs.query({ url: optionsUrl }, (tabs) => {
-//   if (tabs.length) {
-//     chrome.tabs.update(tabs[0].id!, { active: true });
-//   } else {
-//     chrome.tabs.create({ url: optionsUrl });
-//   }
-// });
+chrome.runtime.onInstalled.addListener((details) => {
+  if (details.reason === (chrome.runtime as any).OnInstalledReason.INSTALL) {
+    chrome.tabs.create({
+      url: `${chrome.runtime.getURL("tutorial.html")}`,
+      active: true,
+    });
+  }
+});

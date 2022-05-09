@@ -1,4 +1,5 @@
 import * as React from "react";
+import { FaExternalLinkAlt } from "react-icons/fa";
 import { useI18n } from "../hook/useI18n";
 
 interface OutgoingLinkProps {
@@ -14,7 +15,7 @@ export const OutgoingLink: React.FC<OutgoingLinkProps> = (
 ) => {
   const { formatMessage } = useI18n();
   return (
-    <span>
+    <span className="flex items-start">
       {props.label}
       <a
         id={props.id}
@@ -25,9 +26,8 @@ export const OutgoingLink: React.FC<OutgoingLinkProps> = (
         rel="noopener noreferrer"
         title={formatMessage("link.external.title", { url: props.iri })}
       >
-        <span>
-          &nbsp;
-          <small></small>
+        <span className={`${props.showLink ? "" : "hidden"} text-sm ml-1`}>
+          <FaExternalLinkAlt className="text-green-500" />
         </span>
       </a>
     </span>
