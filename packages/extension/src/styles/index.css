@@ -1,13 +1,16 @@
 @import "tailwindcss/base";
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
+/* tailwind styles will get imported and added here */
 
-/* TODO: we might need to scope this only to iframe so it only applies to content popup as intended */
-html,.frame-root,body, .frame-content  {
-    height: 100%;
+html,
+.frame-root,
+body,
+.frame-content {
+  height: 100%;
 }
 
+/* TODO: do we need frame root? */
 .frame-root {
-    overflow-y: hidden !important;
+  overflow-y: hidden !important;
 }
-

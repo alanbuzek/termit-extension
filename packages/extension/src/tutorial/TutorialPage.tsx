@@ -1,97 +1,95 @@
-import React, { useState, useEffect } from "react";
-import { useI18n } from "../common/component/hook/useI18n";
-import Button from "../content/components/Button";
-import Spinner from "../content/components/Spinner";
-import useDebounce from "../content/helper/useDebounce";
+import React, { useState, useEffect } from 'react';
+import { useI18n } from '../termit-ui-common/component/hook/useI18n';
+import Button from '../content/component/shared/Button';
+import Spinner from '../content/component/shared/Spinner';
+import useDebounce from '../content/component/hook/useDebounce';
 
 const getStages = ({ i18n }) => [
   {
     heading: (
       <span>
-        {i18n("extension.onboarding.welcome.header")}{" "}
+        {i18n('extension.onboarding.welcome.header')}{' '}
         <span className="text-green-500 font-bold">TermIt Annotate!</span>
       </span>
     ),
-    description: <span>{i18n("extension.onboarding.welcome.text1")}</span>,
-    image: chrome.runtime.getURL("/static/img/onboarding/welcome-termit-2.png"),
-    buttonText: <span>{i18n("extension.onboarding.welcome.button")}</span>,
+    description: <span>{i18n('extension.onboarding.welcome.text1')}</span>,
+    image: chrome.runtime.getURL('/static/img/onboarding/welcome-termit.png'),
+    buttonText: <span>{i18n('extension.onboarding.welcome.button')}</span>,
   },
   {
-    heading: <span>{i18n("extension.onboarding.step1.header")}</span>,
+    heading: <span>{i18n('extension.onboarding.step1.header')}</span>,
     description: (
       <span>
-        {i18n("extension.onboarding.step1.text1")}
+        {i18n('extension.onboarding.step1.text1')}
         <br />
-        {i18n("extension.onboarding.step1.text2")}
+        {i18n('extension.onboarding.step1.text2')}
       </span>
     ),
-    image: chrome.runtime.getURL(
-      "/static/img/onboarding/start-annotating-1.gif"
-    ),
-    buttonText: <span>{i18n("extension.onboarding.next")} &#8594;</span>,
+    image: chrome.runtime.getURL('/static/img/onboarding/start-annotating.gif'),
+    buttonText: <span>{i18n('extension.onboarding.next')} &#8594;</span>,
   },
   {
     heading: (
       <span className="text-3xl">
-        {i18n("extension.onboarding.step2.header")}
+        {i18n('extension.onboarding.step2.header')}
       </span>
     ),
     description: (
       <span>
-        {i18n("extension.onboarding.step2.text1")}
+        {i18n('extension.onboarding.step2.text1')}
 
         <br />
-        {i18n("extension.onboarding.step2.text2")}
+        {i18n('extension.onboarding.step2.text2')}
 
         <br />
-        {i18n("extension.onboarding.step2.text3")}
+        {i18n('extension.onboarding.step2.text3')}
       </span>
     ),
-    image: chrome.runtime.getURL("/static/img/onboarding/annotation-1.png"),
+    image: chrome.runtime.getURL('/static/img/onboarding/annotation-1.png'),
     reversed: true,
-    buttonText: <span>{i18n("extension.onboarding.next")} &#8594;</span>,
+    buttonText: <span>{i18n('extension.onboarding.next')} &#8594;</span>,
   },
   {
     heading: (
       <span className="text-3xl">
-        {i18n("extension.onboarding.step3.header")}
+        {i18n('extension.onboarding.step3.header')}
       </span>
     ),
-    description: <span>{i18n("extension.onboarding.step3.text1")}</span>,
-    image: chrome.runtime.getURL("/static/img/onboarding/annotation-2.png"),
+    description: <span>{i18n('extension.onboarding.step3.text1')}</span>,
+    image: chrome.runtime.getURL('/static/img/onboarding/annotation-2.png'),
     reversed: false,
-    buttonText: <span>{i18n("extension.onboarding.next")} &#8594;</span>,
+    buttonText: <span>{i18n('extension.onboarding.next')} &#8594;</span>,
   },
   {
     heading: (
       <span className="text-3xl">
-        {" "}
-        {i18n("extension.onboarding.step4.header")}
+        {' '}
+        {i18n('extension.onboarding.step4.header')}
       </span>
     ),
-    description: <div>{i18n("extension.onboarding.step4.text1")}</div>,
-    image: chrome.runtime.getURL("/static/img/onboarding/sidebar.png"),
+    description: <div>{i18n('extension.onboarding.step4.text1')}</div>,
+    image: chrome.runtime.getURL('/static/img/onboarding/sidebar.png'),
     reversed: false,
-    buttonText: <span>{i18n("extension.onboarding.next")} &#8594;</span>,
+    buttonText: <span>{i18n('extension.onboarding.next')} &#8594;</span>,
   },
   {
     heading: (
       <span className="text-3xl">
-        {i18n("extension.onboarding.step5.header")}
+        {i18n('extension.onboarding.step5.header')}
       </span>
     ),
-    description: <div>{i18n("extension.onboarding.step5.text1")}</div>,
-    image: chrome.runtime.getURL("/static/img/onboarding/termit.png"),
+    description: <div>{i18n('extension.onboarding.step5.text1')}</div>,
+    image: chrome.runtime.getURL('/static/img/onboarding/termit.png'),
     reversed: false,
-    buttonText: <span>{i18n("extension.onboarding.next")} &#8594;</span>,
+    buttonText: <span>{i18n('extension.onboarding.next')} &#8594;</span>,
   },
   {
     heading: (
       <span className="text-3xl">
-        {i18n("extension.onboarding.step6.header")}
+        {i18n('extension.onboarding.step6.header')}
       </span>
     ),
-    description: <div>{i18n("extension.onboarding.step6.text1")}</div>,
+    description: <div>{i18n('extension.onboarding.step6.text1')}</div>,
   },
 ];
 
@@ -101,8 +99,6 @@ const TutorialPage = () => {
   const { i18n } = useI18n();
 
   const stages = getStages({ i18n });
-
-  const finishTutorial = () => {};
 
   useEffect(() => {
     setStep(0);
@@ -115,7 +111,7 @@ const TutorialPage = () => {
   return (
     <div className="lg:mx-20">
       <h3 className="ml-10 mb-5 text-2xl text-gray-500 font-medium mt-0">
-        {i18n("extension.onboarding.header")}
+        {i18n('extension.onboarding.header')}
       </h3>
       <div className="rounded-lg shadow-lg bg-gray-200 px-7 lg:px-14 py-5 lg:py-10 relative">
         <div className="flex flex-col lg:flex-row">
@@ -127,19 +123,19 @@ const TutorialPage = () => {
                 width="400"
                 className={`rounded-lg shadow-lg card my-4 ${
                   stages[step].reversed
-                    ? "order-2 lg:ml-10 lg:mr-2"
-                    : "order-1 lg:mr-14 lg:ml-2"
+                    ? 'order-2 lg:ml-10 lg:mr-2'
+                    : 'order-1 lg:mr-14 lg:ml-2'
                 }`}
               />
             )}
             <div
               className={`flex flex-col justify-center items-start ${
-                stages[step].reversed ? "order-1" : "order-2"
+                stages[step].reversed ? 'order-1' : 'order-2'
               }`}
             >
               <h3
                 className="mt-2 lg:mt-4 text-gray-900 font-semibold leading-relaxed"
-                style={{ fontSize: "1.7rem" }}
+                style={{ fontSize: '1.7rem' }}
               >
                 {stages[step].heading}
               </h3>
@@ -174,7 +170,7 @@ const TutorialPage = () => {
           <div
             key={stage.image}
             className={`cursor-pointer rounded-full mr-6 lg:mr-16 w-6 h-6 flex items-center justify-center text-white text-sm ${
-              step >= stageIdx ? "bg-green-300" : "bg-gray-300"
+              step >= stageIdx ? 'bg-green-300' : 'bg-gray-300'
             }`}
             onClick={() => {
               setStep(stageIdx);
@@ -190,7 +186,7 @@ const TutorialPage = () => {
               setStep(stages.length - 1);
             }}
           >
-            {i18n("extension.onboarding.skip")}
+            {i18n('extension.onboarding.skip')}
           </div>
         ) : (
           <div
@@ -199,7 +195,7 @@ const TutorialPage = () => {
               setStep(0);
             }}
           >
-            {i18n("extension.onboarding.gotostart")}
+            {i18n('extension.onboarding.gotostart')}
           </div>
         )}
       </div>

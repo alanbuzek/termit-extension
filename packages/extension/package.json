@@ -61,7 +61,7 @@
   "scripts": {
     "start": "node scripts/start.js",
     "build": "node scripts/build.js",
-    "test": "node scripts/test.js --env=jsdom",
+    "lint": "eslint src/",
     "watch": "npm-watch",
     "build:css": "NODE_ENV=production tailwind build -i src/styles/index.css -o public/static/css/styles.css --minify",
     "watch:css": "npx tailwindcss -i src/styles/index.css -o public/static/css/styles.css --watch"
@@ -146,6 +146,7 @@
     "eslint-plugin-flowtype": "^5.2.0",
     "eslint-plugin-import": "^2.23.4",
     "eslint-plugin-jsx-a11y": "^6.4.1",
+    "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-react": "^7.20.3",
     "eslint-plugin-react-hooks": "^4.0.7",
     "file-loader": "^6.0.0",

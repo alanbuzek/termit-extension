@@ -1,17 +1,17 @@
-import "regenerator-runtime/runtime.js";
-import { cachedCall, SKIP_CACHE } from "../api/cache";
-import { UserData } from "../common/model/User";
+import 'regenerator-runtime/runtime.js';
+import { cachedCall, SKIP_CACHE } from '../shared/api/cache';
+import { UserData } from '../termit-ui-common/model/User';
 import Vocabulary, {
   VocabularyData,
   CONTEXT as VOCABULARY_CONTEXT,
-} from "../common/model/Vocabulary";
-import Ajax, { content } from "../common/util/Ajax";
-import Constants from "../common/util/Constants";
-import JsonLdUtils from "../common/util/JsonLdUtils";
-import SecurityUtils from "../common/util/SecurityUtils";
-import { cleanOnLogout } from "../content/helper/storageHelpers";
-import BrowserApi from "../shared/BrowserApi";
-import { ExtensionMessage } from "../shared/ExtensionMessage";
+} from '../termit-ui-common/model/Vocabulary';
+import Ajax, { content } from '../termit-ui-common/util/Ajax';
+import Constants from '../termit-ui-common/util/Constants';
+import JsonLdUtils from '../termit-ui-common/util/JsonLdUtils';
+import SecurityUtils from '../content/util/SecurityUtils';
+import BrowserApi from '../shared/BrowserApi';
+import ExtensionMessage from '../shared/ExtensionMessage';
+import StorageUtils from '../content/util/StorageUtils';
 
 // move this into a separte file
 export async function runPageAnnotationAnalysis(
@@ -22,7 +22,7 @@ export async function runPageAnnotationAnalysis(
     content: pageHtml,
     vocabularyContexts: [],
     // TODO: language
-    language: "cs",
+    language: 'cs',
   };
 
   if (vocabulary) {
@@ -38,15 +38,15 @@ export async function runPageAnnotationAnalysis(
   });
 
   return annotaceApi.post(
-    "/annotate-to-occurrences",
+    '/annotate-to-occurrences',
     content(payload)
-      .param("enableKeywordExtraction", "true")
+      .param('enableKeywordExtraction', 'true')
       .accept(Constants.JSON_MIME_TYPE)
       .contentType(Constants.JSON_MIME_TYPE)
   );
 }
 
-export const loadVocabularies = cachedCall("vocabularies", async () => {
+export const loadVocabularies = cachedCall('vocabularies', async () => {
   const instance = await BrowserApi.storage.get(
     Constants.STORAGE.TERMIT_INSTANCE
   );
@@ -56,18 +56,19 @@ export const loadVocabularies = cachedCall("vocabularies", async () => {
   });
 
   const vocabularies = await termitApi
-    .get("/vocabularies")
-    .then((data: object[]) => {
-      return data.length !== 0
+    .get('/vocabularies')
+    // eslint-disable-next-line @typescript-eslint/ban-types
+    .then((data: object[]) =>
+      data.length !== 0
         ? JsonLdUtils.compactAndResolveReferencesAsArray<VocabularyData>(
             data,
             VOCABULARY_CONTEXT
           )
-        : [];
-    })
-    .then((data: VocabularyData[]) => {
-      return data.map((v) => new Vocabulary(v).mapToMinifiedVersion());
-    });
+        : []
+    )
+    .then((data: VocabularyData[]) =>
+      data.map((v) => new Vocabulary(v).mapToMinifiedVersion())
+    );
 
   return vocabularies;
 });
@@ -82,9 +83,9 @@ addListeners();
 
 function handleMessages(message, sender, sendResponse) {
   console.log(
-    "[Background] got handle message: ",
+    '[Background] got handle message: ',
     message,
-    "sendResponse: ",
+    'sendResponse: ',
     sendResponse
   );
 
@@ -98,10 +99,7 @@ function handleMessages(message, sender, sendResponse) {
         .then((res) => {
           sendResponse({ data: res });
         })
-        .catch(
-          (err) => sendResponse({ error: "here" })
-          // sendResponse({ error: err || true })
-        );
+        .catch((error) => sendResponse({ error }));
 
       break;
     }
@@ -109,8 +107,11 @@ function handleMessages(message, sender, sendResponse) {
       BrowserApi.storage
         .set(Constants.STORAGE.TAB_ID_WAITING_FOR_AUTH, sender.tab.id)
         .then(() => sendResponse({ data: {} }));
-      console.log("setting tab id: ", sender.tab);
+      console.log('setting tab id: ', sender.tab);
       break;
+    }
+    default: {
+      sendResponse({});
     }
   }
 
@@ -124,7 +125,7 @@ async function handleExternalMessages(message, sender, sendResponse) {
       // TODO: handle failure
       await BrowserApi.storage.set(Constants.STORAGE.USER, userData);
       await SecurityUtils.saveToken(authToken);
-      console.log("storing: ", Constants.STORAGE.USER, userData);
+      console.log('storing: ', Constants.STORAGE.USER, userData);
 
       // refresh vocabularies cache
       loadVocabularies(SKIP_CACHE);
@@ -132,8 +133,8 @@ async function handleExternalMessages(message, sender, sendResponse) {
       const tabIdWaitingForAuth = await BrowserApi.storage.get(
         Constants.STORAGE.TAB_ID_WAITING_FOR_AUTH
       );
-      if (typeof tabIdWaitingForAuth === "number") {
-        console.log("sending to tab: ", tabIdWaitingForAuth);
+      if (typeof tabIdWaitingForAuth === 'number') {
+        console.log('sending to tab: ', tabIdWaitingForAuth);
         // talk to content scripts if relevant
         chrome.tabs.sendMessage(
           tabIdWaitingForAuth,
@@ -156,8 +157,7 @@ async function handleExternalMessages(message, sender, sendResponse) {
       break;
     }
     case ExtensionMessage.LogoutEvent: {
-      SecurityUtils.clearToken();
-      cleanOnLogout();
+      StorageUtils.clearStorageOnLogout();
       await BrowserApi.storage.remove(Constants.STORAGE.USER);
       sendResponse({ success: true });
       break;
@@ -174,7 +174,7 @@ async function handleExternalMessages(message, sender, sendResponse) {
       break;
     }
     default: {
-      console.warn("Unknown message type: ", message.type);
+      console.warn('Unknown message type: ', message.type);
       sendResponse({ error: true });
     }
   }
@@ -187,14 +187,10 @@ type LoginEventPayload = {
   authToken: string;
 };
 
-chrome.runtime.onMessageExternal.addListener(
-  (message, sender, sendResponse) => {}
-);
-
 chrome.runtime.onInstalled.addListener((details) => {
   if (details.reason === (chrome.runtime as any).OnInstalledReason.INSTALL) {
     chrome.tabs.create({
-      url: `${chrome.runtime.getURL("tutorial.html")}`,
+      url: `${chrome.runtime.getURL('tutorial.html')}`,
       active: true,
     });
   }

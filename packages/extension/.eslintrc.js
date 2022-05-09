@@ -14,8 +14,9 @@ module.exports = {
   },
   ignorePatterns: [
     'build/*',
-    'src/generated/*',
-    'src/content/responsiveVoice.js',
+    // for now, ignore directories containing included code from other repositories
+    'src/termit-ui-common/*',
+    'src/content/util/hypothesis/*',
   ],
   plugins: ['@typescript-eslint', 'react', 'prettier'],
   extends: [
@@ -48,6 +49,24 @@ module.exports = {
     '@typescript-eslint/ban-ts-comment': 'off',
     'consistent-return': 'off',
     '@typescript-eslint/no-use-before-define': 'off',
+    '@typescript-eslint/no-non-null-assertion': 'off',
+    'import/no-unresolved': 'off',
+    'import/namespace': 'off',
+    'import/no-duplicates': 'off',
+    import: 'off',
+    'import/no-self-import': 'off',
+    'import/no-named-as-default-member': 'off',
+    'import/no-named-as-default': 'off',
+    'import/default': 'off',
+    'import/no-extraneous-dependencies': 'off',
+    'import/order': 'off',
+    'import/no-useless-path-segments': 'off',
+    'jsx-a11y/click-events-have-key-events': 'off',
+    'jsx-a11y/no-static-element-interactions': 'off',
+    'react/require-default-props': 'off',
+    'jsx-a11y/no-redundant-roles': 'off',
+    'import/export': 'off',
+    'no-console': 'off',
   },
 
   settings: {

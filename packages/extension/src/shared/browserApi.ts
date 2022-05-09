@@ -1,20 +1,20 @@
-const promisify = (functionCall) => (payload) =>
-  new Promise((resolve, reject) => {
-    functionCall(payload, (response) => {
-      if (response?.error || chrome.runtime.lastError) {
-        reject(response?.error || chrome.runtime.lastError);
-        return;
-      }
-      resolve(response);
-    });
-  });
+// const promisify = (functionCall) => (payload) =>
+//   new Promise((resolve, reject) => {
+//     functionCall(payload, (response) => {
+//       if (response?.error || chrome.runtime.lastError) {
+//         reject(response?.error || chrome.runtime.lastError);
+//         return;
+//       }
+//       resolve(response);
+//     });
+//   });
 
 // promisified and contained browser api
 const BrowserApi = {
   // promisified browser api calls
   sendMessage(payload) {
     // TODO: abstract promisify
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       chrome.runtime.sendMessage(payload, async (response) => {
         if (!response) {
           resolve(null);
@@ -22,8 +22,7 @@ const BrowserApi = {
         const { data, error } = response;
 
         if (error) {
-          reject("There was an error sending this message: " + error);
-          return;
+          throw new Error(`There was an error sending this message: ${error}`);
         }
 
         resolve(data);
@@ -31,12 +30,12 @@ const BrowserApi = {
     });
   },
   sendMessageToTab(tabId, payload) {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       chrome.runtime.sendMessage(tabId, payload, async (response) => {
         const { data, error } = response;
 
         if (error) {
-          reject("There was an error sending this message: " + error);
+          throw new Error(`There was an error sending this message: ${error}`);
           return;
         }
 
@@ -48,12 +47,12 @@ const BrowserApi = {
   storage: {
     set(key: string, value: any) {
       return new Promise((resolve) => {
-        chrome.storage.local.set({ [key]: value }, function () {
+        chrome.storage.local.set({ [key]: value }, () => {
           resolve(null);
         });
       });
     },
-    get(key: string, defaultValue?: any): Promise<any> {
+    get(key: string): Promise<any> {
       return new Promise((resolve) => {
         chrome.storage.local.get([key], (result) => {
           resolve(result[key]);

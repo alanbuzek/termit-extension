@@ -1,10 +1,13 @@
-export enum ExtensionMessage {
+enum ExtensionMessage {
+  // extension -> extension messages
   LoginEvent,
   LogoutEvent,
   ConfigurationLoadedEvent,
-  //
+  // termit-ui -> extension messages
   RunPageTextAnalysis,
   SaveAnnotaionResult,
   OpenToolbar,
-  SetWaitingForAuth
+  SetWaitingForAuth,
 }
+
+export default ExtensionMessage;
