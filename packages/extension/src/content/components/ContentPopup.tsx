@@ -93,12 +93,12 @@ function ContentPopup({
               });
             }}
             // TODO: handle fallback when no vocabulary is selected
-            vocabularyIri={vocabularyIri}
+            vocabularyIri={vocabularyIri!}
             createTerm={(term: Term) => {
               // overlay.off();
               return ContentActions.createTerm(
                 term,
-                vocabularyIri,
+                vocabularyIri!,
                 annotation,
                 definitionAnnotation
               );

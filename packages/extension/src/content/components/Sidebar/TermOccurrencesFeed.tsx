@@ -84,7 +84,7 @@ const TermOccurrencesFeed = ({
         .toLowerCase()
         .includes(occurrenceTextFilter.toLowerCase()) ||
       annotation.term?.label[language]
-        .toLowerCase()
+        ?.toLowerCase()
         .includes(occurrenceTextFilter.toLowerCase());
 
     return typeMatch && textMatch;

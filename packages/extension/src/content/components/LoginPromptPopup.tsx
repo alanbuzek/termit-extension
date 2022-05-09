@@ -16,6 +16,11 @@ export default function LoginPromptPopup({
   initialAction = "login",
   initialInstance = null,
   onInstanceSelectedHandler,
+}: {
+  initialStep?: number;
+  initialAction?: string;
+  initialInstance?: any;
+  onInstanceSelectedHandler: (link: string, instanceSelected: any) => void;
 }) {
   const { i18n } = useI18n();
   const [step, setStep] = useState(initialStep);
@@ -24,7 +29,7 @@ export default function LoginPromptPopup({
   const [selectedAction, setSelectedAction] = useState(initialAction);
 
   const handleInstanceSelect = () => {
-    const link = `${instanceSelected.termitUi}/#/${selectedAction}`
+    const link = `${instanceSelected.termitUi}/#/${selectedAction}`;
     if (onInstanceSelectedHandler) {
       onInstanceSelectedHandler(link, instanceSelected);
     } else {

@@ -161,7 +161,3 @@ export function createTermValueRenderer(vocabularyIri: string) {
     </>
   );
 }
-
-// export function createVocabularyValueRenderer() {
-//   return (option: Vocabulary) => <VocabularyLink vocabulary={option} />;
-// }

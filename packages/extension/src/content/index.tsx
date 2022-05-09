@@ -24,8 +24,6 @@ import { ExtensionMessage } from "../shared/ExtensionMessage";
 import { cleanOnLogout, cleanWholeStorage } from "./helper/storageHelpers";
 import { SKIP_CACHE } from "../api/cache";
 
-// TODO: this should be dynamic when language selection is implemented
-const language = "cs";
 // global important classes
 let sidebar: Sidebar | null = null;
 let annotator: Annotator | null = null;
@@ -78,9 +76,9 @@ const resetContentState = async () => {
   contentState.extensionActive =
     typeof extensionActive === "boolean" ? extensionActive : true;
   contentState.language =
-    (await BrowserApi.storage.get(Constants.STORAGE.LANGUAGE)) || "en"; // fallback to English for now
+    (await BrowserApi.storage.get(Constants.STORAGE.LANGUAGE)) || "cs"; // fallback to Czech as default language (not locale)
   contentState.locale =
-    (await BrowserApi.storage.get(Constants.STORAGE.LOCALE)) || "en"; // fallback to English for now
+    (await BrowserApi.storage.get(Constants.STORAGE.LOCALE)) || Constants.DEFAULT_LANGUAGE
 
   // TODO: make sure to not delete this field on logout
   contentState.instance = await BrowserApi.storage.get(
@@ -404,14 +402,14 @@ export const ContentActions = {
 
         fullTerm.definition = {
           ...fullTerm.definition,
-          [language]: annotation.termOccurrence
+          [contentState.language]: annotation.termOccurrence
             .getTextQuoteSelector()
             .exactMatch.replace(/(\r\n|\n|\r)/gm, " "),
         };
 
         term.definition = {
           ...term.definition,
-          [language]: annotation.termOccurrence
+          [contentState.language]: annotation.termOccurrence
             .getTextQuoteSelector()
             .exactMatch.replace(/(\r\n|\n|\r)/gm, " "),
         };

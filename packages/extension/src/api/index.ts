@@ -420,7 +420,7 @@ export async function saveTermOccurrences(
 
   return termitApi
     .post(
-      `/occurrence`,
+      `/occurrence/web`,
       content(contentBody)
         .params(paramsPayload)
         .contentType(Constants.JSON_MIME_TYPE)
