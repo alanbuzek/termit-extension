@@ -43,5 +43,6 @@
   "host_permissions": ["*://*/*"],
   "externally_connectable": {
     "matches": ["http://localhost:3000/*"]
-  }
+  },
+  "key": "penpnbbgbibnedeecnkbnemoilfdjlbh"
 }

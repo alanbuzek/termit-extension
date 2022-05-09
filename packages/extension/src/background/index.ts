@@ -36,7 +36,7 @@ export async function runPageAnnotationAnalysis(
   });
 
   return annotaceApi.post(
-    "/annotate",
+    "/annotate-to-occurrences",
     content(payload)
       .param("enableKeywordExtraction", "true")
       .accept(Constants.JSON_MIME_TYPE)

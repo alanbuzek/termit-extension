@@ -261,7 +261,7 @@ export const TermOccurrenceFactory = {
           ? termsMap[termIri]
           : undefined,
       target: {
-        types: [VocabularyUtils.HAS_WEBSITE_OCCURRENCE_TARGET],
+        types: [VocabularyUtils.WEBSITE_OCCURRENCE_TARGET],
         selectors: [
           {
             types: [VocabularyUtils.TEXT_QUOTE_SELECTOR],

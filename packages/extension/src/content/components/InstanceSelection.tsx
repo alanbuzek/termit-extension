@@ -4,10 +4,16 @@ import { IntelligentTreeSelect } from "intelligent-tree-select";
 
 export const INSTANCE_LIST = [
   {
+    termitServer: "https://kbss.felk.cvut.cz:48080/termit/rest",
+    termitUi: "https://kbss.felk.cvut.cz:43000",
+    annotaceService: "https://kbss.felk.cvut.cz:48888",
+    label: "Testování",
+  },
+  {
     termitServer: "http://kbss.felk.cvut.cz:48080/termit/rest",
     termitUi: "http://kbss.felk.cvut.cz:43000",
     annotaceService: "http://kbss.felk.cvut.cz:48888",
-    label: "Testování",
+    label: "Testování - http",
   },
   {
     termitServer: "http://localhost:8080/termit/rest",

@@ -18,7 +18,7 @@ const SidebarFooter = ({ activeSection, setActiveSection, isAnonymous }) => {
     },
   ];
   return (
-    <div className="flex border-t border-gray-300 position-absolute right-0 bottom-0 w-full">
+    <div className="flex border-t border-gray-300 w-full mt-auto">
       {sections.map((section, idx) => {
         const isDisabled = isAnonymous && idx == 1;
         const isActive = idx === activeSection;
@@ -39,7 +39,7 @@ const SidebarFooter = ({ activeSection, setActiveSection, isAnonymous }) => {
             } ${
               isDisabled
                 ? "cursor-not-allowed text-gray-300 font-normal"
-                : "cursor-pointer hover:!text-green-600 hover:!bg-gray-200  font-semibold"
+                : "cursor-pointer hover:!bg-gray-200 font-semibold"
             } ${!isActive && !isDisabled ? "text-gray-400" : ""} `}
           >
             <div className="text-sm">{section.icon}</div>

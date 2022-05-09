@@ -120,7 +120,7 @@ const FiltersPanel = ({
           />
         </div>
       </div>
-      <div className="text-gray-600 text-sm px-3 mt-2 mb-1">
+      <div className="text-gray-600 text-sm px-3 mt-2 border-gray-300 border-b pb-3">
         {annotationsCount} {i18n("extension.found.annotations")}.
       </div>
     </>

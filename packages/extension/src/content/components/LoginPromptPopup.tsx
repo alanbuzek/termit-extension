@@ -24,7 +24,7 @@ export default function LoginPromptPopup({
   const [selectedAction, setSelectedAction] = useState(initialAction);
 
   const handleInstanceSelect = () => {
-    const link = `${instanceSelected.termitUi}/${selectedAction}`
+    const link = `${instanceSelected.termitUi}/#/${selectedAction}`
     if (onInstanceSelected) {
       onInstanceSelected(link, instanceSelected);
     } else {
@@ -112,7 +112,7 @@ export default function LoginPromptPopup({
       <p className="font-normal mt-2 text-sm text-gray-600">
         No new tab open? Please{" "}
         <a
-          href={`${instanceSelected.termitUi}/${selectedAction}`}
+          href={`${instanceSelected.termitUi}/#/${selectedAction}`}
           target="_blank"
         >
           follow here.

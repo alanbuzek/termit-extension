@@ -163,7 +163,8 @@ const internals = {
           ...contentPopupResult,
           ...sidebarResult,
         ] as any;
-      } catch {
+      } catch (err) {
+        console.log('selector err')
         return [];
       }
     };
@@ -576,6 +577,8 @@ export const ContentActions = {
     contentState.waitingForAuth = true;
   },
   async authenticateUser() {
+    overlay.on();
+
     console.log("authenticateUser()");
     annotator!.hidePopup();
 
@@ -601,7 +604,6 @@ export const ContentActions = {
       throw new Error("Failed to create default vocabulary!!");
     }
 
-    overlay.on();
 
     if (contentState.vocabularies.length > 1) {
       contentState.globalLoading = false;

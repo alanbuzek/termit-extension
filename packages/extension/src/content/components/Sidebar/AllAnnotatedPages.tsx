@@ -19,21 +19,19 @@ export default function AllAnnotatedPagesSection({
       </div>
       {websites.map((website) => {
         return (
-          <div className="py-1 px-2.5">
-            <div className="rounded-md p-2.5 border border-gray-400 mb-0.5 cursor-pointer transition-all duration-300 relative bg-white term-occurrence-card">
-              <div className="flex justify-between items-end">
-                <div>
-                  <a
-                    className="mb-0 text-sm font-semibold break-all"
-                    href={website.url}
-                    target="_blank"
-                  >
-                    {website.url}
-                  </a>
+          <a
+            className="mb-0 text-sm font-semibold break-all"
+            href={website.url}
+            target="_blank"
+          >
+            <div className="py-1 px-2.5">
+              <div className="rounded-md p-2.5 border border-gray-400 mb-0.5 cursor-pointer transition-all duration-300 relative bg-white term-occurrence-card">
+                <div className="flex justify-between items-end">
+                  {website.url}
                 </div>
               </div>
             </div>
-          </div>
+          </a>
         );
       })}
     </div>

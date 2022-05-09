@@ -107,10 +107,13 @@ const SidebarControlPanel = ({
     );
   }
 
+  if (isAnonymous){
+    return null;
+  }
+
   return (
     <div className="px-3 pt-3.5 pb-4 border-b border-gray-200">
       <div className="flex justify-between items-end">
-        {!isAnonymous && (
           <div>
             <div className="text-gray-600 text-base mb-2">
               {i18n("extension.annotated.with")}
@@ -120,8 +123,6 @@ const SidebarControlPanel = ({
               {vocabulary!.label}
             </div>
           </div>
-        )}
-        {!isAnonymous && (
           <div className="relative">
             <VocabularyEditDropdown
               handleDeleteAllAnnotations={handlePageDeleteClick}
@@ -129,7 +130,6 @@ const SidebarControlPanel = ({
               vocabulary={vocabulary}
             />{" "}
           </div>
-        )}
       </div>
     </div>
   );

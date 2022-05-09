@@ -58,7 +58,20 @@ const TermOccurrencesFeed = ({
   const [failedAnnotationsDismissed, setFailedAnnotationsDismissed] =
     useState(false);
 
-  const filteredAnnotations = annotations.filter((annotation) => {
+  const hasFailedAnnotations = !!failedAnnotations.length;
+
+  const showAnnotationsNotFoundSection =
+    hasFailedAnnotations && showFailedAnnotations;
+  const showAnnotationsNotFoundBanner =
+    hasFailedAnnotations && !failedAnnotationsDismissed;
+
+  const { i18n } = useI18n();
+
+  const annotationsChecked = showAnnotationsNotFoundSection
+    ? failedAnnotations
+    : annotations;
+
+  const filteredAnnotations = annotationsChecked.filter((annotation) => {
     const typeMatch =
       !occurrenceTypeFilter ||
       annotation.getClassName() === occurrenceTypeFilter.value;
@@ -75,17 +88,8 @@ const TermOccurrencesFeed = ({
     return typeMatch && textMatch;
   });
 
-  const hasFailedAnnotations = !!failedAnnotations.length;
-
-  const showAnnotationsNotFoundSection =
-    hasFailedAnnotations && showFailedAnnotations;
-  const showAnnotationsNotFoundBanner =
-    hasFailedAnnotations && !failedAnnotationsDismissed;
-
-  const { i18n } = useI18n();
-
   return (
-    <div className="">
+    <div className="h-full">
       {showAnnotationsNotFoundBanner && (
         <div
           className={`px-3 py-1.5 text-gray-50 font-semibold text-base cursor-pointer flex justify-between items-center transition-all duration-300 hover:bg-red-500 bg-red-400`}
@@ -119,24 +123,15 @@ const TermOccurrencesFeed = ({
         )}
       </div>
       <>
-        {!showAnnotationsNotFoundSection && (
-          <>
-            <FiltersPanel
-              occurrenceTypeFilter={occurrenceTypeFilter}
-              setOccurrenceTypeFilter={setOccurrenceTypeFilter}
-              annotationsCount={filteredAnnotations.length}
-              occurrenceTextFilter={occurrenceTextFilter}
-              setOccurrenceTextFilter={setOccurrenceTextFilter}
-            />
-            <hr className="my-2" />
-          </>
-        )}
+        <FiltersPanel
+          occurrenceTypeFilter={occurrenceTypeFilter}
+          setOccurrenceTypeFilter={setOccurrenceTypeFilter}
+          annotationsCount={filteredAnnotations.length}
+          occurrenceTextFilter={occurrenceTextFilter}
+          setOccurrenceTextFilter={setOccurrenceTextFilter}
+        />
         <TermOccurrencesList
-          annotations={
-            showAnnotationsNotFoundSection
-              ? failedAnnotations
-              : filteredAnnotations
-          }
+          annotations={filteredAnnotations}
           onDeleteAnnotation={onDeleteAnnotation}
         />
       </>
