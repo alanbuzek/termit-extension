@@ -4,40 +4,16 @@ import { IntelligentTreeSelect } from "intelligent-tree-select";
 
 export const INSTANCE_LIST = [
   {
+    termitServer: "http://kbss.felk.cvut.cz:48080/termit/rest",
+    termitUi: "http://kbss.felk.cvut.cz:43000",
+    annotaceService: "http://kbss.felk.cvut.cz:48888",
+    label: "Testování",
+  },
+  {
     termitServer: "http://localhost:8080/termit/rest",
     termitUi: "http://localhost:3000",
     annotaceService: "http://localhost:8888",
     label: "local",
-  },
-  {
-    termitServer: "https://kbss.felk.cvut.cz/termit-server-demo/rest",
-    termitUi: "https://kbss.felk.cvut.cz/termit-server-demo",
-    annotaceService: "https://kbss.felk.cvut.cz/termit-server-demo",
-    label: "server-demo",
-  },
-  {
-    termitServer: "https://kbss.felk.cvut.cz/termit-server-dev/rest",
-    termitUi: "https://kbss.felk.cvut.cz/termit-server-dev",
-    annotaceService: "https://kbss.felk.cvut.cz/termit-server-demo",
-    label: "server-dev",
-  },
-  {
-    termitServer: "https://termit.fel.cvut.cz/service/ipr/termit/rest",
-    termitUi: "https://termit.fel.cvut.cz/service/ipr/termit",
-    annotaceService: "https://kbss.felk.cvut.cz/termit-server-demo",
-    label: "service-ipr",
-  },
-  {
-    termitServer: "https://kbss.felk.cvut.cz/termit-server-stage/rest",
-    termitUi: "https://kbss.felk.cvut.cz/termit-server-stage",
-    annotaceService: "https://kbss.felk.cvut.cz/termit-server-demo",
-    label: "server-stage",
-  },
-  {
-    termitServer: "https://termit.fel.cvut.cz/dev/service/ipr/termit/rest",
-    termitUi: "https://termit.fel.cvut.cz/dev/service/ipr/termit",
-    annotaceService: "https://kbss.felk.cvut.cz/termit-server-demo",
-    label: "dev-service-ipr",
   },
 ];
 
