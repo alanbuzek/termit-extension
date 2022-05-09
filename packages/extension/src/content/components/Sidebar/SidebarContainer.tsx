@@ -4,7 +4,7 @@ import { IntlProvider } from "react-intl";
 import { ContentActions, ContentState } from "../..";
 import cs from "../../../common/i18n/cs";
 import en from "../../../common/i18n/en";
-import { loadStyles } from "../../hypothesis/ContentPopupContainer";
+import StyleSheetLoader from "../../hypothesis/StyleSheetLoader";
 import SidebarApp from "./SidebarApp";
 
 export default class SidebarContainer {
@@ -12,7 +12,7 @@ export default class SidebarContainer {
   private state: ContentState;
   private handleAnnotatePage;
   private handleDeleteAnnotation;
-  private loadedStyles: boolean;
+  private stylesHaveBeenLoaded: boolean;
   /**
    * @param {HTMLElement} container - Element into which the toolbar is rendered
    * @param {ToolbarOptions} options
@@ -22,7 +22,7 @@ export default class SidebarContainer {
     this.state = state;
     this.handleAnnotatePage = handleAnnotatePage;
     this.handleDeleteAnnotation = handleDeleteAnnotation;
-    this.loadedStyles = false;
+    this.stylesHaveBeenLoaded = false;
     this.render();
   }
 
@@ -52,11 +52,9 @@ export default class SidebarContainer {
       </IntlProvider>,
       this.container,
       () => {
-        if (!this.loadedStyles) {
-          loadStyles(this.container, "annotator");
-          loadStyles(this.container, "styles");
-          loadStyles(this.container, "bootstrap-termit");
-          this.loadedStyles = true;
+        if (!this.stylesHaveBeenLoaded) {
+          this.stylesHaveBeenLoaded = true;
+          StyleSheetLoader.loadContentStylesSheets(this.container);
         }
       }
     );

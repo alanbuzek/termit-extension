@@ -1,7 +1,6 @@
 import Annotator from "./hypothesis/Annotator";
 import { Sidebar } from "./hypothesis/SidebarContainer";
 import Vocabulary from "../common/model/Vocabulary";
-import { preloadContentStyles } from "./hypothesis/helpers";
 import {
   Annotation,
   AnnotationFocusTime,
@@ -23,6 +22,7 @@ import { isPagePDFViewer } from "./helper/domHelpers";
 import { ExtensionMessage } from "../shared/ExtensionMessage";
 import { cleanOnLogout, cleanWholeStorage } from "./helper/storageHelpers";
 import { SKIP_CACHE } from "../api/cache";
+import StyleSheetLoader from "./hypothesis/StyleSheetLoader";
 
 // global important classes
 let sidebar: Sidebar | null = null;
@@ -78,7 +78,8 @@ const resetContentState = async () => {
   contentState.language =
     (await BrowserApi.storage.get(Constants.STORAGE.LANGUAGE)) || "cs"; // fallback to Czech as default language (not locale)
   contentState.locale =
-    (await BrowserApi.storage.get(Constants.STORAGE.LOCALE)) || Constants.DEFAULT_LANGUAGE
+    (await BrowserApi.storage.get(Constants.STORAGE.LOCALE)) ||
+    Constants.DEFAULT_LANGUAGE;
 
   // TODO: make sure to not delete this field on logout
   contentState.instance = await BrowserApi.storage.get(
@@ -117,11 +118,10 @@ const internals = {
 
     await resetContentState();
     contentState.user = await api.getUser();
-    preloadContentStyles();
+    StyleSheetLoader.preloadContentStylesheets();
 
     if (contentState.user && !contentState.instance) {
       // data inconcistency -> cleanup and init page
-      console.log("data inconcistency spotted");
       await cleanOnLogout();
       internals.initPage();
       return;
@@ -162,7 +162,7 @@ const internals = {
           ...sidebarResult,
         ] as any;
       } catch (err) {
-        console.log('selector err')
+        console.log("selector err");
         return [];
       }
     };
@@ -601,7 +601,6 @@ export const ContentActions = {
     if (!contentState.vocabularies.length) {
       throw new Error("Failed to create default vocabulary!!");
     }
-
 
     if (contentState.vocabularies.length > 1) {
       contentState.globalLoading = false;

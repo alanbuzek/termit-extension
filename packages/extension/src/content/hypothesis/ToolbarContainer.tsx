@@ -1,10 +1,8 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import { loadStyles } from "./ContentPopupContainer";
-
 import Toolbar from "../components/Toolbar";
-import { ContentState } from '..';
-
+import { ContentState } from "..";
+import StyleSheetLoader from "./StyleSheetLoader";
 
 /**
  * Controller for the toolbar on the edge of the sidebar.
@@ -17,9 +15,9 @@ export class ToolbarContainer {
   private isSidebarOpen: boolean;
   private state: ContentState;
   private toggleSidebar: () => any;
+  private stylesHaveBeenLoaded: boolean = false;
 
   constructor(container, setSidebarOpen, state) {
-
     this.container = container;
     this.state = state;
 
@@ -38,7 +36,6 @@ export class ToolbarContainer {
     return content.getBoundingClientRect().width;
   }
 
-
   /**
    * Update the toolbar to reflect whether the sidebar is open or not.
    */
@@ -51,7 +48,6 @@ export class ToolbarContainer {
     return this.isSidebarOpen;
   }
 
-
   render() {
     ReactDOM.render(
       <Toolbar
@@ -62,9 +58,10 @@ export class ToolbarContainer {
       />,
       this.container,
       () => {
-        loadStyles(this.container, "annotator");
-        loadStyles(this.container, "styles");
-        loadStyles(this.container, "bootstrap-termit");
+        if (!this.stylesHaveBeenLoaded) {
+          this.stylesHaveBeenLoaded = true;
+          StyleSheetLoader.loadContentStylesSheets(this.container as any);
+        }
       }
     );
   }

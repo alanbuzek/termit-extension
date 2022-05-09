@@ -10,26 +10,9 @@ import {
 import { ContentActions, ContentState } from "..";
 import en from "../../common/i18n/en";
 import cs from "../../common/i18n/cs";
+import StyleSheetLoader from "./StyleSheetLoader";
 
 // TODO: this can be moved a different file
-/**
- * Load stylesheets for annotator UI components into the shadow DOM root.
- */
-export function loadStyles(shadowRoot, fileName = "annotator") {
-  // Find the preloaded stylesheet added by the boot script.
-  const url = document.querySelector(
-    `link[rel="preload"][href*="/static/css/${fileName}.css"]`
-  )?.href;
-
-  if (!url) {
-    return;
-  }
-
-  const linkEl = document.createElement("link");
-  linkEl.rel = "stylesheet";
-  linkEl.href = url;
-  shadowRoot.appendChild(linkEl);
-}
 
 /**
  * Stop bubbling up of several events.
@@ -98,7 +81,7 @@ export class ContentPopupContainer {
   private currentAnnotation: Annotation | null = null;
   private contentState: ContentState;
   private onSelectDefinition: () => any;
-  private hasBeenRendered: boolean = false;
+  private stylesHaveBeenLoaded: boolean = false;
   private selectionRect;
   private isRTLselection;
   private selectionRange;
@@ -268,11 +251,9 @@ export class ContentPopupContainer {
       </IntlProvider>,
       this.shadowRoot,
       () => {
-        if (!this.hasBeenRendered) {
-          loadStyles(this.shadowRoot, "annotator");
-          loadStyles(this.shadowRoot, "styles");
-          loadStyles(this.shadowRoot, "bootstrap-termit");
-          this.hasBeenRendered = true;
+        if (!this.stylesHaveBeenLoaded) {
+          this.stylesHaveBeenLoaded = true;
+          StyleSheetLoader.loadContentStylesSheets(this.shadowRoot as any);
         }
       }
     );
