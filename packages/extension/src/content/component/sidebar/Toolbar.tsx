@@ -44,7 +44,7 @@ const ArrowLeft = () => (
     fill="none"
     viewBox="0 0 24 24"
     stroke="currentColor"
-    strokeWidth={4}
+    strokeWidth={3}
   >
     <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
   </svg>
@@ -57,7 +57,7 @@ const ArrowRight = () => (
     fill="none"
     viewBox="0 0 24 24"
     stroke="currentColor"
-    strokeWidth={4}
+    strokeWidth={3}
   >
     <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
   </svg>
@@ -98,7 +98,7 @@ export default function Toolbar({
   return (
     <div className="Toolbar">
       <ToolbarButton
-        className={`Toolbar__sidebar-toggle transition-all duration-300 ${
+        className={`Toolbar__sidebar-toggle ${
           !isSidebarOpen ? 'bg-green-500 text-white' : ''
         } text-lg font-semibold p-1`}
         buttonRef={toggleSidebarRef}
