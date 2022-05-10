@@ -1,7 +1,7 @@
 {
   "short_name": "Termit Annotate",
-  "name": "Termit Annotate - semantic vocabularies and annotations anywhere on the web",
-  "description": "Create semantic terms, vocabularies and annotations while browsing the web. Get automatic suggestions based on your existings terms.",
+  "name": "Termit Annotate - semantic annotations",
+  "description": "Create semantic annotations, terms and vocabularies while browsing the web. Get automatic term suggestions.",
   "version": "1.0.0",
   "manifest_version": 3,
   "background": {
@@ -39,9 +39,9 @@
   "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'self'"
   },
-  "permissions": ["tabs", "storage"],
+  "permissions": ["storage"],
   "host_permissions": ["*://*/*"],
   "externally_connectable": {
-    "matches": ["http://localhost:3000/*", "https://kbss.felk.cvut.cz:43000"]
+    "matches": ["http://localhost:3000/*", "https://kbss.felk.cvut.cz:43000/*", "http://kbss.felk.cvut.cz:43000/*"]
   }
 }
