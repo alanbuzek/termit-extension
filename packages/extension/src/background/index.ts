@@ -12,26 +12,28 @@ import SecurityUtils from '../content/util/SecurityUtils';
 import BrowserApi from '../shared/BrowserApi';
 import ExtensionMessage from '../shared/ExtensionMessage';
 import StorageUtils from '../content/util/StorageUtils';
+import { INSTANCE_LIST } from '../content/component/shared/InstanceSelection';
 
 // move this into a separte file
 export async function runPageAnnotationAnalysis(
   pageHtml: string,
   vocabulary?: string
 ) {
+  const instance = await BrowserApi.storage.get(
+    Constants.STORAGE.TERMIT_INSTANCE
+  );
+
+  const vocabularyRepository = instance?.graphDb || INSTANCE_LIST[0].graphDb;
   const payload: any = {
     content: pageHtml,
     vocabularyContexts: [],
     // TODO: language
     language: 'cs',
+    vocabularyRepository,
   };
-
   if (vocabulary) {
-    payload.vocabularyRepository = vocabulary;
+    payload.vocabularyContexts.push(vocabulary);
   }
-
-  const instance = await BrowserApi.storage.get(
-    Constants.STORAGE.TERMIT_INSTANCE
-  );
 
   const annotaceApi = new Ajax({
     baseURL: instance?.annotaceService || Constants.ANNOTACE_SERVER_URL,

@@ -172,6 +172,7 @@ const internals = {
     annotator = null;
     await resetContentState();
 
+    PageOverlay.off();
     contentState.globalLoading = false;
     internals.updateSidebar();
   },
@@ -229,12 +230,6 @@ export const ContentActions = {
       vocabulary?.iri
     );
 
-    const termOccurrences = TermOccurrenceFactory.createFromTextAnalysisResults(
-      textAnalysisResult,
-      contentState.website?.iri,
-      contentState.terms
-    );
-
     if (!internals.isAnonymous()) {
       // refresh vocabularies cache for later
       api.loadVocabularies(SKIP_CACHE);
@@ -256,6 +251,12 @@ export const ContentActions = {
 
       contentState.terms = vocabularyTerms;
     }
+
+    const termOccurrences = TermOccurrenceFactory.createFromTextAnalysisResults(
+      textAnalysisResult,
+      contentState.website?.iri,
+      contentState.terms
+    );
 
     await annotator!.annotatePage(termOccurrences, true);
     contentState.annotations = annotator!.getAnnotations();
@@ -494,6 +495,7 @@ export const ContentActions = {
       internals.deactivatePage();
       return;
     }
+    PageOverlay.on();
 
     contentState.globalLoading = true;
     internals.updateSidebar();
@@ -620,6 +622,17 @@ export const ContentActions = {
       return;
     }
 
+    contentState.website = await api.createWebsiteInDocument(
+      contentState.pageUrl,
+      VocabularyUtils.create(contentState.vocabulary!.document!.iri)
+    );
+
+    const vocabularyTerms = await api.loadAllTerms(
+      VocabularyUtils.create(contentState.vocabulary!.iri)
+    );
+
+    contentState.terms = vocabularyTerms;
+
     const textAnalysisResult = await backgroundApi.runPageTextAnalysis(
       contentState.originalPageHtml,
       contentState.vocabulary!.iri
@@ -635,17 +648,6 @@ export const ContentActions = {
       ).filter((termOccurrence) => termOccurrence.term);
 
     await annotator!.annotatePage(newTermOccurrences, true);
-
-    contentState.website = await api.createWebsiteInDocument(
-      contentState.pageUrl,
-      VocabularyUtils.create(contentState.vocabulary!.document!.iri)
-    );
-
-    const vocabularyTerms = await api.loadAllTerms(
-      VocabularyUtils.create(contentState.vocabulary!.iri)
-    );
-
-    contentState.terms = vocabularyTerms;
 
     await api.savePageAnnotationResults(
       annotator!

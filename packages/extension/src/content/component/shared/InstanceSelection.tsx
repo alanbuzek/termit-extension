@@ -7,7 +7,7 @@ export const INSTANCE_LIST = [
     termitServer: 'https://kbss.felk.cvut.cz:48080/termit/rest',
     termitUi: 'https://kbss.felk.cvut.cz:43000',
     annotaceService: 'https://kbss.felk.cvut.cz:48888',
-    graphDb: 'https://kbss.felk.cvut.cz:47200',
+    graphDb: 'https://kbss.felk.cvut.cz:47200/repositories/termit',
     label: 'Testování',
   },
   {
@@ -21,7 +21,7 @@ export const INSTANCE_LIST = [
     termitServer: 'http://localhost:8080/termit/rest',
     termitUi: 'http://localhost:3000',
     annotaceService: 'http://localhost:8888',
-    graphDb: 'http://localhost:7200',
+    graphDb: 'http://alanbuzek.local:7200/repositories/termitrepo',
     label: 'local',
   },
 ];

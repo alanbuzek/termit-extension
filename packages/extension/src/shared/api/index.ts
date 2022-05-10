@@ -299,7 +299,7 @@ export function setTermDefinitionSource(
     }
   });
 
-  if (source.target.iri) {
+  if (typeof source.target.iri === 'string') {
     delete source.target.iri;
   }
 
@@ -334,7 +334,7 @@ export function setUknownDefinitionSource(source: TermOccurrence) {
   }
 
   if (source.id) {
-    delete (source as any).id;
+    delete source.id;
   }
 
   const jsonLd = source.toJsonLd();

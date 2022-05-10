@@ -763,6 +763,7 @@ const en = {
     'extension.onboarding.gotostart': 'Go back to start',
     'extension.onboarding.header': 'Quick Tutorial',
     'extension.user.anonymous': 'Anonymous',
+    "extension.clear.data": "Clear extension data"
   },
 };
 

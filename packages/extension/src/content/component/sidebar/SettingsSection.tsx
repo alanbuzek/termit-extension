@@ -23,6 +23,18 @@ export default function SettingsSection({ state }) {
           window.open(link, '_top');
         }}
       />
+      <div className="flex mt-5  border-t py-3 px-2 border-gray-200">
+        <div
+          className=" text-gray-400 hover:text-red-700 text-sm cursor-pointer hover:underline"
+          onClick={() => {
+            StorageUtils.clearWholeStorage();
+            // eslint-disable-next-line no-restricted-globals
+            location.reload();
+          }}
+        >
+          Clear all extension data
+        </div>
+      </div>
     </div>
   );
 }

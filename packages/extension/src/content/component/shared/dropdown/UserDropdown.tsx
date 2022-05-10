@@ -4,10 +4,22 @@ import DropdownItem from './DropdownItem';
 import DropdownContainer from './DropdownContainer';
 import DropdownButton from './DropdownButton';
 import { useI18n } from '../../../../termit-ui-common/component/hook/useI18n';
+import StorageUtils from '../../../util/StorageUtils';
 
 const UserDropdown = ({ isAnonymous }) => {
-  const { dropdownRef, isOpen, handleMenuClick, handleItemClick } =
-    useDropdown();
+  const { dropdownRef, isOpen, handleMenuClick, handleItemClick } = useDropdown(
+    (id) => {
+      if (id === 'logout') {
+        StorageUtils.clearStorageOnLogout();
+        // eslint-disable-next-line no-restricted-globals
+        location.reload();
+      } else if (id === 'clear-data') {
+        StorageUtils.clearWholeStorage();
+        // eslint-disable-next-line no-restricted-globals
+        location.reload();
+      }
+    }
+  );
   const { i18n } = useI18n();
 
   const options = [
@@ -26,6 +38,11 @@ const UserDropdown = ({ isAnonymous }) => {
       name: (<span>TermIt&nbsp;{i18n('extension.webapp')}</span>) as any,
       link: 'http://localhost:3000/#/',
     });
+
+    options.push({
+      name: (<span>{i18n('main.logout')}</span>) as any,
+      id: 'logout',
+    } as any);
   }
 
   return (

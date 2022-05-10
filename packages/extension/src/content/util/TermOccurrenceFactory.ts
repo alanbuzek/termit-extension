@@ -8,7 +8,7 @@ import { AnnotationType } from '../Annotation';
 import { TermsMap } from '../ContentController';
 import ExtensionDomUtils from './ExtensionDomUtils';
 import DomUtils from './ExtensionDomUtils';
-import { xpathFromNode } from './hypothesis/xpath';
+// import { xpathFromNode } from './hypothesis/xpath';
 
 const TermOccurrenceFactory = {
   createFromTextAnalysisResults(
@@ -90,9 +90,7 @@ const TermOccurrenceFactory = {
     return {
       id: about,
       // TODO: remove this
-      termIri: content.startsWith('rus')
-        ? 'http://onto.fel.cvut.cz/ontologies/slovnik/novy-lokalni-slovnik/pojem/ruský'
-        : '',
+      termIri: resource,
       suggestedLemma: content,
       originalText: originalTerm,
       selectors: {
@@ -164,6 +162,8 @@ const TermOccurrenceFactory = {
       extraTypes,
     } = data;
 
+    console.log('termIri: ', termIri);
+    console.log('termsMap[termIri]:', (termsMap || {})[termIri || '']);
     const termOccurrenceData: any = {
       id,
       types:

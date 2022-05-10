@@ -126,13 +126,13 @@ const SidebarControlPanel = ({
             {i18n('extension.annotated.with')}
           </div>
           <div className="flex text-xl font-normal text-gray-700 items-center">
+            <FaBook id="props.id" className="block mr-2" />
             <AssetLink
               path={`${instance.termitUI}/#/vocabularies/${vocabularyIRI.fragment}?namespace=${vocabularyIRI.namespace}`}
               asset={vocabulary!}
               id="selected-vocabulary"
               tooltip="asset.link.tooltip"
             >
-              <FaBook id="props.id" className="block mr-2" />
               {vocabulary!.label}
             </AssetLink>
           </div>
