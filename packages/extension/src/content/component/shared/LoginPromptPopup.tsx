@@ -49,7 +49,15 @@ export default function LoginPromptPopup({
     // we already have an instance -> no need to prompt
     if (currentInstance) {
       setInstanceSelected(currentInstance);
-      handleInstanceSelect();
+      const link = `${currentInstance.termitUi}/#/${selectedAction}`;
+      if (onInstanceSelectedHandler) {
+        onInstanceSelectedHandler(link, currentInstance);
+      } else {
+        // default handler
+        openNewTabLink(link);
+        ContentActions.handleInstanceSelected(currentInstance);
+        setStep(2);
+      }
       return;
     }
 
@@ -59,12 +67,12 @@ export default function LoginPromptPopup({
   if (step === 0) {
     return (
       <div style={{ width: 300 }} className="p-2">
-        <h3 className="text-base text-gray-700 text-center">Login required</h3>
+        <h3 className="text-base text-gray-700 text-center">
+          {i18n('extension.login.required')}
+        </h3>
         <p className="font-normal mb-2 text-sm text-gray-700 text-center">
           {i18n('extension.login.prompt.long')}
         </p>
-        {/* {i18n("extension.login.noaccount")}{" "}
-        {i18n("extension.login.registerhere")} */}
         <div className="flex justify-center">
           <Button onClick={() => handleActionClicked('login')}>
             {i18n('login.title')}
@@ -85,7 +93,7 @@ export default function LoginPromptPopup({
     return (
       <div style={{ width: 300 }} className="p-2 flex flex-col items-start">
         <h3 className="text-base text-gray-700 text-left">
-          Select a TermIt instance:
+          {i18n('extension.instance.prompt')}
         </h3>
         <div className="my-3 w-full">
           <InstanceSelection
@@ -99,7 +107,7 @@ export default function LoginPromptPopup({
           onClick={handleInstanceSelect}
           size="standard"
         >
-          Confirm
+          {i18n('extension.instance.confirm')}
         </Button>
       </div>
     );
@@ -108,21 +116,17 @@ export default function LoginPromptPopup({
   return (
     <div style={{ width: 300 }} className="p-2">
       <h3 className="text-base text-gray-700 text-center">
-        Come back after logging in!
+        {i18n('extension.login.after')}
       </h3>
-      <p className="font-normal text-sm text-gray-800">
-        A new tab with TermIt should automatically open to login or register.
-        Once you do so, come back to this page, your account will be
-        automatically synced!
-      </p>
+      <p className="font-normal text-sm text-gray-800" />
       <p className="font-normal mt-2 text-sm text-gray-600">
-        No new tab open? Please{' '}
+        {i18n('extension.login.notab')}{' '}
         <a
           href={`${instanceSelected.termitUi}/#/${selectedAction}`}
           target="_blank"
           rel="noreferrer"
         >
-          follow here.
+          {i18n('extension.login.notab.link')}
         </a>
       </p>
     </div>

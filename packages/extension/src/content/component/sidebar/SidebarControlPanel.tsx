@@ -87,7 +87,7 @@ const SidebarControlPanel = ({
             displayInfoOnHover={false}
             expanded
             renderAsTree={false}
-            placeholder={i18n('"extension.choose.vocabulary.placeholder"')}
+            placeholder={i18n('extension.choose.vocabulary.placeholder')}
             valueRenderer={(option) => option.label}
           />
         )}

@@ -433,6 +433,7 @@ const cs = {
       'Počet pojmů ve slovníku (bez pojmů z importovaných slovníků)',
     'glossary.new': 'Nový pojem',
     'glossary.select.placeholder': 'Začněte psát pro filtrování pojmů',
+    'resource.metadata.terms.edit.select.placeholder': 'Začněte psát pro filtrování pojmů',
     'glossary.excludeImported': 'Včetně importů',
     'glossary.excludeImported.help':
       'Pojmy z importovaných slovníků jsou v tomto zobrazení skryté, kliknutím je zobrazíte',
@@ -691,10 +692,13 @@ const cs = {
     'validation.message.tooltip':
       'Tato zpráva reprezentuje výsledek kontroly kvality. Formulář lze uložit i v případě, že kvalita není stoprocentní.',
 
+    'extension.choose.vocabulary.anonymous':
+      'Začněte s anotací stránky kliknutím na tlačítko níže.',
     'extension.loading': 'Načítání...',
     'extension.loading.message': `Tato operace může chvilku trvat v závislosti na počtu anotací a velikosti stránky.`,
     'extension.choose.vocabulary':
       'Vyberte si slovník se kterým začnete vytvářet.',
+    'extension.choose.vocabulary.placeholder': 'Vyberte slovník',
     'extension.off.message': 'TermIt Annotate je vypnutý.',
     'extension.off.explanation':
       'Anotování nebude fungovat na žádných stránkách do opětovného zapnutí.',
@@ -702,8 +706,8 @@ const cs = {
     'extension.off': ' ',
     'extension.login.prompt':
       'Musíte se přihlásit abyste mohli začít používat TermIt.',
-    'extension.login.description':
-      'Jakmile tak učiníte, načtěte prosím stránku znovu a začněte anotovat.',
+    'extension.login.prompt.long':
+      'Prosím přihlaste nebo zaregistrujte do TermIt abyste mohli přiřazovat pojmy k výskytům, ukládat anotace a využít i všechny další funkce!',
     'extension.login.noaccount': 'Nemáte účet?',
     'extension.login.registerhere': 'Registrujte se zde',
     'extension.webapp': 'aplikace',
@@ -736,14 +740,14 @@ const cs = {
     'extension.onboarding.next': 'Další',
     'extension.onboarding.welcome.header': 'Vítejte v',
     'extension.onboarding.welcome.text1':
-      'Děkujeme za instalaci TermIt Annotate. Pro začátek jsme pro Vás připravili rychlý návod, jak plugin začít efektivně používat!',
+      'Děkujeme za instalaci TermIt Annotate. Pro začátek jsme pro Vás připravili rychlý návod, jak plugin začít rychle a efektivně používat!',
     'extension.onboarding.welcome.button': 'Začít Tutoriál',
     'extension.onboarding.step1.header':
       'Spusťte anotaci stránky přes postraní panel',
     'extension.onboarding.step1.text1':
-      'Na libovolné stránce, která se vám líbí, otevřete postraní panel pluginu vpravo stránky, vyberte slovník, který chcete použít, a začněte svou anotovat s TermIt Annotate!',
+      'Na libovolné webové stránce pak otevřete postraní panel pluginu, který se dá otevřít přes tlačítko v pravém horním rohu každé stránky. Vyberte slovník, který chcete použít, a začněte anotovat s TermIt Annotate!',
     'extension.onboarding.step1.text2':
-      'Pro uložení anotací a odemknutí všech funkcí budete vyzváni k přihlášení (registraci) do aplikace TermIt',
+      'Pro uložení anotací a odemknutí všech funkcí budete později vyzváni k přihlášení (registraci) do aplikace TermIt',
     'extension.onboarding.step2.header':
       'Potvrďte navrhované výskytu pojmů a vytvořte si vlastní',
     'extension.onboarding.step2.text1':
@@ -754,7 +758,7 @@ const cs = {
       "Můžete také vytvořit nové výrazy ve vybraném slovníku kliknutím na tlačítka '+' ve vyskakovacím okně.",
     'extension.onboarding.step3.header': 'Sledujte anotace v čase',
     'extension.onboarding.step3.text1':
-      'Kdykoli se vrátíte na stránku, kterou jste dříve anotovali, jako anotace se znovu zobrazíme a budete moci pokračovat tam, kde jste skončili.',
+      'Kdykoli se vrátíte na stránku, kterou jste dříve anotovali, se anotace zobrazí znovu ve stejné podobě a Vy budete moci pokračovat přesně tam, kde jste skončili.',
     'extension.onboarding.step4.header':
       'Používejte postraní panel k organizaci anotací',
     'extension.onboarding.step4.text1':
@@ -762,15 +766,31 @@ const cs = {
     'extension.onboarding.step5.header':
       'Plně využijte platformu pro sémantické slovníky TermIt',
     'extension.onboarding.step5.text1':
-      'TermIt je poháněn technologiemi sémantického webu, které poskytují robustní nástroj pro vaše potřeby správy pojmosloví. Z rozšíření se můžete kdykoli proklikout do webové aplikace TermIt, navštívit termíny, definice nebo slovníky a vše do detailu spravovat.',
+      'TermIt stojích na technologiích sémantického webu a poskytuje skvělé řešení pro správu slovníků, pojmů a jejich propojování do stránek a dalších dokumentů. Z webového rozšíření TermIt Annotate se můžete kdykoli proklikout do webové aplikace TermIt, prohlížet a upravovat vytvořené pojmy, definice nebo slovníky a vše do detailu spravovat.',
     'extension.onboarding.step6.header':
-      'Hotovo! Zavřete tuto stránku a začněte používat TermIt Annotate!',
+      'Hotovo! Nyní můžete zavřít tuto stránku a začněte používat TermIt Annotate!',
     'extension.onboarding.step6.text1':
       'K tomuto tutoriálu se budete moci kdukoliv vrátit pomocí odkazu v postranním panelu, pokud si budete potřebovat něco zopakovat.',
     'extension.onboarding.skip': 'Přeskočit tutoriál',
     'extension.onboarding.gotostart': 'Zpět na začátek',
     'extension.onboarding.header': 'Rychlý tutoriál',
     'extension.user.anonymous': 'Anonymní',
+    'extension.choose.vocabulary.vocabPrompt': 'Vyberte prosím slovník, se kterým budete stránku dále anotovat',
+
+    "extension.login.required": "Přihlašte se prosím",
+    "extension.instance.prompt": "Vyberte instanci TermIt:",
+    "extension.login.after": "Vraťte se na tuto stránku po přihlášení!",
+    "extension.login.description": "Nová záložka s TermIt by se měla automaticky otevřít kde se můžete přihlásit nebo registrovat. Poté budou vaše anotace na stránce automaticky synchronizovány.",
+    "extension.login.notab": "Nová záložka se neotevřela? Prosím",
+    "extension.login.notab.link": " klikněte zde.",
+    'extension.choose.instance.placeholder': 'Vyberte instanci',
+    'extension.sidebar.footer.annotator': 'Anotátor',
+    'extension.sidebar.footer.allpages': 'Všechny stránky',
+    'extension.sidebar.footer.settings': 'Nastavení',
+    'extension.settings': "Nastavení rozšíření",
+    'extension.cleardata': "Smazat všechna data rozšíření",
+    'extension.allpages': "Všechny anotované stránky:",
+    'extension.instance.confirm': "Potvrdit",
   },
 };
 

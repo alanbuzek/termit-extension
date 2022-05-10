@@ -21,10 +21,12 @@ export const INSTANCE_LIST = [
     termitServer: 'http://localhost:8080/termit/rest',
     termitUi: 'http://localhost:3000',
     annotaceService: 'http://localhost:8888',
-    graphDb: 'http://alanbuzek.local:7200/repositories/termitrepo',
+    graphDb: 'http://localhost:7200/repositories/termitrepo',
     label: 'local',
   },
 ];
+
+export const DEFAULT_INSTANCE = INSTANCE_LIST[0];
 
 export default function InstanceSelection({
   instanceSelected,
@@ -47,7 +49,7 @@ export default function InstanceSelection({
       displayInfoOnHover={false}
       expanded
       renderAsTree={false}
-      placeholder={i18n('"extension.choose.vocabulary.placeholder"')}
+      placeholder={i18n('extension.choose.instance.placeholder')}
       valueRenderer={(option) => option.label}
     />
   );

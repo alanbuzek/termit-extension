@@ -629,29 +629,32 @@ export const ContentActions = {
       VocabularyUtils.create(contentState.vocabulary!.document!.iri)
     );
 
+    contentState.vocabulary!.document!.websites.push(contentState.website!);
+
+    // update vocabulary cache
+    await BrowserApi.storage.set('vocabularies', contentState.vocabularies);
+
     const vocabularyTerms = await api.loadAllTerms(
       VocabularyUtils.create(contentState.vocabulary!.iri)
     );
 
     contentState.terms = vocabularyTerms;
 
-    // generic suggestions should be the same from back-end now, so to avoid duplicates, let's remove them now
-    // (this will leave any manually created unassigned occurrences by the previously anoymous user)
-    annotator!.removeSuggestedOccurrences();
-
     const textAnalysisResult = await backgroundApi.runPageTextAnalysis(
       contentState.originalPageHtml,
       contentState.vocabulary!.iri
     );
+
+    // generic suggestions should be the same from back-end now, so to avoid duplicates, let's remove them now
+    // (this will leave any manually created unassigned occurrences by the previously anoymous user)
+    annotator!.removeSuggestedOccurrences();
 
     const newTermOccurrences =
       TermOccurrenceFactory.createFromTextAnalysisResults(
         textAnalysisResult,
         contentState.website?.iri,
         contentState.terms
-
-        // filter out only occurrences suggestions that have a term -> they are vocabulary-specific, as we want to drop all generic suggestions, those have already been annotated!
-      ).filter((termOccurrence) => termOccurrence.term);
+      );
 
     await annotator!.annotatePage(newTermOccurrences, true);
 
@@ -663,11 +666,6 @@ export const ContentActions = {
       contentState.website!,
       contentState.vocabulary!.iri
     );
-
-    contentState.vocabulary!.document!.websites.push(contentState.website!);
-
-    // update vocabulary cache
-    await BrowserApi.storage.set('vocabularies', contentState.vocabularies);
 
     PageOverlay.off();
     contentState.globalLoading = false;

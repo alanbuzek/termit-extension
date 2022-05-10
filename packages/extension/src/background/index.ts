@@ -12,7 +12,7 @@ import SecurityUtils from '../content/util/SecurityUtils';
 import BrowserApi from '../shared/BrowserApi';
 import ExtensionMessage from '../shared/ExtensionMessage';
 import StorageUtils from '../content/util/StorageUtils';
-import { INSTANCE_LIST } from '../content/component/shared/InstanceSelection';
+import { DEFAULT_INSTANCE } from '../content/component/shared/InstanceSelection';
 
 // move this into a separte file
 export async function runPageAnnotationAnalysis(
@@ -23,7 +23,7 @@ export async function runPageAnnotationAnalysis(
     Constants.STORAGE.TERMIT_INSTANCE
   );
 
-  const vocabularyRepository = instance?.graphDb || INSTANCE_LIST[0].graphDb;
+  const vocabularyRepository = instance?.graphDb || DEFAULT_INSTANCE.graphDb;
   const payload: any = {
     content: pageHtml,
     vocabularyContexts: [],
@@ -36,7 +36,7 @@ export async function runPageAnnotationAnalysis(
   }
 
   const annotaceApi = new Ajax({
-    baseURL: instance?.annotaceService || Constants.ANNOTACE_SERVER_URL,
+    baseURL: instance?.annotaceService || DEFAULT_INSTANCE.annotaceService,
   });
 
   return annotaceApi.post(

@@ -112,7 +112,7 @@ const constants = {
     TERMIT_INSTANCE: 'INSTANCE',
     TAB_ID_WAITING_FOR_AUTH: 'TAB_ID_WAITING_FOR_AUTH',
   },
-  MAX_HIGHLIGHT_DEPTH: 1,
+  MAX_HIGHLIGHT_DEPTH: 2,
 };
 
 constants.ANNOTATOR_TUTORIAL[constants.LANG.CS.locale] =

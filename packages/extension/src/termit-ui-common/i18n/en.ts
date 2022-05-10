@@ -679,8 +679,7 @@ const en = {
     'validation.message.tooltip':
       'This is a quality validation result. The form can be submitted even if it has quality issues.',
     'extension.loading': 'Loading...',
-    'extension.loading.message': `This operation may take a moment, depending on how many
-    annotations there are on the page.`,
+    'extension.loading.message': `This operation may take a moment, depending on the number of annotations and the size of the page.`,
     'extension.choose.vocabulary.placeholder': 'Choose a vocabulary',
     'extension.choose.vocabulary':
       'Choose a vocabulary to start annotating with.',
@@ -763,7 +762,21 @@ const en = {
     'extension.onboarding.gotostart': 'Go back to start',
     'extension.onboarding.header': 'Quick Tutorial',
     'extension.user.anonymous': 'Anonymous',
-    "extension.clear.data": "Clear extension data"
+    "extension.login.required": "Login required",
+    "extension.instance.prompt": "Select a TermIt instance:",
+    "extension.login.after": "Come back to this page after logging in!",
+    "extension.login.description": "A new tab with TermIt should automatically open to login or register. Once you do so, come back to this page, your account will be automatically synced!",
+    "extension.login.notab": "No new tab open? Please",
+    "extension.login.notab.link": "follow here.",
+    'extension.choose.instance.placeholder': 'Choose instance',
+    'extension.sidebar.footer.annotator': 'Annotator',
+    'extension.sidebar.footer.allpages': 'All pages',
+    'extension.sidebar.footer.settings': 'Settings',
+    'extension.settings': "Extension settings",
+    'extension.cleardata': "Clear all extension data",
+    'extension.allpages': "All annotated pages:",
+    'extension.instance.confirm': "Confirm",
+    
   },
 };
 

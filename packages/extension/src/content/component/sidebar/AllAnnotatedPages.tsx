@@ -1,4 +1,5 @@
 import React from 'react';
+import { useI18n } from '../../../termit-ui-common/component/hook/useI18n';
 import Vocabulary from '../../../termit-ui-common/model/Vocabulary';
 
 export default function AllAnnotatedPagesSection({
@@ -9,11 +10,12 @@ export default function AllAnnotatedPagesSection({
   const websites = vocabularies.flatMap(
     (vocab) => vocab.document?.websites || []
   );
+  const { i18n } = useI18n();
 
   return (
     <div>
       <div className="flex text-lg px-2.5 py-2 mt-2.5 font-semibold text-gray-700">
-        All annotated pages:
+        {i18n('extension.allpages')}
       </div>
       {websites.map((website) => (
         <a

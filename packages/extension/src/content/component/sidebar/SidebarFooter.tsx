@@ -1,19 +1,22 @@
 import React from 'react';
 import { FaCog, FaHighlighter, FaListAlt } from 'react-icons/fa';
+import { useI18n } from '../../../termit-ui-common/component/hook/useI18n';
 
 const SidebarFooter = ({ activeSection, setActiveSection, isAnonymous }) => {
+  const { i18n } = useI18n();
+
   const sections = [
     {
       icon: <FaHighlighter className="text-lg" />,
-      label: 'Current',
+      label: i18n('extension.sidebar.footer.annotator'),
     },
     {
       icon: <FaListAlt className="text-lg" />,
-      label: 'All Pages',
+      label: i18n('extension.sidebar.footer.allpages'),
     },
     {
       icon: <FaCog className="text-lg" />,
-      label: 'Settings',
+      label: i18n('extension.sidebar.footer.settings'),
     },
   ];
   return (

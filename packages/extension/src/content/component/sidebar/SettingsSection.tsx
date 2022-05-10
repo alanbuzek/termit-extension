@@ -3,12 +3,14 @@ import constants from '../../../termit-ui-common/util/Constants';
 import BrowserApi from '../../../shared/BrowserApi';
 import LoginPromptPopup from '../shared/LoginPromptPopup';
 import StorageUtils from '../../util/StorageUtils';
+import { useI18n } from '../../../termit-ui-common/component/hook/useI18n';
 
 export default function SettingsSection({ state }) {
+  const { i18n } = useI18n();
   return (
     <div style={{ width: 300 }} className="p-2">
       <div className="flex text-lg px-2.5 py-2 mt-2.5 font-semibold text-gray-700">
-        Extension settings
+        {i18n('extension.settings')}
       </div>
       <LoginPromptPopup
         initialAction="login"
@@ -32,7 +34,7 @@ export default function SettingsSection({ state }) {
             location.reload();
           }}
         >
-          Clear all extension data
+          {i18n('extension.cleardata')}
         </div>
       </div>
     </div>

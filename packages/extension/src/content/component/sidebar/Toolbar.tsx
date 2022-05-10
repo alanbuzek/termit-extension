@@ -40,11 +40,11 @@ export const AnnotationIcon = ({ className = '', onClick = () => false }) => (
 const ArrowLeft = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    className="h-6 w-6"
+    className="h-10 w-10"
     fill="none"
     viewBox="0 0 24 24"
     stroke="currentColor"
-    strokeWidth={2}
+    strokeWidth={4}
   >
     <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
   </svg>
@@ -53,11 +53,11 @@ const ArrowLeft = () => (
 const ArrowRight = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    className="h-6 w-6"
+    className="h-10 w-10"
     fill="none"
     viewBox="0 0 24 24"
     stroke="currentColor"
-    strokeWidth={2}
+    strokeWidth={4}
   >
     <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
   </svg>
@@ -98,7 +98,9 @@ export default function Toolbar({
   return (
     <div className="Toolbar">
       <ToolbarButton
-        className="Toolbar__sidebar-toggle"
+        className={`Toolbar__sidebar-toggle transition-all duration-300 ${
+          !isSidebarOpen ? 'bg-green-500 text-white' : ''
+        } text-lg font-semibold p-1`}
         buttonRef={toggleSidebarRef}
         label="Annotation sidebar"
         expanded={isSidebarOpen}

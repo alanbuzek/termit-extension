@@ -48,9 +48,6 @@ export const loadVocabularies = cachedCall('vocabularies', async () => {
     );
 
   await BrowserApi.storage.set('vocabularies', vocabularies);
-  const gotVocabs = await BrowserApi.storage.get('vocabularies');
-
-  console.log('got vocabs from cache: ', gotVocabs);
 
   return vocabularies;
 });
