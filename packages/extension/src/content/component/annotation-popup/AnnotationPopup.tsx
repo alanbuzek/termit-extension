@@ -41,7 +41,7 @@ type ContentPopupProps = {
   repositionWithAnnotation: (Annotation) => void;
 };
 
-function ContentPopup({
+function AnnotationPopup({
   initialPopupType,
   showAt,
   hide,
@@ -115,7 +115,12 @@ function ContentPopup({
                   selectionRange,
                   AnnotationType.OCCURRENCE
                 );
+              if (isAnonymous) {
+                closePopup();
+                return;
+              }
               repositionWithAnnotation(markedAnnotation);
+
               setCurrPopup(PopupType.TermOccurrence);
             }}
             onMarkDefinition={async () => {
@@ -125,6 +130,10 @@ function ContentPopup({
                   AnnotationType.DEFINITION
                 );
 
+              if (isAnonymous) {
+                closePopup();
+                return;
+              }
               repositionWithAnnotation(markedAnnotation);
 
               setCurrPopup(PopupType.TermDefinition);
@@ -232,4 +241,4 @@ function isVisibleWrapper(WrappedComponent) {
   };
 }
 
-export default isVisibleWrapper(ContentPopup);
+export default isVisibleWrapper(AnnotationPopup);

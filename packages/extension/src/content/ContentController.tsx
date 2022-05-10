@@ -603,6 +603,7 @@ export const ContentActions = {
 
     await ContentActions.setupLoggedInUser(contentState.vocabulary);
   },
+  // TODO: rename this function
   async setupLoggedInUser(vocabulary: Vocabulary) {
     contentState.globalLoading = true;
     internals.updateSidebar();
@@ -619,6 +620,7 @@ export const ContentActions = {
       // );
       // eslint-disable-next-line no-restricted-globals
       location.reload();
+      // turns out the user already has this page annotated -> just reload and have it fallback to existing page
       return;
     }
 
@@ -632,6 +634,10 @@ export const ContentActions = {
     );
 
     contentState.terms = vocabularyTerms;
+
+    // generic suggestions should be the same from back-end now, so to avoid duplicates, let's remove them now
+    // (this will leave any manually created unassigned occurrences by the previously anoymous user)
+    annotator!.removeSuggestedOccurrences();
 
     const textAnalysisResult = await backgroundApi.runPageTextAnalysis(
       contentState.originalPageHtml,

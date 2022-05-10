@@ -52,23 +52,23 @@ const getStages = ({ i18n }) => [
   {
     heading: (
       <span className="text-3xl">
-        {i18n('extension.onboarding.step3.header')}
-      </span>
-    ),
-    description: <span>{i18n('extension.onboarding.step3.text1')}</span>,
-    image: chrome.runtime.getURL('/static/img/onboarding/annotation-2.png'),
-    reversed: false,
-    buttonText: <span>{i18n('extension.onboarding.next')} &#8594;</span>,
-  },
-  {
-    heading: (
-      <span className="text-3xl">
         {' '}
         {i18n('extension.onboarding.step4.header')}
       </span>
     ),
     description: <div>{i18n('extension.onboarding.step4.text1')}</div>,
     image: chrome.runtime.getURL('/static/img/onboarding/sidebar.png'),
+    reversed: false,
+    buttonText: <span>{i18n('extension.onboarding.next')} &#8594;</span>,
+  },
+  {
+    heading: (
+      <span className="text-3xl">
+        {i18n('extension.onboarding.step3.header')}
+      </span>
+    ),
+    description: <span>{i18n('extension.onboarding.step3.text1')}</span>,
+    image: chrome.runtime.getURL('/static/img/onboarding/annotation-2.png'),
     reversed: false,
     buttonText: <span>{i18n('extension.onboarding.next')} &#8594;</span>,
   },

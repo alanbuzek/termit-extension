@@ -2,9 +2,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { IntlProvider } from 'react-intl';
-import ContentPopup, {
+import AnnotationPopup, {
   PopupType,
-} from '../component/annotation-popup/ContentPopup';
+} from '../component/annotation-popup/AnnotationPopup';
 import Annotation, { isDefinitionAnnotation } from '../Annotation';
 import { ContentState } from '../ContentController';
 import en from '../../termit-ui-common/i18n/en';
@@ -247,7 +247,7 @@ export class ContentPopupContainer {
         defaultLocale="en"
         messages={this.contentState.locale === 'en' ? en.messages : cs.messages}
       >
-        <ContentPopup
+        <AnnotationPopup
           isVisible={this.isVisible}
           showAt={this.showAt.bind(this)}
           hide={this.hide.bind(this)}

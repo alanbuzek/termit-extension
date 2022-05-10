@@ -7,6 +7,7 @@ import TermOccurrence from '../termit-ui-common/model/TermOccurrence';
 import HtmlDomUtils from '../termit-ui-common/component/annotator/HtmlDomUtils';
 import Constants from '../termit-ui-common/util/Constants';
 import Marker from './util/Marker';
+import ContentMessage from './util/ContentMessage';
 
 // TODO: remove "hypothesis-adder" and all other hypothesis-adder elements
 const termitElements = ['hypothesis-adder', 'hypothesis-sidebar', 'termit-h'];
@@ -130,6 +131,12 @@ export default class Annotator {
     const updatedRange = updatedSelection!.getRangeAt(0);
 
     if (!isSelectionAllowed(updatedRange, updatedSelection)) {
+      ContentMessage.showMessage(
+        `Annototation not allowed: there can be a maximum of ${
+          Constants.MAX_HIGHLIGHT_DEPTH + 1
+        } layers of annotations on top of each other`,
+        'error'
+      );
       this.onClearSelection();
       return;
     }

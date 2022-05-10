@@ -14,7 +14,7 @@ export const INSTANCE_LIST = [
     termitServer: 'http://kbss.felk.cvut.cz:48080/termit/rest',
     termitUi: 'http://kbss.felk.cvut.cz:43000',
     annotaceService: 'http://kbss.felk.cvut.cz:48888',
-    graphDb: 'http://kbss.felk.cvut.cz:47200',
+    graphDb: 'http://kbss.felk.cvut.cz:47200/repositories/termit',
     label: 'Testování - http',
   },
   {
