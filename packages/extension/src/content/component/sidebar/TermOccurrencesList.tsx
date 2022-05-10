@@ -86,7 +86,7 @@ const TermOccurrencesList = ({
               <div
                 className={`mb-0 ${lengthBasedTextStyle(textContent.length)}`}
               >
-                {`${textContent.slice(0, 150)}${
+                {`${textContent.slice(0, 110)}${
                   textContent.length > 110 ? '...' : ''
                 }`}
               </div>

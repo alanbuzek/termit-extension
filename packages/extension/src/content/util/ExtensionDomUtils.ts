@@ -1,4 +1,4 @@
-import getCssSelector from 'css-selector-generator';
+// import getCssSelector from 'css-selector-generator';
 import { finder } from '@medv/finder';
 import { getSingleSelector } from 'optimal-select';
 
@@ -41,14 +41,14 @@ const ExtensionDomUtils = {
   generateNewCssSelector(element: Element) {
     // const selector1 = getCssSelector(element);
     try {
-      const selector1 = getCssSelector(element, { maxCandidates: 5 });
+      // const selector1 = getCssSelector(element, { maxCandidates: 5 });
       const selector2 = finder(element, {
         maxNumberOfTries: 5,
       });
       const selector3 = getSingleSelector(element);
-      return [...new Set([selector1, selector2, selector3])].join('|');
+      return [...new Set([selector2, selector3])].join('|');
     } catch (err) {
-      return [];
+      return '';
     }
   },
 

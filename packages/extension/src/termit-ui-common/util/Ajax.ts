@@ -3,6 +3,7 @@ import Constants, { getEnv } from './Constants';
 import SecurityUtils from '../../content/util/SecurityUtils';
 import BrowserApi from '../../shared/BrowserApi';
 import StorageUtils from '../../content/util/StorageUtils';
+import ContentMessage from '../../content/util/ContentMessage';
 
 class RequestConfigBuilder {
   private mContent?: any;
@@ -169,6 +170,20 @@ export function paramsSerializer(paramData: {} | undefined) {
   return options ? `?${options.slice(0, -1)}` : options;
 }
 
+const handleError = (response, err) => {
+  if (response && response.status === Constants.STATUS_UNAUTHORIZED) {
+    StorageUtils.clearStorageOnLogout();
+    if (typeof document !== 'undefined') {
+      location.reload();
+    }
+  }
+
+  if (typeof window !== 'undefined') {
+    ContentMessage.showMessage("Error from server: " + err, 'error')
+  }
+  throw new Error('Fetch failed: ' + err);
+}
+
 const callFetch = async (baseURL: string, path: string, config) => {
   // pre-request interceptor
   config.headers[Constants.Headers.AUTHORIZATION] =
@@ -182,20 +197,18 @@ const callFetch = async (baseURL: string, path: string, config) => {
   }
   return fetch(`${baseURL}${path}`, config).then((response: Response) => {
     if (!response.ok) {
-      if (response.status === Constants.STATUS_UNAUTHORIZED) {
-        StorageUtils.clearStorageOnLogout();
-      }
-      throw new Error('Fetch failed');
+      handleError(response, null)
     }
     if (response.headers && response.headers[Constants.Headers.AUTHORIZATION]) {
       SecurityUtils.saveToken(
         response.headers[Constants.Headers.AUTHORIZATION]
       );
     }
-
     if (response.status !== 201 && response.status !== 204) {
       return response.json();
     }
+  }).catch(err => {
+    handleError(null, err)
   });
 };
 

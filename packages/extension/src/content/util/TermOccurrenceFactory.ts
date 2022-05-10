@@ -116,7 +116,8 @@ const TermOccurrenceFactory = {
     const cssSelector = DomUtils.generateNewCssSelector(
       parentElement as Element
     );
-    const xPathSelector = xpathFromNode(parentElement, document.body);
+    // const xPathSelector = xpathFromNode(parentElement, document.body);
+    const xPathSelector = '';
     const selectionContent = range.toString();
     const termOccurrence = TermOccurrenceFactory.create(
       {
