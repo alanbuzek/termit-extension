@@ -4,10 +4,10 @@ import { useI18n } from '../../../termit-ui-common/component/hook/useI18n';
 
 export const INSTANCE_LIST = [
   {
-    termitServer: 'https://kbss.felk.cvut.cz:48080/termit/rest',
-    termitUi: 'https://kbss.felk.cvut.cz:43000',
-    annotaceService: 'https://kbss.felk.cvut.cz:48888',
-    graphDb: 'https://kbss.felk.cvut.cz:47200/repositories/termit',
+    termitServer: 'https://kbss.felk.cvut.cz/ann/sluzby/server/termit/rest',
+    termitUi: 'https://kbss.felk.cvut.cz/termit-ann',
+    annotaceService: 'https://kbss.felk.cvut.cz/ann/sluzby/annotace',
+    graphDb: 'http://kbss.felk.cvut.cz:47200/repositories/termit',
     label: 'Testování',
   },
   {
