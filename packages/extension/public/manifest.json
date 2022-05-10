@@ -1,8 +1,8 @@
 {
-  "short_name": "Termit Extension",
-  "name": "Termit Extension",
-  "description": "Termit annotations anywhere on the web",
-  "version": "0.0.1",
+  "short_name": "Termit Annotate",
+  "name": "Termit Annotate - semantic vocabularies and annotations anywhere on the web",
+  "description": "Create semantic terms, vocabularies and annotations while browsing the web. Get automatic suggestions based on your existings terms.",
+  "version": "1.0.0",
   "manifest_version": 3,
   "background": {
     "service_worker": "/static/js/background.js"
@@ -42,6 +42,6 @@
   "permissions": ["tabs", "storage"],
   "host_permissions": ["*://*/*"],
   "externally_connectable": {
-    "matches": ["http://localhost:3000/*"]
+    "matches": ["http://localhost:3000/*", "https://kbss.felk.cvut.cz:43000"]
   }
 }
