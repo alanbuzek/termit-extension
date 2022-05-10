@@ -184,6 +184,13 @@ async function handleExternalMessages(message, sender, sendResponse) {
   return true;
 }
 
+chrome.action.onClicked.addListener((tab) => {
+  if (!tab || !tab.id) {
+    return;
+  }
+  chrome.tabs.sendMessage(tab.id, { type: ExtensionMessage.OpenToolbar });
+});
+
 type LoginEventPayload = {
   userData: UserData;
   authToken: string;
