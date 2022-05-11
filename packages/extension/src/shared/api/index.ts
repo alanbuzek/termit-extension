@@ -300,46 +300,17 @@ export function setTermDefinitionSource(
     delete source.target.iri;
   }
 
-  if (source.iri) {
+  if (source) {
     delete source.iri;
   }
+
+  source.types = source.types.filter(type => [VocabularyUtils.TERM_DEFINITION_SOURCE, VocabularyUtils.TERM_OCCURRENCE].includes(type))
 
   return termitApi
     .put(
       `/terms/${termIri.fragment}/definition-source`,
       param('namespace', termIri.namespace).content(source.toJsonLd())
     )
-    .then((result) => {
-      source.iri = result['@id'];
-    });
-}
-
-// TODO: should be deleted?
-export function setUknownDefinitionSource(source: TermOccurrence) {
-  source.target.selectors.forEach((selector) => {
-    if (selector.iri) {
-      delete selector.iri;
-    }
-  });
-
-  if (source.target.iri) {
-    delete source.target.iri;
-  }
-
-  if (source.iri) {
-    delete source.iri;
-  }
-
-  if (source.id) {
-    delete source.id;
-  }
-
-  const jsonLd = source.toJsonLd();
-
-  delete jsonLd.term;
-
-  return termitApi
-    .post(`/terms/definition-source`, content(jsonLd))
     .then((result) => {
       source.iri = result['@id'];
     });
@@ -374,7 +345,7 @@ export async function updateTermOccurrence(termOccurrence: TermOccurrence) {
 export async function saveTermOccurrences(
   termOccurrences: TermOccurrence[],
   website: Website,
-  vocabularyIri: string
+  vocabularyIri: string,
 ) {
   const websiteIRI: IRI = VocabularyUtils.create(website.iri);
 
@@ -389,14 +360,18 @@ export async function saveTermOccurrences(
   };
 
   const contentBody = termOccurrences.map((termOccurrence) => {
+    const extraTypes: string[] = [];
+    if (termOccurrence.isSuggested()) {
+      extraTypes.push(VocabularyUtils.SUGGESTED_TERM_OCCURRENCE);
+    } else if (termOccurrence.types.includes(VocabularyUtils.UNKNOWN_DEFINITION_OCCURRENCE)) {
+      extraTypes.push(VocabularyUtils.UNKNOWN_DEFINITION_OCCURRENCE);
+    }
     const payload: any = {
       exactMatch: termOccurrence.getTextQuoteSelector().exactMatch,
       cssSelector: termOccurrence.getCssSelector().value,
       xPathSelector: termOccurrence.getXPathSelector().value,
       start: termOccurrence.getTextPositionSelector().start,
-      extraTypes: termOccurrence.isSuggested()
-        ? [VocabularyUtils.SUGGESTED_TERM_OCCURRENCE]
-        : [],
+      extraTypes,
       id: termOccurrence.id,
     };
 
@@ -404,6 +379,10 @@ export async function saveTermOccurrences(
       const termIRI = VocabularyUtils.create(termOccurrence.term.iri);
       payload.termNamespace = termIRI.namespace;
       payload.termFragment = termIRI.fragment;
+
+      if (termOccurrence.types.includes(VocabularyUtils.TERM_DEFINITION_SOURCE)) {
+        throw new Error("Can't create a definition source with assigned term here!")
+      }
     }
 
     if (termOccurrence.isSuggested() && termOccurrence.suggestedLemma) {
@@ -469,7 +448,7 @@ export async function getUser() {
 }
 
 export async function createDefaultVocabulary() {
-  const label = 'Default vocabulary';
+  const label = `Default vocabulary ${JsonLdUtils.generateBlankNodeId()}`;
 
   const iri = await loadIdentifier({ name: label, assetType: 'VOCABULARY' });
 
@@ -524,5 +503,4 @@ export default {
   createDefaultVocabulary,
   createVocabulary,
   initApi,
-  setUknownDefinitionSource,
 };

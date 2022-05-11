@@ -1,4 +1,4 @@
-import { ContentPopupContainer } from './react-tree-container/AnnotationPopupContainer';
+import { AnnotationPopupContainer } from './react-tree-container/AnnotationPopupContainer';
 import * as rangeUtil from './util/hypothesis/rangeUtils';
 import SelectionObserver from './util/hypothesis/SelectionObserver';
 import Annotation, { AnnotationType } from './Annotation';
@@ -41,7 +41,7 @@ const isSelectionAllowed = (range: Range, selection: Selection) => {
 export default class Annotator {
   private rootElement: any;
 
-  private contentPopup: ContentPopupContainer;
+  private contentPopup: AnnotationPopupContainer;
 
   private selectionObserver: SelectionObserver;
 
@@ -60,7 +60,7 @@ export default class Annotator {
   public constructor(rootElement: HTMLElement, contentState: ContentState) {
     this.contentState = contentState;
     this.rootElement = rootElement;
-    this.contentPopup = new ContentPopupContainer(
+    this.contentPopup = new AnnotationPopupContainer(
       this.rootElement,
       this.contentState,
       (onDefinitionSelected) => {
@@ -102,7 +102,7 @@ export default class Annotator {
           clearTimeout(ignoreNextSelectionTimeout);
           ignoreNextSelectionTimeout = null;
         }, 300);
-        this.onSelection(range);
+        this.onSelection();
       }
     });
   }
@@ -177,8 +177,25 @@ export default class Annotator {
     );
   }
 
-  public hidePopup() {
+  public hidePopup(isClearingSelection = false) {
+    const { currentAnnotation } = this;
+    this.currentAnnotation = undefined;
+    console.log(
+      'Hiding popup - isClearingSelection: ',
+      isClearingSelection,
+      ', this.currentAnnotation: ',
+      !!this.currentAnnotation
+    );
     this.contentPopup.hide();
+
+    if (
+      isClearingSelection &&
+      currentAnnotation &&
+      !currentAnnotation.termOccurrence.iri
+    ) {
+      console.log('saving previously ephemeral annotation');
+      ContentActions.saveUnassignedOccurrence(currentAnnotation);
+    }
   }
 
   public async annotatePage(
@@ -218,7 +235,7 @@ export default class Annotator {
       return;
     }
 
-    this.contentPopup.hide();
+    this.hidePopup(true);
   }
 
   public getContentPoup() {

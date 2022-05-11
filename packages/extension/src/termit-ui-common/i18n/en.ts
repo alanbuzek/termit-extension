@@ -720,7 +720,7 @@ const en = {
     'occurrence.unknown.definition': 'Unknown term defintion',
     'occurrence.suggested.new.term': 'Proposed new term',
     'occurrence.suggested.existing.term': 'Proposed existing term',
-    'extension.occurrences.filter.placeholder': 'Filter by text',
+    'extension.occurrences.filter.placeholder': 'Search',
     'extension.occurrences.all': 'All occurrences',
     'occurrence.delete.all': 'Delete all annotations',
     'occurrence.delete.suggestions': 'Delete suggestions',

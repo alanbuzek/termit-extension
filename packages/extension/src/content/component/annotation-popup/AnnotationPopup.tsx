@@ -77,7 +77,8 @@ function AnnotationPopup({
             intl={intl}
             i18n={i18n}
             onClose={() => {
-              closePopup();
+              setCurrPopup(PopupType.TermOccurrence);
+              setDefinitionAnnotation(undefined);
               PageOverlay.off();
             }}
             onMinimize={() => {
@@ -229,7 +230,7 @@ function AnnotationPopup({
   );
 }
 
-// this ensures the wrapped component is mounted anew and no previous state is preserved, when calling hide() and show() in ContentPopupContainer
+// this ensures the wrapped component is mounted anew and no previous state is preserved, when calling hide() and show() in AnnotationPopupContainer
 function isVisibleWrapper(WrappedComponent) {
   // eslint-disable-next-line react/display-name
   return ({ isVisible, ...props }) => {

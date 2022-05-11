@@ -168,7 +168,7 @@ const TermOccurrenceFactory = {
       id,
       types:
         annotationType === AnnotationType.DEFINITION
-          ? [VocabularyUtils.TERM_DEFINITION_SOURCE]
+          ? [VocabularyUtils.UNKNOWN_DEFINITION_OCCURRENCE]
           : [VocabularyUtils.WEBSITE_TERM_OCCURRENCE],
       term:
         termIri && termsMap && termsMap[termIri]

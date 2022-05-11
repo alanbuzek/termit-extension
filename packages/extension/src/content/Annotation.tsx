@@ -30,11 +30,6 @@ export const AnnotationFocusTime = {
   INFINITE: -1,
 };
 
-// TODO: we'll have to make sure that the mapping works ok here (e.g. ddo:definice vs full url)
-export function isDefinitionAnnotation(types: string[]) {
-  return types.includes(AnnotationType.DEFINITION);
-}
-
 class Annotation {
   public termOccurrence: TermOccurrence;
 
@@ -153,6 +148,18 @@ class Annotation {
     this.termOccurrence.types = this.termOccurrence.types.filter(
       (type) => type !== VocabularyUtils.SUGGESTED_TERM_OCCURRENCE
     );
+
+    if (
+      this.termOccurrence.types.includes(
+        VocabularyUtils.UNKNOWN_DEFINITION_OCCURRENCE
+      )
+    ) {
+      this.termOccurrence.types = this.termOccurrence.types.filter(
+        (type) => type !== VocabularyUtils.UNKNOWN_DEFINITION_OCCURRENCE
+      );
+      this.termOccurrence.types.push(VocabularyUtils.TERM_DEFINITION_SOURCE);
+    }
+
     this.updateAppearance();
   }
 
@@ -212,7 +219,12 @@ class Annotation {
   }
 
   public isDefinition() {
-    return this.termOccurrence.types.includes(AnnotationType.DEFINITION);
+    return (
+      this.termOccurrence.types.includes(AnnotationType.DEFINITION) ||
+      this.termOccurrence.types.includes(
+        VocabularyUtils.UNKNOWN_DEFINITION_OCCURRENCE
+      )
+    );
   }
 
   public setFailed(value: boolean) {

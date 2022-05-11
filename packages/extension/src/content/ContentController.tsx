@@ -1,11 +1,7 @@
 import Annotator from './Annotator';
 import Sidebar from './react-tree-container/SidebarContainer';
 import Vocabulary from '../termit-ui-common/model/Vocabulary';
-import Annotation, {
-  AnnotationFocusTime,
-  AnnotationType,
-  isDefinitionAnnotation,
-} from './Annotation';
+import Annotation, { AnnotationFocusTime, AnnotationType } from './Annotation';
 import api from '../shared/api';
 import VocabularyUtils, { IRI } from '../termit-ui-common/util/VocabularyUtils';
 import Term from '../termit-ui-common/model/Term';
@@ -347,15 +343,17 @@ export const ContentActions = {
     annotationType: string,
     isDuringTermCreation = false
   ) {
+    if (internals.isAnonymous()) {
+      annotator!.hidePopup();
+
+      return;
+    }
+
     // const originalTerm = annotation.term;
     annotation.assignTerm(term);
     annotator!.hidePopup();
     const hasBeenPersisted = !!annotation.termOccurrence.iri;
     const isDefinition = annotationType === AnnotationType.DEFINITION;
-
-    if (internals.isAnonymous()) {
-      return;
-    }
 
     if (isDefinition) {
       if (hasBeenPersisted) {
@@ -472,7 +470,7 @@ export const ContentActions = {
   async removeOccurrence(annotation: Annotation) {
     await annotation.removeOccurrence();
     if (annotation.termOccurrence.iri && !internals.isAnonymous()) {
-      if (annotation.isDefinition()) {
+      if (annotation.isDefinition() && annotation.term) {
         await api.removeTermDefinitionSource(
           annotation.termOccurrence,
           annotation.term!
@@ -584,7 +582,7 @@ export const ContentActions = {
 
     if (!contentState.vocabularies.length) {
       await api.createDefaultVocabulary();
-      contentState.vocabularies = await api.loadVocabularies();
+      contentState.vocabularies = await api.loadVocabularies(SKIP_CACHE);
       // create default vocabulary
     }
 
@@ -659,10 +657,7 @@ export const ContentActions = {
     await annotator!.annotatePage(newTermOccurrences, true);
 
     await api.savePageAnnotationResults(
-      annotator!
-        .getFoundTermOccurrences()
-        // don't save definitions just yet
-        .filter((annotation) => !isDefinitionAnnotation(annotation.types)),
+      annotator!.getFoundTermOccurrences(),
       contentState.website!,
       contentState.vocabulary!.iri
     );
@@ -675,15 +670,14 @@ export const ContentActions = {
   },
   // TODO: unused for now
   async saveUnassignedOccurrence(annotation: Annotation) {
-    if (annotation.isDefinition()) {
-      await api.setUknownDefinitionSource(annotation.termOccurrence);
-    } else {
-      await api.saveTermOccurrences(
-        [annotation.termOccurrence],
-        contentState.website!,
-        contentState.vocabulary!.iri
-      );
+    if (internals.isAnonymous()) {
+      return;
     }
+    await api.saveTermOccurrences(
+      [annotation.termOccurrence],
+      contentState.website!,
+      contentState.vocabulary!.iri
+    );
 
     internals.updateSidebar();
   },

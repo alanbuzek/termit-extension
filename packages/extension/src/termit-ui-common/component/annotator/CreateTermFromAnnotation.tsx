@@ -6,7 +6,7 @@ import { IRI } from '../../util/VocabularyUtils';
 import AssetFactory from '../../util/AssetFactory';
 import { langString } from '../../model/MultilingualString';
 import { isTermValid, LabelExists } from '../term/TermValidationUtils';
-import { ContentState } from '../../../content/ContentController';
+import { ContentState, ContentActions } from '../../../content/ContentController';
 import Annotation from '../../../content/Annotation';
 import TermOccurrence from '../../model/TermOccurrence';
 import ExtensionDomUtils from '../../../content/util/ExtensionDomUtils';
@@ -101,6 +101,14 @@ export class CreateTermFromAnnotation extends React.Component<
     this.setState(AssetFactory.createEmptyTermData());
     this.props.onClose();
   };
+
+  public onCancelWithCleanup(){
+    if (this.props.definitionAnnotation){
+      ContentActions.removeOccurrence(this.props.definitionAnnotation);
+    }
+
+    this.onCancel();
+  }
 
   public render() {
     const { i18n, intl } = this.props;

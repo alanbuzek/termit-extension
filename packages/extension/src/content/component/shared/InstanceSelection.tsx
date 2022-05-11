@@ -14,8 +14,15 @@ export const INSTANCE_LIST = [
     termitServer: 'http://localhost:8080/termit/rest',
     termitUi: 'http://localhost:3000',
     annotaceService: 'http://localhost:8888',
-    graphDb: 'http://localhost:7200/repositories/termitrepo',
+    graphDb: 'http://localhost:7200/repositories/termit2',
     label: 'local',
+  },
+  {
+    termitServer: 'https://kbss.felk.cvut.cz/ann/sluzby/server/rest',
+    termitUi: 'https://kbss.felk.cvut.cz/termit-ann',
+    annotaceService: 'http://localhost:8888',
+    graphDb: 'http://kbss.felk.cvut.cz:47200/repositories/alan-termit-test2',
+    label: 'remote, local annotace',
   },
 ];
 

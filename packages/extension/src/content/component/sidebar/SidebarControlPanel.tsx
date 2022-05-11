@@ -128,7 +128,7 @@ const SidebarControlPanel = ({
           <div className="flex text-xl font-normal text-gray-700 items-center">
             <FaBook id="props.id" className="block mr-2" />
             <AssetLink
-              path={`${instance.termitUI}/#/vocabularies/${vocabularyIRI.fragment}?namespace=${vocabularyIRI.namespace}`}
+              path={`${instance.termitUi}/#/vocabularies/${vocabularyIRI.fragment}?namespace=${vocabularyIRI.namespace}`}
               asset={vocabulary!}
               id="selected-vocabulary"
               tooltip="asset.link.tooltip"

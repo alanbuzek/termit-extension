@@ -89,6 +89,7 @@ const VocabularyUtils = {
   JE_TEMATEM: `${_NS_TERMIT}je-tématem`,
   MA_MUJ_POSLEDNI_KOMENTAR: `${_NS_TERMIT}má-můj-poslední-komentář`,
   SUGGESTED_TERM_OCCURRENCE: `${_NS_TERMIT}navržený-výskyt-termu`,
+  UNKNOWN_DEFINITION_OCCURRENCE: `${_NS_TERMIT}neznámý-definiční-výskyt-termu`, // NOTE: ønly frontend knows about this type, back-end gets in as "extraTypes" without parsing it further
   ASSIGNMENT_TARGET: `${_NS_TERMIT}c\u00edl`,
   OCCURRENCE_TARGET: `${_NS_TERMIT}cíl-výskytu`,
   FILE_OCCURRENCE_TARGET: `${_NS_TERMIT}c\u00edl-souborov\u00e9ho-v\u00fdskytu`,

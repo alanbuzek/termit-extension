@@ -5,7 +5,7 @@ import { IntlProvider } from 'react-intl';
 import AnnotationPopup, {
   PopupType,
 } from '../component/annotation-popup/AnnotationPopup';
-import Annotation, { isDefinitionAnnotation } from '../Annotation';
+import Annotation from '../Annotation';
 import { ContentState } from '../ContentController';
 import en from '../../termit-ui-common/i18n/en';
 import cs from '../../termit-ui-common/i18n/cs';
@@ -73,7 +73,7 @@ function nearestPositionedAncestor(el) {
   return parentEl;
 }
 
-export class ContentPopupContainer {
+export class AnnotationPopupContainer {
   private outerContainer: HTMLElement;
 
   private shadowRoot: ShadowRoot;
@@ -191,7 +191,7 @@ export class ContentPopupContainer {
     left = Math.max(left, 0);
     left = Math.min(
       left,
-      this.view.innerWidth - adderWidth - sidebarWidth - 50
+      this.view.innerWidth - adderWidth - sidebarWidth + 200
     );
 
     top = Math.max(top, 0);
@@ -232,7 +232,7 @@ export class ContentPopupContainer {
   private render(selectionRange?) {
     let initialPopupType = PopupType.PurposeSelection;
     if (this.currentAnnotation) {
-      if (isDefinitionAnnotation(this.currentAnnotation.termOccurrence.types)) {
+      if (this.currentAnnotation.isDefinition()) {
         initialPopupType = PopupType.TermDefinition;
       } else {
         initialPopupType = PopupType.TermOccurrence;
