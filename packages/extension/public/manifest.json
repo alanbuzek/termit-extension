@@ -44,7 +44,8 @@
   "externally_connectable": {
     "matches": [
       "http://localhost:3000/*",
-      "https://kbss.felk.cvut.cz/termit-ann/*"
+      "https://kbss.felk.cvut.cz/termit-ann/*",
+      "http://kbss.felk.cvut.cz/termit-ann/*"
     ]
   },
   "key": "AAAAB3NzaC1yc2EAAAADAQABAAABAQChEIfkjnZPm4g67iFSaI7BEG+5x1yrGdRbIM3nfwC8tPBzPjtE6YVQ9+815mywWwjVQGkZc0cAlqYWyElNIYYvHEn1aFcnJrnGykFG5CwGu65tKWNjwlhR5velhkp+ursEAbx21xUfK1ZVosKFfuEoS4U7ixLai9ekx4D+GRHt8vAZdUMziuj3iVEeybAarUV/4+n/Q3MqT0urTLXQjhdOV/OgfDQnU0IyokCosdt+2jkuxiqPEBq269d2mUdwEXAkYkBlsD5r5sIJKCzOaCs3npZ8TJwdePapckXMZew36/KSm7Nl2mBq34nMMdKy1/bpGpXCeKTs1P4t97W/9XMT"
