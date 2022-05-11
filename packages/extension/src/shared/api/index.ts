@@ -477,7 +477,7 @@ export async function createDefaultVocabulary() {
     label,
     iri,
     comment: 'This is your default vocabulary',
-  }).mapToMinifiedVersion();
+  });
   vocabulary.addType(VocabularyUtils.DOCUMENT_VOCABULARY);
 
   const document = new Document({
@@ -494,7 +494,7 @@ export async function createDefaultVocabulary() {
 
 export function createVocabulary(vocabulary: Vocabulary) {
   return termitApi.post(
-    `${Constants.API_PREFIX}/vocabularies`,
+    `/vocabularies`,
     content(vocabulary.toJsonLd())
   );
 }
