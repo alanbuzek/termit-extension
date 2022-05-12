@@ -25,7 +25,7 @@ export function getEnv(name: string, defaultValue?: string): string {
 }
 
 const API_PREFIX = '/rest';
-const DEFAULT_LANGUAGE = 'en';
+const DEFAULT_LANGUAGE = 'cs';
 
 const constants = {
   // Will be replaced with actual server url during build
