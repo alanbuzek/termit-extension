@@ -2,7 +2,7 @@
   "short_name": "Termit Annotate",
   "name": "Termit Annotate - semantic annotations",
   "description": "Create semantic annotations, terms and vocabularies while browsing the web. Get automatic term suggestions.",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "manifest_version": 3,
   "background": {
     "service_worker": "/static/js/background.js"
@@ -47,6 +47,5 @@
       "https://kbss.felk.cvut.cz/termit-ann/*",
       "http://kbss.felk.cvut.cz/termit-ann/*"
     ]
-  },
-  "key": "AAAAB3NzaC1yc2EAAAADAQABAAABAQChEIfkjnZPm4g67iFSaI7BEG+5x1yrGdRbIM3nfwC8tPBzPjtE6YVQ9+815mywWwjVQGkZc0cAlqYWyElNIYYvHEn1aFcnJrnGykFG5CwGu65tKWNjwlhR5velhkp+ursEAbx21xUfK1ZVosKFfuEoS4U7ixLai9ekx4D+GRHt8vAZdUMziuj3iVEeybAarUV/4+n/Q3MqT0urTLXQjhdOV/OgfDQnU0IyokCosdt+2jkuxiqPEBq269d2mUdwEXAkYkBlsD5r5sIJKCzOaCs3npZ8TJwdePapckXMZew36/KSm7Nl2mBq34nMMdKy1/bpGpXCeKTs1P4t97W/9XMT"
+  }
 }
