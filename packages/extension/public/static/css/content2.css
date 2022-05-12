@@ -199,7 +199,7 @@ termit-h {
 }
 
 termit-h.termit-h-hovered {
-  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.15), 0 4px 6px -4px rgb(0 0 0 / 0.15);
 }
 
 /* termit-h.termit-h-hovered {
@@ -211,7 +211,7 @@ termit-h.assigned-term-occurrence {
 }
 
 termit-h.assigned-term-occurrence.termit-h-hovered {
-  background: rgba(116, 237, 108, 0.8);
+  background: rgba(101, 231, 92, 0.8);
 }
 
 termit-h.suggested-term-occurrence {
@@ -219,7 +219,7 @@ termit-h.suggested-term-occurrence {
 }
 
 termit-h.suggested-term-occurrence.termit-h-hovered {
-  background: rgba(253, 203, 168, 0.8);
+  background: rgba(255, 170, 109, 0.8);
 }
 
 termit-h.invalid-term-occurrence {

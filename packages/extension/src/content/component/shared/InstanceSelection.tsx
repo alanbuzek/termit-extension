@@ -18,13 +18,6 @@ export const INSTANCE_LIST = [
     graphDb: 'http://localhost:7200/repositories/termit2',
     label: 'local',
   },
-  {
-    termitServer: 'https://kbss.felk.cvut.cz/ann/sluzby/server/rest',
-    termitUi: 'https://kbss.felk.cvut.cz/termit-ann',
-    annotaceService: 'http://localhost:8888',
-    graphDb: 'http://kbss.felk.cvut.cz:47200/repositories/alan-termit-test2',
-    label: 'remote, local annotace',
-  },
 ];
 
 export const DEFAULT_INSTANCE = INSTANCE_LIST[0];
