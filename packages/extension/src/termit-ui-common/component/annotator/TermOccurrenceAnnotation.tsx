@@ -22,6 +22,7 @@ interface TermOccurrenceAnnotationProps {
   onClose: () => void;
   contentState: ContentState;
   onRemove: () => void;
+  instance?;
 }
 
 export const TrashIcon = () => (
@@ -102,6 +103,7 @@ export const TermOccurrenceAnnotation: React.FC<TermOccurrenceAnnotationProps> =
     };
     const popupBody = editing ? (
       <AnnotationTerms
+        instance={props.instance}
         selectedTerm={term}
         onCreateTerm={props.onCreateTerm}
         i18n={i18n}
@@ -120,6 +122,7 @@ export const TermOccurrenceAnnotation: React.FC<TermOccurrenceAnnotationProps> =
         term={term}
         resource={props.resource}
         annotationClass={props.annotationClass}
+        instance={props.instance}
       />
     );
 

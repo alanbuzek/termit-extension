@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { CreateTermFromAnnotation } from '../../../termit-ui-common/component/annotator/CreateTermFromAnnotation';
 import TermDefinitionAnnotation from '../../../termit-ui-common/component/annotator/TermDefinitionAnnotation';
 import TermOccurrenceAnnotation from '../../../termit-ui-common/component/annotator/TermOccurrenceAnnotation';
-import HighlightedTextAdder from './PurpuseSelectionDialog';
+import PurposeSelectionDialog from './PurpuseSelectionDialog';
 
 import Annotation, {
   AnnotationTypeClass,
@@ -109,7 +109,7 @@ function AnnotationPopup({
         );
       case PopupType.PurposeSelection:
         return (
-          <HighlightedTextAdder
+          <PurposeSelectionDialog
             onMarkOccurrence={async () => {
               const markedAnnotation =
                 await ContentActions.createUnknownOccurrenceFromRange(
@@ -144,6 +144,7 @@ function AnnotationPopup({
       case PopupType.TermOccurrence:
         return (
           <TermOccurrenceAnnotation
+            instance={contentState.instance}
             term={annotation?.term}
             annotationClass={
               annotation?.getTermState() ||
@@ -175,6 +176,7 @@ function AnnotationPopup({
       case PopupType.TermDefinition:
         return (
           <TermDefinitionAnnotation
+            instance={contentState.instance}
             term={annotation?.term}
             text={
               annotation?.termOccurrence?.getTextContent() ||

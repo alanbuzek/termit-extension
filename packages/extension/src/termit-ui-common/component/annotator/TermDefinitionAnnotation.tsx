@@ -20,6 +20,7 @@ interface TermDefinitionAnnotationProps {
   onSelectTerm: (term: Term) => Promise<void>;
   onClose: () => void;
   contentState: ContentState;
+  instance?: any;
 }
 
 function createActionButtons(
@@ -67,6 +68,7 @@ export const TermDefinitionAnnotation: React.FC<TermDefinitionAnnotationProps> =
     }, [term]);
     const bodyContent = editing ? (
       <AnnotationTerms
+        instance={props.instance}
         canCreateTerm={false}
         selectedTerm={term}
         i18n={i18n}
@@ -84,6 +86,7 @@ export const TermDefinitionAnnotation: React.FC<TermDefinitionAnnotationProps> =
         term={term}
         resource={props.resource}
         textContent={props.text}
+        instance={props.instance}
       />
     );
 

@@ -49,7 +49,7 @@ export const UserInfo = ({ user, instance }) => {
         </div>
       )}
       <div className="relative">
-        <UserDropdown isAnonymous={!user} />
+        <UserDropdown isAnonymous={!user} instance={instance} />
       </div>
     </div>
   );

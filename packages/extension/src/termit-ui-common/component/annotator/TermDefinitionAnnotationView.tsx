@@ -7,6 +7,7 @@ interface TermDefinitionAnnotationViewProps {
   term?: Term | null;
   resource?: string;
   textContent: string;
+  instance?;
 }
 
 const TermDefinitionAnnotationView: React.FC<TermDefinitionAnnotationViewProps> =
@@ -18,7 +19,7 @@ const TermDefinitionAnnotationView: React.FC<TermDefinitionAnnotationViewProps> 
           <tbody>
             <tr>
               <td>
-                <TermLink term={props.term} />
+                <TermLink term={props.term} instance={props.instance} />
               </td>
             </tr>
           </tbody>

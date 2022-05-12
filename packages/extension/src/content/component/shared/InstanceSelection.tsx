@@ -7,7 +7,8 @@ export const INSTANCE_LIST = [
     termitServer: 'https://kbss.felk.cvut.cz/ann/sluzby/server/rest',
     termitUi: 'https://kbss.felk.cvut.cz/termit-ann',
     annotaceService: 'https://kbss.felk.cvut.cz/ann/sluzby/annotace',
-    graphDb: 'http://kbss.felk.cvut.cz:47200/repositories/alan-termit-test2',
+    graphDb:
+      'https://kbss.felk.cvut.cz/ann/sluzby/db/repositories/alan-termit-test2',
     label: 'Testování',
   },
   {

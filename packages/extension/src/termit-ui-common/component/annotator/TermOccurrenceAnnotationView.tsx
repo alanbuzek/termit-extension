@@ -7,6 +7,7 @@ interface TermOccurrenceAnnotationViewProps {
   term?: any;
   resource?: string;
   annotationClass: string;
+  instance?;
 }
 
 const TermOccurrenceAnnotationView: React.FC<TermOccurrenceAnnotationViewProps> =
@@ -19,7 +20,7 @@ const TermOccurrenceAnnotationView: React.FC<TermOccurrenceAnnotationViewProps> 
             <tbody>
               <tr>
                 <td>
-                  <TermLink term={props.term!} />
+                  <TermLink term={props.term!} instance={props.instance} />
                 </td>
               </tr>
             </tbody>

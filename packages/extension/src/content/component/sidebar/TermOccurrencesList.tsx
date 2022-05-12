@@ -61,6 +61,7 @@ const TermOccurrencesList = ({
   annotations,
   onDeleteAnnotation,
   isAnonymous,
+  instance,
 }) => {
   const [deletingAnnotation, setDeletingAnnotation] = useState<Annotation>();
   const { i18n } = useI18n();
@@ -95,7 +96,7 @@ const TermOccurrencesList = ({
                   <span className="font-semibold mr-2">
                     {i18n('type.term')}:
                   </span>
-                  <TermLink term={annotation.term} />
+                  <TermLink term={annotation.term} instance={instance} />
                 </div>
               )}
             </div>

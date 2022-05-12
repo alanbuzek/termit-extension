@@ -30,6 +30,7 @@ interface AnnotationTermsProps extends GlossaryTermsProps {
   onChange: (term: Term | null) => void;
   selectedTerm: Term | null;
   onCreateTerm?: () => void;
+  instance?;
 }
 
 export class AnnotationTerms extends React.Component<AnnotationTermsProps> {
@@ -109,7 +110,8 @@ export class AnnotationTerms extends React.Component<AnnotationTermsProps> {
                 this.props.vocabulary!.iri
               )}
               valueRenderer={createTermValueRenderer(
-                this.props.vocabulary!.iri
+                this.props.vocabulary!.iri,
+                this.props.instance
               )}
               {...commonTermTreeSelectProps(this.props)}
               placeholder={i18n('terms.select.assignment.placeholder')}

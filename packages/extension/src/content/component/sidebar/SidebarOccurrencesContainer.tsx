@@ -27,6 +27,7 @@ const SidebarOccurrencesContainer = ({
         annotations={state.annotations}
         onDeleteAnnotation={onDeleteAnnotation}
         isAnonymous={!state.user}
+        instance={state.instance}
       />
     )}
   </>

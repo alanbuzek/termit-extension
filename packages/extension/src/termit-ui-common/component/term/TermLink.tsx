@@ -14,39 +14,22 @@ interface TermLinkProps {
   id?: string;
   language?: string;
   activeTab?: string;
+  instance?;
 }
 
-export function getTermPath(term: Term | TermInfo, user?: User | null) {
-  return getTermPathWithTab(term, user, undefined);
+export function getTermPath(term: Term | TermInfo, instance?) {
+  return getTermPathWithTab(term, instance);
 }
 
-function getTermPathWithTab(term: Term | TermInfo, activeTab?: string) {
-  // TODO: show real path here
-  // if (!term.vocabulary) {
-  // return Routing.getTransitionPath(Routes.dashboard);
-  // }
+function getTermPathWithTab(term: Term | TermInfo, instance?) {
   const vocIri = VocabularyUtils.create(term.vocabulary!.iri!);
   const iri = VocabularyUtils.create(term.iri);
-  const queryParams: string[][] = [];
-  queryParams.push(['namespace', vocIri.namespace!]);
-  if (activeTab) {
-    queryParams.push(['activeTab', activeTab]);
+
+  if (!instance){
+    return '';
   }
 
-  return `http://localhost:3000/#/vocabularies/${vocIri.fragment}/terms/${iri.fragment}`;
-  // return Routing.getTransitionPath(
-  //   Authentication.isLoggedIn(user)
-  //     ? Routes.vocabularyTermDetail
-  //     : Routes.publicVocabularyTermDetail,
-  //   {
-  //     params: new Map([
-  //       ["name", vocIri.fragment],
-  //       ["termName", iri.fragment],
-  //     ]),
-  //     // @ts-ignore
-  //     query: new Map(queryParams),
-  //   }
-  // );
+  return `${instance.termitUi}/#/vocabularies/${vocIri.fragment}/terms/${iri.fragment}`;
 }
 
 export const TermLink: React.FC<TermLinkProps> = (props) => {
@@ -57,7 +40,7 @@ export const TermLink: React.FC<TermLinkProps> = (props) => {
     // This can happen e.g. when FTS returns a term in the predefined language used for term types
     return <OutgoingLink label={label} iri={term.iri} />;
   }
-  const path = getTermPathWithTab(term, props.activeTab);
+  const path = getTermPathWithTab(term, props.instance);
   // Make a copy of the term with a simple localized label for the AssetLink component
   const t = { ...term, label };
 

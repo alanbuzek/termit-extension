@@ -146,10 +146,10 @@ export function createTermsWithImportsOptionRendererAndUnusedTermsAndQualityBadg
   };
 }
 
-export function createTermValueRenderer(vocabularyIri: string) {
+export function createTermValueRenderer(vocabularyIri: string, instance?) {
   return (option: Term) => (
     <>
-      <TermLink term={option} />
+      <TermLink term={option} instance={instance} />
       {vocabularyIri !== option.vocabulary?.iri ? (
         <VocabularyNameBadge vocabulary={option.vocabulary} />
       ) : null}

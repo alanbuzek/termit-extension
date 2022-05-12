@@ -6,7 +6,7 @@ import DropdownButton from './DropdownButton';
 import { useI18n } from '../../../../termit-ui-common/component/hook/useI18n';
 import StorageUtils from '../../../util/StorageUtils';
 
-const UserDropdown = ({ isAnonymous }) => {
+const UserDropdown = ({ isAnonymous, instance }) => {
   const { dropdownRef, isOpen, handleMenuClick, handleItemClick } = useDropdown(
     (id) => {
       if (id === 'logout') {
@@ -33,10 +33,10 @@ const UserDropdown = ({ isAnonymous }) => {
     },
   ];
 
-  if (!isAnonymous) {
+  if (!isAnonymous && instance) {
     options.unshift({
       name: (<span>TermIt&nbsp;{i18n('extension.webapp')}</span>) as any,
-      link: 'http://localhost:3000/#/',
+      link: `${instance.termitUi}/#/`,
     });
 
     options.push({
