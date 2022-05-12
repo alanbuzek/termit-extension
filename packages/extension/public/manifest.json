@@ -2,7 +2,7 @@
   "short_name": "Termit Annotate",
   "name": "Termit Annotate - semantic annotations",
   "description": "Create semantic annotations, terms and vocabularies while browsing the web. Get automatic term suggestions.",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "manifest_version": 3,
   "background": {
     "service_worker": "/static/js/background.js"
