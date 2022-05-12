@@ -764,9 +764,9 @@ const cs = {
     'extension.onboarding.step4.text1':
       'Prostřednictvím postranního panelu rozšíření budete moci vyhledávat a spravovat stávající anotace stránky, mazat anotace nebo přistupovat k seznamu všech anotovaných stránek.',
     'extension.onboarding.step5.header':
-      'Plně využijte platformu pro sémantické slovníky TermIt',
+      'Plně využijte platformu TermIt',
     'extension.onboarding.step5.text1':
-      'TermIt stojích na technologiích sémantického webu a poskytuje skvělé řešení pro správu slovníků, pojmů a jejich propojování do stránek a dalších dokumentů. Z webového rozšíření TermIt Annotate se můžete kdykoli proklikout do webové aplikace TermIt, prohlížet a upravovat vytvořené pojmy, definice nebo slovníky a vše do detailu spravovat.',
+      'TermIt stojí na technologiích sémantického webu a poskytuje skvělé řešení pro správu slovníků, pojmů a jejich propojování do stránek a dalších dokumentů. Z webového rozšíření TermIt Annotate se můžete kdykoli proklikout do webové aplikace TermIt, prohlížet a upravovat vytvořené pojmy, definice nebo slovníky a vše do detailu spravovat.',
     'extension.onboarding.step6.header':
       'Hotovo! Nyní můžete zavřít tuto stránku a začněte používat TermIt Annotate!',
     'extension.onboarding.step6.text1':
