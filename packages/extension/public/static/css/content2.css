@@ -50,24 +50,11 @@
   bottom: -150px;
 }
 
-.toastify-rounded {
-  border-radius: 25px;
-}
-
 .toastify-avatar {
   width: 1.5em;
   height: 1.5em;
   margin: -7px 5px;
   border-radius: 2px;
-}
-
-.toastify-center {
-  margin-left: auto;
-  margin-right: auto;
-  left: 0;
-  right: 0;
-  max-width: fit-content;
-  max-width: -moz-fit-content;
 }
 
 @media only screen and (max-width: 360px) {
@@ -80,7 +67,7 @@
   }
 }
 
-
+/*  */
 
 .popover {
   position: absolute;
@@ -125,119 +112,6 @@
   content: "";
   border-color: transparent;
   border-style: solid;
-}
-.bs-popover-top,
-.bs-popover-auto[x-placement^="top"] {
-  margin-bottom: 0.5rem;
-}
-.bs-popover-top .arrow,
-.bs-popover-auto[x-placement^="top"] .arrow {
-  bottom: calc((0.5rem + 1px) * -1);
-}
-.bs-popover-top .arrow::before,
-.bs-popover-auto[x-placement^="top"] .arrow::before,
-.bs-popover-top .arrow::after,
-.bs-popover-auto[x-placement^="top"] .arrow::after {
-  border-width: 0.5rem 1rem 0;
-}
-.bs-popover-top .arrow::before,
-.bs-popover-auto[x-placement^="top"] .arrow::before {
-  bottom: 0;
-  border-top-color: rgba(0, 0, 0, 0.25);
-}
-.bs-popover-top .arrow::after,
-.bs-popover-auto[x-placement^="top"] .arrow::after {
-  bottom: 1px;
-  border-top-color: #fff;
-}
-.bs-popover-right,
-.bs-popover-auto[x-placement^="right"] {
-  margin-left: 0.5rem;
-}
-.bs-popover-right .arrow,
-.bs-popover-auto[x-placement^="right"] .arrow {
-  left: calc((0.5rem + 1px) * -1);
-  width: 0.5rem;
-  height: 1rem;
-  margin: 0.3rem 0;
-}
-.bs-popover-right .arrow::before,
-.bs-popover-auto[x-placement^="right"] .arrow::before,
-.bs-popover-right .arrow::after,
-.bs-popover-auto[x-placement^="right"] .arrow::after {
-  border-width: 1rem 0.5rem 1rem 0;
-}
-.bs-popover-right .arrow::before,
-.bs-popover-auto[x-placement^="right"] .arrow::before {
-  left: 0;
-  border-right-color: rgba(0, 0, 0, 0.25);
-}
-.bs-popover-right .arrow::after,
-.bs-popover-auto[x-placement^="right"] .arrow::after {
-  left: 1px;
-  border-right-color: #fff;
-}
-.bs-popover-bottom,
-.bs-popover-auto[x-placement^="bottom"] {
-  margin-top: 0.5rem;
-}
-.bs-popover-bottom .arrow,
-.bs-popover-auto[x-placement^="bottom"] .arrow {
-  top: calc((0.5rem + 1px) * -1);
-}
-.bs-popover-bottom .arrow::before,
-.bs-popover-auto[x-placement^="bottom"] .arrow::before,
-.bs-popover-bottom .arrow::after,
-.bs-popover-auto[x-placement^="bottom"] .arrow::after {
-  border-width: 0 1rem 0.5rem 1rem;
-}
-.bs-popover-bottom .arrow::before,
-.bs-popover-auto[x-placement^="bottom"] .arrow::before {
-  top: 0;
-  border-bottom-color: rgba(0, 0, 0, 0.25);
-}
-.bs-popover-bottom .arrow::after,
-.bs-popover-auto[x-placement^="bottom"] .arrow::after {
-  top: 1px;
-  border-bottom-color: #fff;
-}
-.bs-popover-bottom .popover-header::before,
-.bs-popover-auto[x-placement^="bottom"] .popover-header::before {
-  position: absolute;
-  top: 0;
-  left: 50%;
-  display: block;
-  width: 1rem;
-  margin-left: 1rem;
-  content: "";
-  border-bottom: 1px solid #f7f7f7;
-}
-.bs-popover-left,
-.bs-popover-auto[x-placement^="left"] {
-  margin-right: 0.5rem;
-}
-.bs-popover-left .arrow,
-.bs-popover-auto[x-placement^="left"] .arrow {
-  right: calc((0.5rem + 1px) * -1);
-  width: 0.5rem;
-  height: 1rem;
-  margin: 0.3rem 0;
-}
-.bs-popover-left .arrow::before,
-.bs-popover-auto[x-placement^="left"] .arrow::before,
-.bs-popover-left .arrow::after,
-.bs-popover-auto[x-placement^="left"] .arrow::after {
-  border-width: 1rem 0 1rem 0.5rem;
-}
-.bs-popover-left .arrow::before,
-.bs-popover-auto[x-placement^="left"] .arrow::before {
-  right: 0;
-  border-left-color: rgba(0, 0, 0, 0.25);
-}
-.bs-popover-left .arrow::after,
-.bs-popover-auto[x-placement^="left"] .arrow::after {
-  right: 1px;
-  border-left-color: #fff;
 }
 .popover-header {
   padding: 0.5rem 0.75rem;
@@ -305,65 +179,6 @@
   border-style: solid;
 }
 
-.bs-tooltip-top {
-  padding: var(--tooltip-arrow-height) 0;
-}
-
-.bs-tooltip-top.arrow {
-  bottom: 0;
-}
-.bs-tooltip-top.arrow::before {
-  top: 0;
-  border-width: var(--tooltip-arrow-height) var(--tooltip-arrow-width-half) 0;
-  border-top-color: var(--tooltip-arrow-color);
-}
-
-.bs-tooltip-right {
-  padding: 0 var(--tooltip-arrow-height);
-}
-.bs-tooltip-right .arrow {
-  left: 0;
-  width: var(--tooltip-arrow-height);
-  height: var(--tooltip-arrow-width);
-}
-
-.bs-tooltip-right .arrow::before {
-  right: 0;
-  border-width: var(--tooltip-arrow-width-half) var(--tooltip-arrow-height)
-    var(--tooltip-arrow-width-half) 0;
-  border-right-color: var(--tooltip-arrow-color);
-}
-
-.bs-tooltip-bottom {
-  padding: var(--tooltip-arrow-height) 0;
-}
-
-.bs-tooltip-bottom .arrow {
-  top: 0;
-}
-.bs-tooltip-bottom .arrow::before {
-  bottom: 0;
-  border-width: 0 var(--tooltip-arrow-width-half) var(--tooltip-arrow-height);
-  border-bottom-color: var(--tooltip-arrow-color);
-}
-
-.bs-tooltip-left {
-  padding: 0 var(--tooltip-arrow-height);
-}
-
-.bs-tooltip-auto[x-placement^="top"] {
-  padding: var(--tooltip-arrow-height) 0;
-}
-.bs-tooltip-auto[x-placement^="right"] {
-  padding: 0 var(--tooltip-arrow-height);
-}
-.bs-tooltip-auto[x-placement^="bottom"] {
-  padding: var(--tooltip-arrow-height) 0;
-}
-.bs-tooltip-auto[x-placement^="left"] {
-  padding: 0 var(--tooltip-arrow-height);
-}
-
 /* Wrapper for the tooltip content */
 .tooltip-inner {
   max-width: var(--tooltip-max-width);
@@ -373,32 +188,6 @@
   background-color: var(--tooltip-bg);
 }
 
-/* ----end of tooltips ---------------******* */
-
-#masterlingo-popup {
-  width: 300px;
-  height: auto;
-  position: absolute;
-  /* top: 750px;
-    right: 500px; */
-  z-index: 2147483;
-  background-color: white;
-  /* box-shadow: 0px 0px 2px #5c5c5c8e; */
-  border-radius: 5px;
-  border: 1px solid rgb(229, 231, 235);
-}
-
-#masterlingo-popup iframe {
-  width: 100%;
-  height: 100%;
-  border: none;
-}
-
-#masterlingo-snackbar iframe {
-  width: 100%;
-  height: 100%;
-  border: none;
-}
 
 termit-h {
   transition: all 0.5s;
@@ -441,10 +230,6 @@ termit-h.invalid-term-occurrence.termit-h-hovered {
   background: rgba(235, 5, 5, 0.7);
 }
 
-termit-h.loading-term-occurrence {
-  background: #e9eaec;
-}
-
 termit-h.assigned-term-occurrence.proposed-occurrence {
   border: 0.15em dotted green;
 }
@@ -455,10 +240,6 @@ termit-h.suggested-term-occurrence.proposed-occurrence {
 
 termit-h.invalid-term-occurrence.proposed-occurrence {
   border: 0.15em dotted rgb(239, 14, 0);
-}
-
-termit-h.loading-term-occurrence.proposed-occurrence {
-  border: 0.15em dotted rgb(239, 173, 62);
 }
 
 termit-h.term-definition {
@@ -480,50 +261,6 @@ termit-h.pending-term-definition.termit-h-hovered {
 .termit-annotation-focused {
   outline: 4px solid rgb(126, 241, 32) !important;
   /* background-color: rgb(126, 241, 32) !important; */
-}
-
-.termit-info-window {
-  position: fixed;
-  background-color: rgb(163, 245, 156);
-  color: rgba(0, 0, 0, 0.938);
-  right: 10px;
-  bottom: 10px;
-  width: 650px;
-  height: 120px;
-  font-weight: 500;
-  font-size: 20px;
-  padding: 15px;
-  border-radius: 18px;
-}
-
-.termit-failures {
-  font-weight: bold;
-}
-
-.termit-successes {
-  font-weight: bold;
-}
-
-.frame-root {
-  overflow-y: hidden !important;
-}
-
-#masterlingo-snackbar {
-  z-index: 2147483647;
-  width: 600px;
-  height: 414px;
-  /* background-color: #333; */
-  color: #fff;
-  text-align: center;
-  border-radius: 5px;
-  padding: 0px;
-  position: fixed;
-  left: 50%;
-  bottom: 50px;
-  transform: translateX(-50%);
-  font-size: 17px;
-  box-shadow: 0px 0px 2px #5c5c5c8e;
-  border: 1px solid rgb(143, 143, 143);
 }
 
 /* TODO: figure out why this is not being imported to /build */
