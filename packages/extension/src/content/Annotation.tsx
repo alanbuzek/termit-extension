@@ -30,6 +30,10 @@ export const AnnotationFocusTime = {
   INFINITE: -1,
 };
 
+/**
+ * Annotation is essentially a wrapper around TermOccurrence, which is what comes back from TermIt.
+ * The class enables to operate on a annotation by highlighting it, getting its CSS properties and updating appearence or removing it from page
+ */
 class Annotation {
   public termOccurrence: TermOccurrence;
 

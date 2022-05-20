@@ -17,6 +17,9 @@ const internals = {
   },
 };
 
+/**
+ * Shows a semi transparent dark overlay over the page, e.g. when the page is loading or a popup is open
+ */
 const PageOverlay = {
   on() {
     internals.init();

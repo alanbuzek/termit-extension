@@ -1,5 +1,8 @@
 import Toastify from 'toastify-js';
 
+/**
+ * Using Toastify, messages will be shown to user on the visited page if needed
+ */
 const ContentMessage = {
   showMessage(text, type = 'success') {
     // only run in content script, otherwise no-op

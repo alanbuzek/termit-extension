@@ -8,8 +8,10 @@ import { AnnotationType } from '../Annotation';
 import { TermsMap } from '../AnnotatorController';
 import ExtensionDomUtils from './ExtensionDomUtils';
 import DomUtils from './ExtensionDomUtils';
-// import { xpathFromNode } from './hypothesis/xpath';
 
+/**
+ * A set of utility functions of creating TermOccurrences from various kinds of data
+ */
 const TermOccurrenceFactory = {
   createFromTextAnalysisResults(
     results: any[],

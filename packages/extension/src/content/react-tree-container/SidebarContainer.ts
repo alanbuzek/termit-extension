@@ -7,6 +7,9 @@ import { ContentState } from '../AnnotatorController';
 import Annotation from '../Annotation';
 import ExtensionMessage from '../../shared/ExtensionMessage';
 
+/**
+ * Sidebar Container wraps its React tree with a plain JS class to easily operate on
+ */
 export default class Sidebar {
   private sidebarComponent: SidebarContainer;
 

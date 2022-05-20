@@ -41,6 +41,9 @@ type ContentPopupProps = {
   repositionWithAnnotation: (Annotation) => void;
 };
 
+/**
+ * Central component containing any type of popup, keeps track of whichever one is currently available
+ */
 function AnnotationPopup({
   initialPopupType,
   showAt,

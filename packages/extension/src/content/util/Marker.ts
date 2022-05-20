@@ -4,12 +4,16 @@ import TermOccurrence from '../../termit-ui-common/model/TermOccurrence';
 import Annotation from '../Annotation';
 import { nodeFromXPath } from './hypothesis/xpath';
 
+// hanldes marked element click -> call global annotation action
 const handleElementClick = (annotation) => (event) => {
   event.stopPropagation();
   event.preventDefault();
   AnnotatorActions.showPopup(annotation);
 };
 
+/**
+ * Attempts to resolve our selectors
+ */
 const selectAnnotationContainer = (termOccurrence: TermOccurrence) => {
   const cssSelector = termOccurrence.getCssSelector().value;
   const xPathSelector = termOccurrence.getXPathSelector()?.value;
@@ -42,6 +46,9 @@ const selectAnnotationContainer = (termOccurrence: TermOccurrence) => {
 // we're caching markjs instances asociated with elements, so there don't need to be extra querySelector calls
 const markJsInstancesCache = {};
 
+/**
+ * Object wrapping calls to the adjusted mark.js library at https://github.com/alanbuzek/mark.js
+ */
 const Marker = {
   unmarkAnnotation(element: HTMLElement) {
     return new Promise((resolve) =>
@@ -49,6 +56,7 @@ const Marker = {
         done: resolve,
         attribute: {
           key: 'data-term-occurrence-iri',
+          // only resolve a very specific element, not all elements
           value: element.dataset.termOccurrenceIri,
         },
       })

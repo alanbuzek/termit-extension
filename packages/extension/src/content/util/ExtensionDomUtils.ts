@@ -1,6 +1,10 @@
 // import getCssSelector from 'css-selector-generator';
 import { finder } from '@medv/finder';
 import { getSingleSelector } from 'optimal-select';
+import Annotator from '../Annotator';
+import Sidebar from '../react-tree-container/SidebarContainer';
+
+const originalQuerySelectorAll = document.querySelectorAll.bind(document);
 
 const ExtensionDomUtils = {
   /**
@@ -104,6 +108,29 @@ const ExtensionDomUtils = {
     }
 
     return match[1];
+  },
+  exposeShadowDomInQuerySelectorAll(annotator: Annotator, sidebar: Sidebar) {
+    document.querySelectorAll = (str) => {
+      try {
+        const originalResult = originalQuerySelectorAll(str);
+        const contentPopupResult = annotator!
+          .getContentPoup()
+          .getShadowRoot()
+          .querySelectorAll(str);
+        const sidebarResult = sidebar!.getShadowRoot().querySelectorAll(str);
+        return [
+          ...originalResult,
+          ...contentPopupResult,
+          ...sidebarResult,
+        ] as any;
+      } catch (err) {
+        console.log('selector err');
+        return [];
+      }
+    };
+  },
+  resetQuerySelectorAll() {
+    document.querySelectorAll = originalQuerySelectorAll;
   },
 };
 

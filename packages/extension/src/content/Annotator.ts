@@ -37,6 +37,11 @@ const isSelectionAllowed = (range: Range, selection: Selection) => {
   );
 };
 
+/**
+ * Annotator manages is array of all Annotations on the page,
+ * they are divided to successful and unsuccesful annotations,
+ * it further calls Marker for actually highlihting the elements on the page
+ */
 export default class Annotator {
   private rootElement: any;
 

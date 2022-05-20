@@ -3,6 +3,9 @@ import ExtensionMessage from '../shared/ExtensionMessage';
 import Constants from '../termit-ui-common/util/Constants';
 import backgroundHelper from './backgroundHelper';
 
+/**
+ * Handle messages coming from other scripts.
+ */
 export default function handleMessages(message, sender, sendResponse) {
   console.log(
     '[Background] got handle message: ',

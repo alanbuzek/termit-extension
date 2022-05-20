@@ -31,6 +31,9 @@ const internals = {
   },
 };
 
+/**
+ * We need to manually preload and load stylesheets into our shadow dom element where React is mounted
+ */
 const StyleSheetLoader = {
   preloadContentStylesheets() {
     styleSheetsToLoad.forEach((stylesheetPath) =>

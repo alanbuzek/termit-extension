@@ -1,5 +1,3 @@
-// From hypothesis: https://github.com/hypothesis/client
-
 /**
  * Get the node name for use in generating an xpath expression.
  *

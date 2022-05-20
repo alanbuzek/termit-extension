@@ -1,6 +1,9 @@
 import Constants from '../../termit-ui-common/util/Constants';
 import BrowserApi from '../../shared/BrowserApi';
 
+/**
+ * Utility functions operating on Browser storage
+ */
 const StorageUtils = {
   clearWholeStorage() {
     return BrowserApi.storage.clear();

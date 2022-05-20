@@ -19,13 +19,11 @@ import TermOccurrenceFactory from './util/TermOccurrenceFactory';
 import PageOverlay from './util/PageOverlay';
 import ExtensionDomUtils from './util/ExtensionDomUtils';
 
-// global important classes
-let sidebar: Sidebar | null = null;
-let annotator: Annotator | null = null;
-let hasBeenPageInited = false;
-
 export type TermsMap = { [key: string]: Term };
 
+/*
+Content script-wide state;
+*/
 export type ContentState = {
   vocabulary: Vocabulary | null;
   annotations: Annotation[] | null;
@@ -50,13 +48,21 @@ export type ContentState = {
   } | null;
 };
 
-const contentState = {} as ContentState;
+// global important classes
+let sidebar: Sidebar | null = null;
+let annotator: Annotator | null = null;
+let hasBeenPageInited = false;
+
 /**
+ * global state of the extension
  * all important global content script calls should be done here
  */
+const contentState = {} as ContentState;
 
-const originalQuerySelectorAll = document.querySelectorAll.bind(document);
-
+/**
+ * InternalActions represent functions that modify global state and may call APIs,
+ * but can only be invoke within this contenxt, and are not exposed to elsewhere, unlike AnnotatorActions that are exposed
+ */
 const InternalActions = {
   async resetContentState() {
     contentState.annotations = null;
@@ -175,27 +181,10 @@ const InternalActions = {
     // save this in its original form, without annotations, if we want to run annotation multiple times
     contentState.originalPageHtml = `${document.body.outerHTML}`;
     // so that reactboostrap works fine (needs be able to query select elements withing shadow dom)
-    document.querySelectorAll = (str) => {
-      try {
-        const originalResult = originalQuerySelectorAll(str);
-        const contentPopupResult = annotator!
-          .getContentPoup()
-          .getShadowRoot()
-          .querySelectorAll(str);
-        const sidebarResult = sidebar!.getShadowRoot().querySelectorAll(str);
-        return [
-          ...originalResult,
-          ...contentPopupResult,
-          ...sidebarResult,
-        ] as any;
-      } catch (err) {
-        console.log('selector err');
-        return [];
-      }
-    };
+    ExtensionDomUtils.exposeShadowDomInQuerySelectorAll(annotator, sidebar!);
   },
   async deactivatePage() {
-    document.querySelectorAll = originalQuerySelectorAll;
+    ExtensionDomUtils.resetQuerySelectorAll();
     // reset page
     annotator?.destroy();
     annotator = null;
@@ -299,6 +288,10 @@ const InternalActions = {
   },
 };
 
+/**
+ * InternalActions represent functions that modify global state and may call APIs,
+ * and exposed to React components to call
+ */
 export const AnnotatorActions = {
   showPopup(annotation: Annotation) {
     annotator!.showPopup(annotation);
