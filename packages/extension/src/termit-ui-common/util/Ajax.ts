@@ -337,11 +337,9 @@ export class Ajax {
     const formData: object =
       config.getFormData() !== undefined ? config.getFormData()! : {};
     if (config.getContentType() === Constants.X_WWW_FORM_URLENCODED) {
-      // TODO: we probably don't need this (hasn't been tested)
       return this.fetchInstance.post(path, par, conf);
     }
     if (config.getContentType() === Constants.MULTIPART_FORM_DATA) {
-      // TODO: we probably don't need this (hasn't been tested)
       return this.fetchInstance.post(path, formData, conf);
     }
     const query: string = config.getParams() ? `?${par.toString()}` : '';

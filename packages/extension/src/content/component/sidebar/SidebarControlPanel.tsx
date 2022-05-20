@@ -7,7 +7,7 @@ import Vocabulary from '../../../termit-ui-common/model/Vocabulary';
 import Annotation from '../../Annotation';
 import VocabularyEditDropdown from '../shared/dropdown/VocabularyEditDropdown';
 import { useI18n } from '../../../termit-ui-common/component/hook/useI18n';
-import { ContentActions } from '../../ContentController';
+import { AnnotatorActions } from '../../AnnotatorController';
 import VocabularyUtils from '../../../termit-ui-common/util/VocabularyUtils';
 import AssetLink from '../../../termit-ui-common/component/misc/AssetLink';
 import PageOverlay from '../../util/PageOverlay';
@@ -98,7 +98,7 @@ const SidebarControlPanel = ({
             PageOverlay.on();
 
             if (isVocabPrompt) {
-              ContentActions.setupLoggedInUser(selectedVocabulary!);
+              AnnotatorActions.setupLoggedInUser(selectedVocabulary!);
             } else {
               handleAnnotatePage(selectedVocabulary!);
             }

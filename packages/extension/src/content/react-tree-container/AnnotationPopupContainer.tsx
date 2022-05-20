@@ -6,13 +6,11 @@ import AnnotationPopup, {
   PopupType,
 } from '../component/annotation-popup/AnnotationPopup';
 import Annotation from '../Annotation';
-import { ContentState } from '../ContentController';
+import { ContentState } from '../AnnotatorController';
 import en from '../../termit-ui-common/i18n/en';
 import cs from '../../termit-ui-common/i18n/cs';
 import StyleSheetLoader from '../util/StyleSheetLoader';
 import PageOverlay from '../util/PageOverlay';
-
-// TODO: this can be moved a different file
 
 /**
  * Stop bubbling up of several events.
@@ -123,10 +121,6 @@ export class AnnotationPopupContainer {
   }
 
   public hide() {
-    if (this.currentAnnotation && !this.currentAnnotation.termOccurrence.iri) {
-      // TODO:
-      // ContentActions.saveUnassignedOccurrence(this.currentAnnotation);
-    }
     this.isVisible = false;
     this.render();
     Object.assign(this.outerContainer.style, {

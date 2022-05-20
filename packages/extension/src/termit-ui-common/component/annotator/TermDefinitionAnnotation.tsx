@@ -5,11 +5,9 @@ import { GoPencil } from 'react-icons/go';
 import Term from '../../model/Term';
 import SimplePopupWithActions from './SimplePopupWithActions';
 import AnnotationTerms from './AnnotationTerms';
-// import TermDefinitionAnnotationView from "./TermDefinitionAnnotationView";
-// import IfUserAuthorized from "../authorization/IfUserAuthorized";
 import { useI18n } from '../hook/useI18n';
 import TermDefinitionAnnotationView from './TermDefinitionAnnotationView';
-import { ContentState } from '../../../content/ContentController';
+import { ContentState } from '../../../content/AnnotatorController';
 import { TrashIcon } from './TermOccurrenceAnnotation';
 
 interface TermDefinitionAnnotationProps {

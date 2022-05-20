@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { ContentActions } from '../../ContentController';
+import { AnnotatorActions } from '../../AnnotatorController';
 import { useI18n } from '../../../termit-ui-common/component/hook/useI18n';
 import Constants from '../../../termit-ui-common/util/Constants';
 import BrowserApi from '../../../shared/BrowserApi';
@@ -35,7 +35,7 @@ export default function LoginPromptPopup({
     } else {
       // default handler
       openNewTabLink(link);
-      ContentActions.handleInstanceSelected(instanceSelected);
+      AnnotatorActions.handleInstanceSelected(instanceSelected);
       setStep(2);
     }
   };
@@ -55,7 +55,7 @@ export default function LoginPromptPopup({
       } else {
         // default handler
         openNewTabLink(link);
-        ContentActions.handleInstanceSelected(currentInstance);
+        AnnotatorActions.handleInstanceSelected(currentInstance);
         setStep(2);
       }
       return;

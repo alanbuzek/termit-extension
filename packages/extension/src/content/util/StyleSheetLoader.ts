@@ -1,6 +1,6 @@
 const styleSheetsToLoad = [
   '/static/css/annotator.css',
-  '/static/css/styles.css', // TODO: rename this to tailwind
+  '/static/css/styles.css',
   '/static/css/bootstrap-termit.css',
 ];
 

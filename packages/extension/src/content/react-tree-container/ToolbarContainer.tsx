@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import Toolbar from '../component/sidebar/Toolbar';
-import { ContentState } from '../ContentController';
+import { ContentState } from '../AnnotatorController';
 import StyleSheetLoader from '../util/StyleSheetLoader';
 
 class ToolbarContainer {

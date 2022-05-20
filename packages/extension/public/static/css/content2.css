@@ -134,7 +134,6 @@
 :root {
   --zindex-tooltip: 107000;
   --tooltip-margin: 0;
-  /* TODO: adjust */
   --tooltip-font-size: 0.875rem;
   --tooltip-opacity: 0.9;
   --tooltip-arrow-width: 0.8rem;
@@ -263,7 +262,7 @@ termit-h.pending-term-definition.termit-h-hovered {
   /* background-color: rgb(126, 241, 32) !important; */
 }
 
-/* TODO: figure out why this is not being imported to /build */
+/* : figure out why this is not being imported to /build */
 #termit-overlay {
   position: fixed; /* Sit on top of the page content */
   display: none; /* Hidden by default */

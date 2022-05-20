@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { IntlProvider } from 'react-intl';
-import { ContentActions, ContentState } from '../../ContentController';
+import { AnnotatorActions, ContentState } from '../../AnnotatorController';
 import cs from '../../../termit-ui-common/i18n/cs';
 import en from '../../../termit-ui-common/i18n/en';
 import StyleSheetLoader from '../../util/StyleSheetLoader';
@@ -50,8 +50,8 @@ export default class SidebarContainer {
         <SidebarApp
           handleDeleteAnnotation={this.handleDeleteAnnotation}
           handleAnnotatePage={this.handleAnnotatePage}
-          handleDeletePage={ContentActions.removeWebsiteAnnotations}
-          handleDeleteSuggestions={ContentActions.removeSuggestedAnnotations}
+          handleDeletePage={AnnotatorActions.removeWebsiteAnnotations}
+          handleDeleteSuggestions={AnnotatorActions.removeSuggestedAnnotations}
           state={this.state}
         />
       </IntlProvider>,

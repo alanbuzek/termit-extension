@@ -1,1 +1,1 @@
-export * from './ContentController';
+export * from './AnnotatorController';

@@ -11,7 +11,7 @@ import Annotation, {
   AnnotationType,
 } from '../../Annotation';
 import PageOverlay from '../../util/PageOverlay';
-import { ContentState, ContentActions } from '../../ContentController';
+import { ContentState, AnnotatorActions } from '../../AnnotatorController';
 import Term from '../../../termit-ui-common/model/Term';
 import VocabularyUtils from '../../../termit-ui-common/util/VocabularyUtils';
 import { useI18n } from '../../../termit-ui-common/component/hook/useI18n';
@@ -90,11 +90,10 @@ function AnnotationPopup({
                 setDefinitionAnnotation(defAnnotation);
               });
             }}
-            // TODO: handle fallback when no vocabulary is selected
             vocabularyIri={vocabularyIri!}
             createTerm={(term: Term) =>
               // PageOverlay.off();
-              ContentActions.createTerm(
+              AnnotatorActions.createTerm(
                 term,
                 vocabularyIri!,
                 annotation,
@@ -112,7 +111,7 @@ function AnnotationPopup({
           <PurposeSelectionDialog
             onMarkOccurrence={async () => {
               const markedAnnotation =
-                await ContentActions.createUnknownOccurrenceFromRange(
+                await AnnotatorActions.createUnknownOccurrenceFromRange(
                   selectionRange,
                   AnnotationType.OCCURRENCE
                 );
@@ -126,7 +125,7 @@ function AnnotationPopup({
             }}
             onMarkDefinition={async () => {
               const markedAnnotation =
-                await ContentActions.createUnknownOccurrenceFromRange(
+                await AnnotatorActions.createUnknownOccurrenceFromRange(
                   selectionRange,
                   AnnotationType.DEFINITION
                 );
@@ -156,10 +155,10 @@ function AnnotationPopup({
             }
             onRemove={() => {
               closePopup();
-              return ContentActions.removeOccurrence(annotation);
+              return AnnotatorActions.removeOccurrence(annotation);
             }}
             onSelectTerm={(term: Term) =>
-              ContentActions.assignTermToOccurrence(
+              AnnotatorActions.assignTermToOccurrence(
                 term,
                 annotation,
                 AnnotationType.OCCURRENCE
@@ -184,10 +183,10 @@ function AnnotationPopup({
             }
             onRemove={() => {
               closePopup();
-              return ContentActions.removeOccurrence(annotation);
+              return AnnotatorActions.removeOccurrence(annotation);
             }}
             onSelectTerm={(term: Term) =>
-              ContentActions.assignTermToOccurrence(
+              AnnotatorActions.assignTermToOccurrence(
                 term,
                 annotation,
                 AnnotationType.DEFINITION

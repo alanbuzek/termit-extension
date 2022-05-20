@@ -27,7 +27,6 @@ export async function runPageAnnotationAnalysis(
   const payload: any = {
     content: pageHtml,
     vocabularyContexts: [],
-    // TODO: language
     language: 'cs',
     vocabularyRepository,
   };
@@ -92,7 +91,6 @@ function handleMessages(message, sender, sendResponse) {
   );
 
   switch (message.type) {
-    // TODO: why not just call it directly from content script?
     case ExtensionMessage.RunPageTextAnalysis: {
       runPageAnnotationAnalysis(
         message.payload.pageHtml,
@@ -124,7 +122,6 @@ async function handleExternalMessages(message, sender, sendResponse) {
     case ExtensionMessage.LoginEvent: {
       const { userData, authToken } = message.payload as LoginEventPayload;
 
-      // TODO: handle failure
       await BrowserApi.storage.set(Constants.STORAGE.USER, userData);
       await SecurityUtils.saveToken(authToken);
       console.log('storing: ', Constants.STORAGE.USER, userData);

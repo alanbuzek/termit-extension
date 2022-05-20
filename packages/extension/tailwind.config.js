@@ -25,9 +25,7 @@ module.exports = {
       },
       colors: {
         green: {
-          //   TODO: add termit colors
           500: '#29ab87',
-          //     400: '#29ab87',
         },
       },
     },

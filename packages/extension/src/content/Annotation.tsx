@@ -69,7 +69,6 @@ class Annotation {
   }
 
   public getTermCreatorState() {
-    // TODO: this check may later not work with existing terms
     if (this.termOccurrence.isSuggested()) {
       return AnnotationOriginClass.PROPOSED;
     }

@@ -75,7 +75,6 @@ const resetContentState = async () => {
     (await BrowserApi.storage.get(Constants.STORAGE.LOCALE)) ||
     Constants.DEFAULT_LANGUAGE;
 
-  // TODO: make sure to not delete this field on logout
   contentState.instance = await BrowserApi.storage.get(
     Constants.STORAGE.TERMIT_INSTANCE
   );
@@ -130,7 +129,7 @@ const internals = {
     internals.initSidebar();
 
     if (contentState.extensionActive) {
-      await ContentActions.annotateExistingWebsite();
+      await AnnotatorActions.annotateExistingWebsite();
     }
   },
   updateSidebar() {
@@ -140,7 +139,6 @@ const internals = {
     annotator = new Annotator(document.body, contentState);
     // save this in its original form, without annotations, if we want to run annotation multiple times
     contentState.originalPageHtml = `${document.body.outerHTML}`;
-    // TODO: put this into a helper file
     // so that reactboostrap works fine (needs be able to query select elements withing shadow dom)
     document.querySelectorAll = (str) => {
       try {
@@ -176,8 +174,8 @@ const internals = {
     sidebar = new Sidebar(
       document.body,
       contentState,
-      ContentActions.annotateNewWebsite,
-      ContentActions.removeOccurrence
+      AnnotatorActions.annotateNewWebsite,
+      AnnotatorActions.removeOccurrence
     );
   },
   parseQueryParamAnnotationToFocus() {
@@ -205,13 +203,13 @@ const internals = {
 
       // avoid any possible race condions
       setTimeout(() => {
-        ContentActions.annotateExistingWebsite();
+        AnnotatorActions.annotateExistingWebsite();
       }, 100);
     }
   },
 };
 
-export const ContentActions = {
+export const AnnotatorActions = {
   showPopup(annotation: Annotation) {
     annotator!.showPopup(annotation);
   },
@@ -332,7 +330,6 @@ export const ContentActions = {
     contentState.globalLoading = false;
     internals.updateSidebar();
 
-    // TODO: this should be removed?
     setTimeout(() => {
       sidebar!.open();
     }, 200);
@@ -372,7 +369,6 @@ export const ContentActions = {
         // delete previous definition annotation from the same term (can only have one)
         // from front-end only, back-end will automatically delete previous existing
         if (annotationIdx >= 0) {
-          // TODO: put into an internals helper function and remove
           contentState.annotations![annotationIdx].removeOccurrence();
           contentState.annotations?.splice(annotationIdx, 1);
         }
@@ -451,13 +447,13 @@ export const ContentActions = {
       iri: contentState!.vocabulary!.iri,
       types: contentState!.vocabulary!.types,
     };
-    await ContentActions.assignTermToOccurrence(
+    await AnnotatorActions.assignTermToOccurrence(
       term,
       annotation,
       AnnotationType.OCCURRENCE
     );
     if (definitionAnnotation) {
-      await ContentActions.assignTermToOccurrence(
+      await AnnotatorActions.assignTermToOccurrence(
         term,
         definitionAnnotation,
         AnnotationType.DEFINITION,
@@ -538,7 +534,7 @@ export const ContentActions = {
     );
 
     if (contentState.extensionActive) {
-      await ContentActions.annotateExistingWebsite();
+      await AnnotatorActions.annotateExistingWebsite();
     } else {
       await internals.deactivatePage();
     }
@@ -599,9 +595,8 @@ export const ContentActions = {
     }
     [contentState.vocabulary] = contentState.vocabularies;
 
-    await ContentActions.setupLoggedInUser(contentState.vocabulary);
+    await AnnotatorActions.setupLoggedInUser(contentState.vocabulary);
   },
-  // TODO: rename this function
   async setupLoggedInUser(vocabulary: Vocabulary) {
     contentState.globalLoading = true;
     internals.updateSidebar();
@@ -668,7 +663,6 @@ export const ContentActions = {
     // this makes sure to re-render sidebar on data update
     internals.updateSidebar();
   },
-  // TODO: unused for now
   async saveUnassignedOccurrence(annotation: Annotation) {
     if (internals.isAnonymous()) {
       return;
@@ -704,7 +698,7 @@ function handleMessages(message, sender, sendResponse) {
     case ExtensionMessage.LoginEvent: {
       console.log('waiting for Auth? : ', contentState.waitingForAuth);
       if (contentState.waitingForAuth) {
-        ContentActions.authenticateUser();
+        AnnotatorActions.authenticateUser();
       }
     }
   }

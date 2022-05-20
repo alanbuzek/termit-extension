@@ -6,7 +6,7 @@ import { IRI } from '../../util/VocabularyUtils';
 import AssetFactory from '../../util/AssetFactory';
 import { langString } from '../../model/MultilingualString';
 import { isTermValid, LabelExists } from '../term/TermValidationUtils';
-import { ContentState, ContentActions } from '../../../content/ContentController';
+import { ContentState, AnnotatorActions } from '../../../content/AnnotatorController';
 import Annotation from '../../../content/Annotation';
 import TermOccurrence from '../../model/TermOccurrence';
 import ExtensionDomUtils from '../../../content/util/ExtensionDomUtils';
@@ -104,7 +104,7 @@ export class CreateTermFromAnnotation extends React.Component<
 
   public onCancelWithCleanup(){
     if (this.props.definitionAnnotation){
-      ContentActions.removeOccurrence(this.props.definitionAnnotation);
+      AnnotatorActions.removeOccurrence(this.props.definitionAnnotation);
     }
 
     this.onCancel();

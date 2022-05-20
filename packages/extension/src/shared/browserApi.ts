@@ -1,19 +1,7 @@
-// const promisify = (functionCall) => (payload) =>
-//   new Promise((resolve, reject) => {
-//     functionCall(payload, (response) => {
-//       if (response?.error || chrome.runtime.lastError) {
-//         reject(response?.error || chrome.runtime.lastError);
-//         return;
-//       }
-//       resolve(response);
-//     });
-//   });
-
 // promisified and contained browser api
 const BrowserApi = {
   // promisified browser api calls
   sendMessage(payload) {
-    // TODO: abstract promisify
     return new Promise((resolve) => {
       chrome.runtime.sendMessage(payload, async (response) => {
         if (!response) {

@@ -6,8 +6,6 @@ import TermAssignment, {
 } from './TermAssignment';
 import Utils from '../util/Utils';
 import VocabularyUtils from '../util/VocabularyUtils';
-// TODO: move to there when possible
-// import { isAnnotationWithMinimumScore } from "../component/annotator/AnnotationDomHelper";
 export function isAnnotationWithMinimumScore(
   score: number,
   threshold: number

@@ -2,14 +2,13 @@ import { AnnotationPopupContainer } from './react-tree-container/AnnotationPopup
 import * as rangeUtil from './util/hypothesis/rangeUtils';
 import SelectionObserver from './util/hypothesis/SelectionObserver';
 import Annotation, { AnnotationType } from './Annotation';
-import { ContentActions, ContentState } from './ContentController';
+import { AnnotatorActions, ContentState } from './AnnotatorController';
 import TermOccurrence from '../termit-ui-common/model/TermOccurrence';
 import HtmlDomUtils from '../termit-ui-common/component/annotator/HtmlDomUtils';
 import Constants from '../termit-ui-common/util/Constants';
 import Marker from './util/Marker';
 import ContentMessage from './util/ContentMessage';
 
-// TODO: remove "hypothesis-adder" and all other hypothesis-adder elements
 const termitElements = ['hypothesis-adder', 'hypothesis-sidebar', 'termit-h'];
 
 const isDescendantOfTermItElements = (element?: Element) =>
@@ -142,7 +141,7 @@ export default class Annotator {
     }
 
     if (this.isSelectingDefinition) {
-      ContentActions.createUnknownOccurrenceFromRange(
+      AnnotatorActions.createUnknownOccurrenceFromRange(
         updatedRange,
         AnnotationType.DEFINITION
       ).then((annotation) => {
@@ -194,7 +193,7 @@ export default class Annotator {
       !currentAnnotation.termOccurrence.iri
     ) {
       console.log('saving previously ephemeral annotation');
-      ContentActions.saveUnassignedOccurrence(currentAnnotation);
+      AnnotatorActions.saveUnassignedOccurrence(currentAnnotation);
     }
   }
 
@@ -253,7 +252,7 @@ export default class Annotator {
     }
     this.annotations!.push(result);
     result.updateRelatedAnnotationElements();
-    ContentActions.showPopup(result);
+    AnnotatorActions.showPopup(result);
     return result;
   }
 

@@ -3,7 +3,7 @@ import Vocabulary from '../../termit-ui-common/model/Vocabulary';
 import { createShadowRoot } from './AnnotationPopupContainer';
 import SidebarContainer from '../component/sidebar/SidebarContainer';
 import ToolbarContainer from './ToolbarContainer';
-import { ContentState } from '../ContentController';
+import { ContentState } from '../AnnotatorController';
 import Annotation from '../Annotation';
 import ExtensionMessage from '../../shared/ExtensionMessage';
 

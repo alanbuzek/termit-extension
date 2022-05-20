@@ -1,14 +1,13 @@
 import Mark from 'mark.js';
-import { ContentActions } from '../ContentController';
+import { AnnotatorActions } from '../AnnotatorController';
 import TermOccurrence from '../../termit-ui-common/model/TermOccurrence';
 import Annotation from '../Annotation';
 import { nodeFromXPath } from './hypothesis/xpath';
 
-// TODO: adjust this
 const handleElementClick = (annotation) => (event) => {
   event.stopPropagation();
   event.preventDefault();
-  ContentActions.showPopup(annotation);
+  AnnotatorActions.showPopup(annotation);
 };
 
 const selectAnnotationContainer = (termOccurrence: TermOccurrence) => {

@@ -5,7 +5,7 @@ import TermOccurrence, {
 import JsonLdUtils from '../../termit-ui-common/util/JsonLdUtils';
 import VocabularyUtils from '../../termit-ui-common/util/VocabularyUtils';
 import { AnnotationType } from '../Annotation';
-import { TermsMap } from '../ContentController';
+import { TermsMap } from '../AnnotatorController';
 import ExtensionDomUtils from './ExtensionDomUtils';
 import DomUtils from './ExtensionDomUtils';
 // import { xpathFromNode } from './hypothesis/xpath';
@@ -82,14 +82,12 @@ const TermOccurrenceFactory = {
     websiteIri,
     extraTypes: string[] = []
   ) {
-    // TODO: use 'resource'
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { about, resource, startOffset, originalTerm, content } =
       textAnalysisRecord as any;
 
     return {
       id: about,
-      // TODO: remove this
       termIri: resource,
       suggestedLemma: content,
       originalText: originalTerm,

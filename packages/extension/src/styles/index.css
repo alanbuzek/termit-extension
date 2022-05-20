@@ -10,7 +10,6 @@ body,
   height: 100%;
 }
 
-/* TODO: do we need frame root? */
 .frame-root {
   overflow-y: hidden !important;
 }

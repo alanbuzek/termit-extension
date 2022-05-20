@@ -15,7 +15,7 @@ import {
   createTermValueRenderer,
 } from '../misc/treeselect/Renderers';
 import { HasI18n } from '../hoc/withI18n';
-import { TermsMap } from '../../../content/ContentController';
+import { TermsMap } from '../../../content/AnnotatorController';
 import Button from '../../../content/component/shared/Button';
 
 interface GlossaryTermsProps extends HasI18n {

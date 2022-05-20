@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { ContentActions, ContentState } from '../../ContentController';
+import { AnnotatorActions, ContentState } from '../../AnnotatorController';
 import { useI18n } from '../../../termit-ui-common/component/hook/useI18n';
 import Vocabulary from '../../../termit-ui-common/model/Vocabulary';
 import Annotation from '../../Annotation';
@@ -31,7 +31,7 @@ const SidebarApp = ({
 
   const handleExtensionActiveChange = async (newValue) => {
     setExtensionActive(newValue);
-    await ContentActions.toggleExtensionActive();
+    await AnnotatorActions.toggleExtensionActive();
   };
 
   const { i18n } = useI18n();

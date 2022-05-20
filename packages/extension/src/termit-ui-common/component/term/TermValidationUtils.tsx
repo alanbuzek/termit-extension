@@ -1,9 +1,9 @@
-// import Ajax, { params } from "../util/Ajax";
 import Constants from '../../util/Constants';
 import { IRI } from '../../util/VocabularyUtils';
 import { TermData } from '../../model/Term';
 import { getLocalized } from '../../model/MultilingualString';
 
+// NOTE: we need to determined if this is needed in the extension
 export function checkLabelUniqueness(
   vocabularyIri: IRI,
   prefLabel: string,
@@ -12,18 +12,6 @@ export function checkLabelUniqueness(
   onUnique: () => any = () => undefined
 ) {
   return true;
-  // const url =
-  //   Constants.API_PREFIX + "/vocabularies/" + vocabularyIri.fragment + "/terms";
-  // Ajax.head(
-  //   url,
-  //   params({
-  //     namespace: vocabularyIri.namespace,
-  //     prefLabel,
-  //     language,
-  //   })
-  // )
-  //   .then(onDuplicate)
-  //   .catch(onUnique);
 }
 
 function labelInEachLanguageValid<T extends TermData>(
@@ -31,7 +19,6 @@ function labelInEachLanguageValid<T extends TermData>(
   labelExists: LabelExists
 ): boolean {
   return true;
-  // TODO: remove mock
   const languages = Object.keys(data.label);
   for (const lang of languages) {
     if (!isLabelValid(data, lang) || labelExists[lang]) {

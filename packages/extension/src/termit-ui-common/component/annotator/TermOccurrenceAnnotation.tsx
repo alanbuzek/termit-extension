@@ -9,7 +9,7 @@ import TermOccurrenceAnnotationView from './TermOccurrenceAnnotationView';
 import { useI18n } from '../hook/useI18n';
 import SimplePopupWithActions from './SimplePopupWithActions';
 import Term from '../../model/Term';
-import { ContentState } from '../../../content/ContentController';
+import { ContentState } from '../../../content/AnnotatorController';
 
 interface TermOccurrenceAnnotationProps {
   term?: Term | null;

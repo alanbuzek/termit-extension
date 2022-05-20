@@ -8,7 +8,6 @@ import Vocabulary, {
   VocabularyData,
 } from '../../termit-ui-common/model/Vocabulary';
 import Ajax, { content, param, params } from '../../termit-ui-common/util/Ajax';
-import Annotation from '../../content/Annotation';
 import JsonLdUtils from '../../termit-ui-common/util/JsonLdUtils';
 import Utils from '../../termit-ui-common/util/Utils';
 import VocabularyUtils, {
@@ -23,7 +22,7 @@ import TermOccurrence, {
 } from '../../termit-ui-common/model/TermOccurrence';
 import BrowserApi from '../BrowserApi';
 import User, { UserData } from '../../termit-ui-common/model/User';
-import { TermsMap } from '../../content/ContentController';
+import { TermsMap } from '../../content/AnnotatorController';
 import Document, { DocumentData } from '../../termit-ui-common/model/Document';
 
 let termitApi: any = null;
@@ -186,25 +185,13 @@ export async function getWebsiteTermOccurrences(
  * @param iri Resource identifier
  */
 export function getLabel(iri: string) {
-  // TODO: consider implementing labelCache later if needed
-  // if (field === "label" && getState().labelCache[iri]) {
-  //   return Promise.resolve(getState().labelCache[iri]);
-  // }
 
   const mockDataLabel = 'Decree No';
 
   return Promise.resolve(mockDataLabel);
-  // return termitApi.get("/data/label", param("iri", iri));
-}
-
-export async function createDefinitionOccurrence(annotation: Annotation) {
-  // TODO
-  return Promise.resolve();
 }
 
 export function loadTypes() {
-  // TODO: add caching layer, at least within one browser session
-  // return
 
   return termitApi
     .get('/language/types')
@@ -336,8 +323,6 @@ export async function updateTermOccurrence(termOccurrence: TermOccurrence) {
       termNamespace: termIRI.namespace,
       termFragment: termIRI.fragment,
       occurrenceNamespace: termOccurrenceIRI.namespace,
-      // TODO:
-      // termFragment: term ? VocabularyUtils.create(term.iri).fragment : null,
     })
   );
 }
@@ -416,14 +401,11 @@ export function removeOccurrence(termOccurrence: TermOccurrence) {
 
   const paramsPayload: { namespace: string; termFragment?: string } = {
     namespace: termOccurrenceIRI.namespace!,
-    // TODO:
-    // termFragment: term ? VocabularyUtils.create(term.iri).fragment : null,
   };
 
   if (termIRI) {
     paramsPayload.termFragment = termIRI.fragment;
   }
-  // TODO
   return termitApi.delete(
     `/occurrence/${termOccurrenceIRI.fragment}`,
     params(paramsPayload)
@@ -486,7 +468,6 @@ export default {
   loadTypes,
   createTerm,
   removeOccurrence,
-  createDefinitionOccurrence,
   savePageAnnotationResults,
   createWebsiteInDocument,
   getExistingWebsite,

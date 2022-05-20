@@ -17,6 +17,7 @@ module.exports = {
     // for now, ignore directories containing included code from other repositories
     'src/termit-ui-common/*',
     'src/content/util/hypothesis/*',
+    'config/*',
   ],
   plugins: ['@typescript-eslint', 'react', 'prettier'],
   extends: [

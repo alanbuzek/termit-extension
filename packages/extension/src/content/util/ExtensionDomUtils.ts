@@ -76,7 +76,6 @@ const ExtensionDomUtils = {
     const commonAncestor = range.commonAncestorContainer;
 
     if (!commonAncestor) {
-      // TODO: handle better? this should probably never happen?
       throw new Error('No parent element to create annotation!');
     }
 

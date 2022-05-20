@@ -30,7 +30,6 @@ export const DropdownComponent = ({
           selected={option.value === value}
           key={option.name}
         >
-          {/* TODO */}
           {option.name.slice(0, 18)}
         </option>
       ))}
