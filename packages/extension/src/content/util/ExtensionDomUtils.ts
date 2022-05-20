@@ -97,6 +97,14 @@ const ExtensionDomUtils = {
       isAcrossMultipleElements,
     };
   },
+  parseQueryParamAnnotationToFocus() {
+    const match = document.URL.match(/termit-focus-annotation=(.+)$/);
+    if (!match) {
+      return;
+    }
+
+    return match[1];
+  },
 };
 
 export default ExtensionDomUtils;

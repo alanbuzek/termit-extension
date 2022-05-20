@@ -17,6 +17,7 @@ import StyleSheetLoader from './util/StyleSheetLoader';
 import StorageUtils from './util/StorageUtils';
 import TermOccurrenceFactory from './util/TermOccurrenceFactory';
 import PageOverlay from './util/PageOverlay';
+import ExtensionDomUtils from './util/ExtensionDomUtils';
 
 // global important classes
 let sidebar: Sidebar | null = null;
@@ -26,14 +27,11 @@ let hasBeenPageInited = false;
 export type TermsMap = { [key: string]: Term };
 
 export type ContentState = {
-  // api data
   vocabulary: Vocabulary | null;
   annotations: Annotation[] | null;
   failedAnnotations: Annotation[] | null;
   terms: TermsMap | null;
   website: Website | null;
-  // local state data
-  // hasBeenAnnotated: boolean;
   vocabularies: Vocabulary[];
   user: User | null;
   extensionActive: boolean;
@@ -52,47 +50,84 @@ export type ContentState = {
   } | null;
 };
 
-const resetContentState = async () => {
-  contentState.annotations = null;
-  contentState.failedAnnotations = null;
-  contentState.vocabulary = null;
-  contentState.terms = null;
-  contentState.website = null;
-  // NOTE: these two fields, we want to preserve even on content state reset
-  // contentState.vocabularies = [];
-  // contentState.user = null;
-  contentState.globalLoading = false;
-  contentState.isVocabPrompt = false;
-  contentState.originalPageHtml = '';
-  const extensionActive = await BrowserApi.storage.get(
-    Constants.STORAGE.EXTENSION_ACTIVE
-  );
-  contentState.extensionActive =
-    typeof extensionActive === 'boolean' ? extensionActive : true;
-  contentState.language =
-    (await BrowserApi.storage.get(Constants.STORAGE.LANGUAGE)) || 'cs'; // fallback to Czech as default language (not locale)
-  contentState.locale =
-    (await BrowserApi.storage.get(Constants.STORAGE.LOCALE)) ||
-    Constants.DEFAULT_LANGUAGE;
-
-  contentState.instance = await BrowserApi.storage.get(
-    Constants.STORAGE.TERMIT_INSTANCE
-  );
-
-  console.log('contentInstance: ', contentState.instance);
-  if (contentState.instance) {
-    await api.initApi(contentState.instance.termitServer);
-  }
-};
-
-let contentState = {} as ContentState;
+const contentState = {} as ContentState;
 /**
  * all important global content script calls should be done here
  */
 
 const originalQuerySelectorAll = document.querySelectorAll.bind(document);
 
-const internals = {
+const InternalActions = {
+  async resetContentState() {
+    contentState.annotations = null;
+    contentState.failedAnnotations = null;
+    contentState.vocabulary = null;
+    contentState.terms = null;
+    contentState.website = null;
+    // NOTE: these two fields, we want to preserve even on content state reset
+    // contentState.vocabularies = [];
+    // contentState.user = null;
+    contentState.globalLoading = false;
+    contentState.isVocabPrompt = false;
+    contentState.originalPageHtml = '';
+    const extensionActive = await BrowserApi.storage.get(
+      Constants.STORAGE.EXTENSION_ACTIVE
+    );
+    contentState.extensionActive =
+      typeof extensionActive === 'boolean' ? extensionActive : true;
+    contentState.language =
+      (await BrowserApi.storage.get(Constants.STORAGE.LANGUAGE)) || 'cs'; // fallback to Czech as default language (not locale)
+    contentState.locale =
+      (await BrowserApi.storage.get(Constants.STORAGE.LOCALE)) ||
+      Constants.DEFAULT_LANGUAGE;
+
+    contentState.instance = await BrowserApi.storage.get(
+      Constants.STORAGE.TERMIT_INSTANCE
+    );
+
+    if (contentState.instance) {
+      await api.initApi(contentState.instance.termitServer);
+    }
+  },
+  async authenticateUser() {
+    PageOverlay.on();
+
+    console.log('authenticateUser()');
+    annotator!.hidePopup();
+
+    contentState.waitingForAuth = false;
+    contentState.globalLoading = true;
+    InternalActions.updateSidebar();
+    contentState.user = await api.getUser();
+
+    if (!contentState.user) {
+      console.error('Inconsistent state! Login event but no user!');
+      return;
+    }
+
+    contentState.vocabularies = await api.loadVocabularies();
+
+    if (!contentState.vocabularies.length) {
+      await api.createDefaultVocabulary();
+      contentState.vocabularies = await api.loadVocabularies(SKIP_CACHE);
+      // create default vocabulary
+    }
+
+    if (!contentState.vocabularies.length) {
+      throw new Error('Failed to create default vocabulary!!');
+    }
+
+    if (contentState.vocabularies.length > 1) {
+      contentState.globalLoading = false;
+      contentState.isVocabPrompt = true;
+      sidebar?.open();
+      InternalActions.updateSidebar();
+      return;
+    }
+    [contentState.vocabulary] = contentState.vocabularies;
+
+    await AnnotatorActions.setupLoggedInUser(contentState.vocabulary);
+  },
   isAnonymous() {
     return !contentState.user;
   },
@@ -109,27 +144,27 @@ const internals = {
       return;
     }
 
-    await resetContentState();
+    await InternalActions.resetContentState();
     contentState.user = await api.getUser();
     StyleSheetLoader.preloadContentStylesheets();
 
     if (contentState.user && !contentState.instance) {
       // data inconcistency -> cleanup and init page
       await StorageUtils.clearStorageOnLogout();
-      internals.initPage();
+      InternalActions.initPage();
       return;
     }
 
     if (!contentState.user) {
-      internals.initSidebar();
+      InternalActions.initSidebar();
       return;
     }
     contentState.vocabularies = await api.loadVocabularies();
 
-    internals.initSidebar();
+    InternalActions.initSidebar();
 
     if (contentState.extensionActive) {
-      await AnnotatorActions.annotateExistingWebsite();
+      await InternalActions.annotateExistingWebsite();
     }
   },
   updateSidebar() {
@@ -164,11 +199,11 @@ const internals = {
     // reset page
     annotator?.destroy();
     annotator = null;
-    await resetContentState();
+    await InternalActions.resetContentState();
 
     PageOverlay.off();
     contentState.globalLoading = false;
-    internals.updateSidebar();
+    InternalActions.updateSidebar();
   },
   async initSidebar() {
     sidebar = new Sidebar(
@@ -178,14 +213,7 @@ const internals = {
       AnnotatorActions.removeOccurrence
     );
   },
-  parseQueryParamAnnotationToFocus() {
-    const match = document.URL.match(/termit-focus-annotation=(.+)$/);
-    if (!match) {
-      return;
-    }
 
-    return match[1];
-  },
   handleLocationChange() {
     if (!contentState.pageUrl) {
       // location changed before we page inited
@@ -197,15 +225,77 @@ const internals = {
       // new url detected -> deactivate last page and try annotating again
       contentState.pageUrl = DomUtils.getPageUrl();
 
-      internals.deactivatePage();
+      InternalActions.deactivatePage();
       contentState.globalLoading = true;
-      internals.updateSidebar();
+      InternalActions.updateSidebar();
 
       // avoid any possible race condions
       setTimeout(() => {
-        AnnotatorActions.annotateExistingWebsite();
+        InternalActions.annotateExistingWebsite();
       }, 100);
     }
+  },
+  async annotateExistingWebsite() {
+    if (InternalActions.isAnonymous()) {
+      return;
+    }
+
+    contentState.globalLoading = true;
+    InternalActions.updateSidebar();
+
+    const foundExistingWebsite = await api.getExistingWebsite(
+      contentState.pageUrl,
+      contentState.vocabularies
+    );
+
+    if (!foundExistingWebsite) {
+      contentState.globalLoading = false;
+      InternalActions.updateSidebar();
+      // website hasn't been annotated yet, wait for explicit user action
+      return;
+    }
+
+    // refresh vocabularies cache for later
+    api.loadVocabularies(SKIP_CACHE);
+
+    const { website, vocabulary } = foundExistingWebsite;
+
+    contentState.terms = await api.loadAllTerms(
+      VocabularyUtils.create(vocabulary.iri)
+    );
+
+    const termOccurrences = await api.getWebsiteTermOccurrences(
+      website,
+      contentState.terms!
+    );
+    InternalActions.activatePage();
+
+    await annotator!.annotatePage(termOccurrences);
+    contentState.annotations = annotator!.getAnnotations();
+    contentState.failedAnnotations = annotator!.getFailedAnnotations();
+    contentState.vocabulary = vocabulary;
+    contentState.website = website;
+
+    const occurrenceToFocusIri =
+      ExtensionDomUtils.parseQueryParamAnnotationToFocus();
+
+    if (occurrenceToFocusIri) {
+      const foundAnnotation = contentState.annotations.find(
+        (annotation) => annotation.termOccurrence.iri === occurrenceToFocusIri
+      );
+      if (!foundAnnotation) {
+        console.warn('Focused annotation not found: ', foundAnnotation);
+      } else {
+        foundAnnotation.focusAnnotation(AnnotationFocusTime.LONG);
+      }
+    }
+
+    contentState.globalLoading = false;
+    InternalActions.updateSidebar();
+
+    setTimeout(() => {
+      sidebar!.open();
+    }, 200);
   },
 };
 
@@ -215,8 +305,8 @@ export const AnnotatorActions = {
   },
   async annotateNewWebsite(vocabulary?: Vocabulary) {
     contentState.globalLoading = true;
-    internals.updateSidebar();
-    internals.activatePage();
+    InternalActions.updateSidebar();
+    InternalActions.activatePage();
 
     const textAnalysisResult = await backgroundApi.runPageTextAnalysis(
       // maybe cache this outerHTML as a string?
@@ -224,7 +314,7 @@ export const AnnotatorActions = {
       vocabulary?.iri
     );
 
-    if (!internals.isAnonymous()) {
+    if (!InternalActions.isAnonymous()) {
       // refresh vocabularies cache for later
       api.loadVocabularies(SKIP_CACHE);
 
@@ -256,7 +346,7 @@ export const AnnotatorActions = {
     contentState.annotations = annotator!.getAnnotations();
     contentState.failedAnnotations = annotator!.getFailedAnnotations();
 
-    if (!internals.isAnonymous()) {
+    if (!InternalActions.isAnonymous()) {
       await api.savePageAnnotationResults(
         annotator!.getFoundTermOccurrences(),
         contentState.website!,
@@ -267,80 +357,20 @@ export const AnnotatorActions = {
     PageOverlay.off();
     contentState.globalLoading = false;
     // this makes sure to re-render sidebar on data update
-    internals.updateSidebar();
+    InternalActions.updateSidebar();
 
     setTimeout(() => {
-      internals.updateSidebar();
+      InternalActions.updateSidebar();
     }, 200);
   },
-  async annotateExistingWebsite() {
-    if (internals.isAnonymous()) {
-      return;
-    }
 
-    contentState.globalLoading = true;
-    internals.updateSidebar();
-
-    const foundExistingWebsite = await api.getExistingWebsite(
-      contentState.pageUrl,
-      contentState.vocabularies
-    );
-
-    if (!foundExistingWebsite) {
-      contentState.globalLoading = false;
-      internals.updateSidebar();
-      // website hasn't been annotated yet, wait for explicit user action
-      return;
-    }
-
-    // refresh vocabularies cache for later
-    api.loadVocabularies(SKIP_CACHE);
-
-    const { website, vocabulary } = foundExistingWebsite;
-
-    contentState.terms = await api.loadAllTerms(
-      VocabularyUtils.create(vocabulary.iri)
-    );
-
-    const termOccurrences = await api.getWebsiteTermOccurrences(
-      website,
-      contentState.terms!
-    );
-    internals.activatePage();
-
-    await annotator!.annotatePage(termOccurrences);
-    contentState.annotations = annotator!.getAnnotations();
-    contentState.failedAnnotations = annotator!.getFailedAnnotations();
-    contentState.vocabulary = vocabulary;
-    contentState.website = website;
-
-    const occurrenceToFocusIri = internals.parseQueryParamAnnotationToFocus();
-
-    if (occurrenceToFocusIri) {
-      const foundAnnotation = contentState.annotations.find(
-        (annotation) => annotation.termOccurrence.iri === occurrenceToFocusIri
-      );
-      if (!foundAnnotation) {
-        console.warn('Focused annotation not found: ', foundAnnotation);
-      } else {
-        foundAnnotation.focusAnnotation(AnnotationFocusTime.LONG);
-      }
-    }
-
-    contentState.globalLoading = false;
-    internals.updateSidebar();
-
-    setTimeout(() => {
-      sidebar!.open();
-    }, 200);
-  },
   async assignTermToOccurrence(
     term: Term,
     annotation: Annotation,
     annotationType: string,
     isDuringTermCreation = false
   ) {
-    if (internals.isAnonymous()) {
+    if (InternalActions.isAnonymous()) {
       annotator!.hidePopup();
 
       return;
@@ -414,7 +444,7 @@ export const AnnotatorActions = {
       );
     }
 
-    internals.updateSidebar();
+    InternalActions.updateSidebar();
   },
   async createUnknownOccurrenceFromRange(
     selectionRange: Range,
@@ -431,7 +461,7 @@ export const AnnotatorActions = {
       newTermOccurrence
     );
 
-    internals.updateSidebar();
+    InternalActions.updateSidebar();
     return newAnnotation;
   },
   async createTerm(
@@ -461,11 +491,11 @@ export const AnnotatorActions = {
       );
     }
 
-    internals.updateSidebar();
+    InternalActions.updateSidebar();
   },
   async removeOccurrence(annotation: Annotation) {
     await annotation.removeOccurrence();
-    if (annotation.termOccurrence.iri && !internals.isAnonymous()) {
+    if (annotation.termOccurrence.iri && !InternalActions.isAnonymous()) {
       if (annotation.isDefinition() && annotation.term) {
         await api.removeTermDefinitionSource(
           annotation.termOccurrence,
@@ -482,17 +512,17 @@ export const AnnotatorActions = {
     const annotationIdx = annotationsArray!.indexOf(annotation);
     annotationsArray?.splice(annotationIdx, 1);
 
-    internals.updateSidebar();
+    InternalActions.updateSidebar();
   },
   async removeWebsiteAnnotations() {
-    if (internals.isAnonymous()) {
-      internals.deactivatePage();
+    if (InternalActions.isAnonymous()) {
+      InternalActions.deactivatePage();
       return;
     }
     PageOverlay.on();
 
     contentState.globalLoading = true;
-    internals.updateSidebar();
+    InternalActions.updateSidebar();
 
     await api.removeWebsiteFromDocument(
       contentState.vocabulary!.document!,
@@ -505,15 +535,15 @@ export const AnnotatorActions = {
     // update vocabulary cache
     await BrowserApi.storage.set('vocabularies', contentState.vocabularies);
 
-    internals.deactivatePage();
+    InternalActions.deactivatePage();
   },
   async removeSuggestedAnnotations() {
     contentState.globalLoading = true;
-    internals.updateSidebar();
+    InternalActions.updateSidebar();
 
     annotator!.removeSuggestedOccurrences();
 
-    if (!internals.isAnonymous()) {
+    if (!InternalActions.isAnonymous()) {
       await api.removeSuggestedOccurrences(
         contentState.vocabulary!.document!,
         contentState.website!
@@ -521,7 +551,7 @@ export const AnnotatorActions = {
     }
 
     contentState.globalLoading = false;
-    internals.updateSidebar();
+    InternalActions.updateSidebar();
   },
   async toggleExtensionActive() {
     // if this is ever called, we assume having a logged-in user
@@ -534,16 +564,15 @@ export const AnnotatorActions = {
     );
 
     if (contentState.extensionActive) {
-      await AnnotatorActions.annotateExistingWebsite();
+      await InternalActions.annotateExistingWebsite();
     } else {
-      await internals.deactivatePage();
+      await InternalActions.deactivatePage();
     }
   },
   async handleInstanceSelected(currentInstance) {
     if (contentState.user) {
       // cleanup
       await StorageUtils.clearWholeStorage();
-      // internals.deactivatePage();
       return;
     }
 
@@ -554,52 +583,13 @@ export const AnnotatorActions = {
     contentState.instance = currentInstance;
     await api.initApi(contentState.instance!.termitServer);
     await backgroundApi.setWaitingForAuth();
-    // annotator?.hidePopup();
-    internals.updateSidebar();
+    InternalActions.updateSidebar();
     contentState.waitingForAuth = true;
   },
-  async authenticateUser() {
-    PageOverlay.on();
 
-    console.log('authenticateUser()');
-    annotator!.hidePopup();
-
-    contentState.waitingForAuth = false;
-    contentState.globalLoading = true;
-    internals.updateSidebar();
-    contentState.user = await api.getUser();
-
-    if (!contentState.user) {
-      console.error('Inconsistent state! Login event but no user!');
-      return;
-    }
-
-    contentState.vocabularies = await api.loadVocabularies();
-
-    if (!contentState.vocabularies.length) {
-      await api.createDefaultVocabulary();
-      contentState.vocabularies = await api.loadVocabularies(SKIP_CACHE);
-      // create default vocabulary
-    }
-
-    if (!contentState.vocabularies.length) {
-      throw new Error('Failed to create default vocabulary!!');
-    }
-
-    if (contentState.vocabularies.length > 1) {
-      contentState.globalLoading = false;
-      contentState.isVocabPrompt = true;
-      sidebar?.open();
-      internals.updateSidebar();
-      return;
-    }
-    [contentState.vocabulary] = contentState.vocabularies;
-
-    await AnnotatorActions.setupLoggedInUser(contentState.vocabulary);
-  },
   async setupLoggedInUser(vocabulary: Vocabulary) {
     contentState.globalLoading = true;
-    internals.updateSidebar();
+    InternalActions.updateSidebar();
     contentState.vocabulary = vocabulary;
 
     const foundExistingWebsite = await api.getExistingWebsite(
@@ -608,12 +598,9 @@ export const AnnotatorActions = {
     );
 
     if (foundExistingWebsite) {
-      // throw new Error(
-      //   "Attempting to reannotate an already annotated page. Please refresh the page."
-      // );
+      // turns out the user already has this page annotated -> just reload and have it fallback to existing page
       // eslint-disable-next-line no-restricted-globals
       location.reload();
-      // turns out the user already has this page annotated -> just reload and have it fallback to existing page
       return;
     }
 
@@ -661,10 +648,10 @@ export const AnnotatorActions = {
     contentState.globalLoading = false;
     contentState.isVocabPrompt = false;
     // this makes sure to re-render sidebar on data update
-    internals.updateSidebar();
+    InternalActions.updateSidebar();
   },
   async saveUnassignedOccurrence(annotation: Annotation) {
-    if (internals.isAnonymous()) {
+    if (InternalActions.isAnonymous()) {
       return;
     }
     await api.saveTermOccurrences(
@@ -673,32 +660,27 @@ export const AnnotatorActions = {
       contentState.vocabulary!.iri
     );
 
-    internals.updateSidebar();
+    InternalActions.updateSidebar();
   },
 };
 
-window.addEventListener('load', internals.initPage);
+window.addEventListener('load', InternalActions.initPage);
 // don't wait too long for page load event, which might not fire until loading all unimportant parts (e.g., ads, iframes etc...) -> force it after 5s
-setTimeout(internals.initPage, 5000);
+setTimeout(InternalActions.initPage, 5000);
 
 const listeners = ['click', 'popstate', 'locationchange'];
-
 listeners.forEach((listener) =>
-  window.addEventListener(listener, internals.handleLocationChange)
+  window.addEventListener(listener, InternalActions.handleLocationChange)
 );
 
-console.log('chrome.runtime: ', chrome.runtime);
 chrome.runtime.onMessage.addListener(handleMessages);
-console.log('added listener: ', chrome.runtime.onMessage);
 
 function handleMessages(message, sender, sendResponse) {
-  console.log('got message: ', message);
   // eslint-disable-next-line default-case
   switch (message.type) {
     case ExtensionMessage.LoginEvent: {
-      console.log('waiting for Auth? : ', contentState.waitingForAuth);
       if (contentState.waitingForAuth) {
-        AnnotatorActions.authenticateUser();
+        InternalActions.authenticateUser();
       }
     }
   }
