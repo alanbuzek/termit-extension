@@ -68,6 +68,7 @@ module.exports = {
     'jsx-a11y/no-redundant-roles': 'off',
     'import/export': 'off',
     'no-console': 'off',
+    'react/jsx-no-bind': 'off',
   },
 
   settings: {
